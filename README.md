@@ -28,7 +28,7 @@ By default it's shipped with DatabaseConfiguratorDatabase and PDODriver.
 But you can wrote your own configurator and driver for using xml files intead of database.  
 Database is a facade wich made easier to wrote code by abstracting driver used.
 
-## DatabaseDriverPdo methods
+## PDODriver methods
 * select  
 * read  
 * insert  
