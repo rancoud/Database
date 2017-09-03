@@ -4,8 +4,13 @@
 
 Request Database with PDO without write it.  
 
-## How to use it?
+## Installation
+```php
+composer require rancoud/database
 ```
+
+## How to use it?
+```php
 $params = ['engine' => 'mysql',
         'host'          => 'localhost',
         'user'          => 'root',
