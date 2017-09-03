@@ -1,12 +1,17 @@
 # Database Package
 
-[![Build Status](https://travis-ci.org/Rancoud/Database.svg?branch=master)](https://travis-ci.org/Rancoud/Database) [![Coverage Status](https://coveralls.io/repos/github/Rancoud/Database/badge.svg?branch=master)](https://coveralls.io/github/Rancoud/Database?branch=master)
+[![Build Status](https://travis-ci.org/rancoud/Database.svg?branch=master)](https://travis-ci.org/rancoud/Database) [![Coverage Status](https://coveralls.io/repos/github/rancoud/Database/badge.svg?branch=master)](https://coveralls.io/github/rancoud/Database?branch=master)
 
 Request Database with PDO without write it.  
 
 ## How to use it?
 ```
-$databaseConf = new DatabaseConfigurator('mysql', 'localhost', 'user', 'password', 'database');  
+$params = ['engine' => 'mysql',
+        'host'          => 'localhost',
+        'user'          => 'root',
+        'password'      => '',
+        'database'      => 'test_database'];
+$databaseConf = new DatabaseConfigurator($params);  
 $database = new Database($databaseConf, new PDODriver());  
 ```
 
