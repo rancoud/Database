@@ -77,7 +77,7 @@ class Configurator
                 throw new Exception('"' . $prop . '" settings is not defined or not a string', 10);
             }
 
-            $this->{'set'.ucfirst($prop)}($settings[$prop]);
+            $this->{'set' . ucfirst($prop)}($settings[$prop]);
         }
     }
 
@@ -97,8 +97,7 @@ class Configurator
     public function setEngine(string $engine)
     {
         $enginesAvailables = PDO::getAvailableDrivers();
-        if(!in_array($engine, $enginesAvailables))
-        {
+        if (!in_array($engine, $enginesAvailables, true)) {
             throw new Exception('The engine "' . $engine . '" is not available for PDO', 20);
         }
 
@@ -193,22 +192,18 @@ class Configurator
     {
         $parameters = $this->getParameters();
 
-        if($this->getEngine() === 'mysql')
-        {
+        if ($this->getEngine() === 'mysql') {
             $parameters[PDO::MYSQL_ATTR_INIT_COMMAND] = 'SET NAMES ' . $this->getCharset();
         }
 
-        if($this->getReportError() === 'silent')
-        {
+        if ($this->getReportError() === 'silent') {
             $parameters[PDO::ATTR_ERRMODE] = PDO::ERRMODE_SILENT;
-        }
-        else if($this->getReportError() === 'exception')
-        {
+        } elseif ($this->getReportError() === 'exception') {
             $parameters[PDO::ATTR_ERRMODE] = PDO::ERRMODE_EXCEPTION;
         }
 
         $parameters[PDO::ATTR_PERSISTENT] = $this->permanentConnection;
-        
+
         return $parameters;
     }
 
@@ -245,8 +240,7 @@ class Configurator
      */
     public function setReportError(string $reportError)
     {
-        if(!in_array($reportError, ['silent', 'exception']))
-        {
+        if (!in_array($reportError, ['silent', 'exception'], true)) {
             throw new Exception('The report error "' . $reportError . '" is incorrect. (silent , exception)', 30);
         }
 
