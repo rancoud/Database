@@ -3,16 +3,15 @@
 namespace Rancoud\Database\Test;
 
 use PHPUnit\Framework\TestCase;
+use Rancoud\Database\Configurator;
 use Rancoud\Database\Database;
-use Rancoud\Database\DatabaseConfigurator;
-use Rancoud\Database\Driver;
 
 /**
  * Class DatabaseTest.
  */
 class DatabaseTest extends TestCase
 {
-    /** @var Driver */
+    /** @var Database */
     protected $db;
 
     public function setUp()
@@ -22,8 +21,8 @@ class DatabaseTest extends TestCase
             'user'          => 'root',
             'password'      => '',
             'database'      => 'test_database'];
-        $rQueryConf = new DatabaseConfigurator($params);
-        $this->db = new Database($rQueryConf, new Driver());
+        $databaseConf = new Configurator($params);
+        $this->db = new Database($databaseConf);
     }
 
     /*
@@ -110,12 +109,13 @@ class DatabaseTest extends TestCase
             $var = $this->db->selectVar('SELECT name FROM test WHERE id = :id', ['id' => 3]);
             $this->assertSame('B', $var);
         }
-    */
-    public function testGetError()
-    {
-        $var = $this->db->selectVar('SELECT namebbb FROM test WHERE id = :id', ['id' => 3]);
-        if ($this->db->hasError()) {
-            $this->assertSame('B', $var);
+    
+        public function testGetError()
+        {
+            $var = $this->db->selectVar('SELECT namebbb FROM test WHERE id = :id', ['id' => 3]);
+            if ($this->db->hasError()) {
+                $this->assertSame('B', $var);
+            }
         }
-    }
+    */
 }

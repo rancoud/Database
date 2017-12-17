@@ -4,7 +4,6 @@ namespace Rancoud\Database;
 
 use Exception;
 use PDO;
-use PDOException;
 use PDOStatement;
 
 /**
@@ -50,19 +49,18 @@ class Database
     /**
      * @param Configurator|null $configurator
      *
-     * @return Database
      * @throws Exception
+     *
+     * @return Database
      */
     public static function getInstance(Configurator $configurator = null)
     {
         if (self::$instance === null) {
-            if($configurator === null)
-            {
+            if ($configurator === null) {
                 throw new Exception('Configurator Missing', 10);
             }
             self::$instance = new self($configurator);
-        }
-        else if($configurator !== null) {
+        } elseif ($configurator !== null) {
             throw new Exception('Configurator Already Setup', 11);
         }
 
@@ -82,26 +80,21 @@ class Database
         try {
             $startTime = microtime(true);
 
-            if($this->configurator->getEngine() !== 'sqlite')
-            {
+            if ($this->configurator->getEngine() !== 'sqlite') {
                 $this->pdo = new PDO($dsn, $user, $password, $parameters);
-            }
-            else
-            {
+            } else {
                 $this->pdo = new PDO($dsn, null, null, $parameters);
             }
 
             $endTime = microtime(true);
 
-            if($this->configurator->hasSaveQueries())
-            {
+            if ($this->configurator->hasSaveQueries()) {
                 $this->savedQueries[] = ['Connection' => $this->getTime($startTime, $endTime)];
             }
         } catch (Exception $e) {
             $this->addErrorConnection($e);
 
-            if($this->configurator->hasThrowException())
-            {
+            if ($this->configurator->hasThrowException()) {
                 throw new Exception('Error Connecting Database', 20);
             }
         }
@@ -118,8 +111,7 @@ class Database
         $charset = $this->configurator->getCharset();
 
         $dsn = $engine . ':host=' . $host . ';dbname=' . $database . ';charset=' . $charset;
-        if($engine === 'sqlite')
-        {
+        if ($engine === 'sqlite') {
             $dsn = 'sqlite:' . $database . ';charset=' . $charset;
         }
 
@@ -127,22 +119,31 @@ class Database
     }
 
     /**
-     * @param       $sql
-     * @param array $parameters
+     * @param string $sql
+     * @param array  $parameters
      *
      * @throws Exception
      *
      * @return PDOStatement
      */
-    private function prepareBind($sql, $parameters = [])
+    private function prepareBind(string $sql, array $parameters = [])
     {
         if ($this->pdo === null) {
             $this->connnect();
         }
 
-        $statement = $this->pdo->prepare($sql);
-        if ($statement === false) {
-            throw new Exception('Error Prepare Statement', 30);
+        $statement = null;
+
+        try {
+            $statement = $this->pdo->prepare($sql);
+            if ($statement === false) {
+                throw new Exception('Error Prepare Statement', 30);
+            }
+        } catch (Exception $e) {
+            $this->addErrorPrepare($sql, $parameters);
+            if ($this->configurator->hasThrowException()) {
+                throw new Exception('Error Execute Select Query', 40);
+            }
         }
 
         foreach ($parameters as $key => $value) {
@@ -152,6 +153,7 @@ class Database
             }
 
             if ($param !== false) {
+                // TODO : catch failure
                 $statement->bindValue(":$key", $value, $param);
             }
         }
@@ -160,7 +162,7 @@ class Database
     }
 
     /**
-     * @param $value
+     * @param mixed $value
      *
      * @return bool|int
      */
@@ -208,11 +210,25 @@ class Database
     }
 
     /**
-     * @param PDOStatement $statement
-     * @param array         $parameters
-     * @param               $time
+     * @param string $sql
+     * @param array  $parameters
      */
-    private function saveQueries(PDOStatement $statement, $parameters, $time)
+    private function addErrorPrepare(string $sql, array $parameters)
+    {
+        $this->errors[] = [
+            'query'       => $sql,
+            'query_error' => null,
+            'pdo_error'   => $this->pdo->errorInfo(),
+            'dump_params' => $parameters
+        ];
+    }
+
+    /**
+     * @param PDOStatement $statement
+     * @param array        $parameters
+     * @param float        $time
+     */
+    private function addQuery(PDOStatement $statement, array $parameters, float $time)
     {
         if ($this->configurator->hasSaveQueries()) {
             $this->savedQueries[] = [
@@ -239,14 +255,14 @@ class Database
     }
 
     /**
-     * @param       $sql
-     * @param array $parameters
+     * @param string $sql
+     * @param array  $parameters
      *
      * @throws Exception
      *
      * @return PDOStatement
      */
-    public function select($sql, $parameters = [])
+    public function select(string $sql, array $parameters = [])
     {
         $statement = $this->prepareBind($sql, $parameters);
 
@@ -255,16 +271,18 @@ class Database
         try {
             $results = $statement->execute();
             if ($results === false) {
-                $this->addError($statement);
-                //throw new Exception('Error Execute Select Query', 30);
+                throw new Exception('Error Execute Select Query', 40);
             }
         } catch (Exception $e) {
             $this->addError($statement);
+            if ($this->configurator->hasThrowException()) {
+                throw new Exception('Error Execute Select Query', 40);
+            }
         }
 
         $endTime = microtime(true);
 
-        $this->saveQueries($statement, $parameters, $this->getTime($startTime, $endTime));
+        $this->addQuery($statement, $parameters, $this->getTime($startTime, $endTime));
 
         return $statement;
     }
@@ -275,7 +293,7 @@ class Database
      *
      * @return mixed
      */
-    public function read($statement, $fetchType = null)
+    private function read(PDOStatement $statement, $fetchType = null)
     {
         if ($fetchType === null) {
             $fetchType = PDO::FETCH_ASSOC;
@@ -286,11 +304,11 @@ class Database
 
     /**
      * @param PDOStatement $statement
-     * @param null          $fetchType
+     * @param null         $fetchType
      *
      * @return array
      */
-    public function readAll(PDOStatement $statement, $fetchType = null)
+    private function readAll(PDOStatement $statement, $fetchType = null)
     {
         if ($fetchType === null) {
             $fetchType = PDO::FETCH_ASSOC;
@@ -300,15 +318,15 @@ class Database
     }
 
     /**
-     * @param       $sql
-     * @param array $parameters
-     * @param bool  $getLastInsertId
+     * @param string $sql
+     * @param array  $parameters
+     * @param bool   $getLastInsertId
      *
      * @throws Exception
      *
      * @return int|null
      */
-    public function insert($sql, $parameters = [], $getLastInsertId = false)
+    public function insert(string $sql, array $parameters = [], bool $getLastInsertId = false)
     {
         $statement = $this->prepareBind($sql, $parameters);
 
@@ -317,12 +335,12 @@ class Database
         $results = $statement->execute();
         if ($results === false) {
             $this->addError($statement);
-            throw new Exception('Error Execute Insert Query', 40);
+            throw new Exception('Error Execute Insert Query', 50);
         }
 
         $endTime = microtime(true);
 
-        $this->saveQueries($statement, $parameters, $this->getTime($startTime, $endTime));
+        $this->addQuery($statement, $parameters, $this->getTime($startTime, $endTime));
         if ($getLastInsertId === true) {
             return (int) $this->pdo->lastInsertId();
         }
@@ -331,15 +349,15 @@ class Database
     }
 
     /**
-     * @param       $sql
-     * @param array $parameters
-     * @param bool  $getCountRowAffected
+     * @param string $sql
+     * @param array  $parameters
+     * @param bool   $getCountRowAffected
      *
      * @throws Exception
      *
      * @return int|null
      */
-    public function update($sql, $parameters = [], $getCountRowAffected = false)
+    public function update(string $sql, array $parameters = [], bool $getCountRowAffected = false)
     {
         $statement = $this->prepareBind($sql, $parameters);
 
@@ -348,12 +366,12 @@ class Database
         $results = $statement->execute();
         if ($results === false) {
             $this->addError($statement);
-            throw new Exception('Error Execute Update Query', 50);
+            throw new Exception('Error Execute Update Query', 60);
         }
 
         $endTime = microtime(true);
 
-        $this->saveQueries($statement, $parameters, $this->getTime($startTime, $endTime));
+        $this->addQuery($statement, $parameters, $this->getTime($startTime, $endTime));
         if ($getCountRowAffected) {
             return (int) $statement->rowCount();
         }
@@ -362,15 +380,15 @@ class Database
     }
 
     /**
-     * @param       $sql
-     * @param array $parameters
-     * @param bool  $getCountRowAffected
+     * @param string $sql
+     * @param array  $parameters
+     * @param bool   $getCountRowAffected
      *
      * @throws Exception
      *
      * @return int|null
      */
-    public function delete($sql, $parameters = [], $getCountRowAffected = false)
+    public function delete(string $sql, array $parameters = [], bool $getCountRowAffected = false)
     {
         $statement = $this->prepareBind($sql, $parameters);
 
@@ -379,12 +397,12 @@ class Database
         $results = $statement->execute();
         if ($results === false) {
             $this->addError($statement);
-            throw new Exception('Error Execute Delete Query', 60);
+            throw new Exception('Error Execute Delete Query', 70);
         }
 
         $endTime = microtime(true);
 
-        $this->saveQueries($statement, $parameters, $this->getTime($startTime, $endTime));
+        $this->addQuery($statement, $parameters, $this->getTime($startTime, $endTime));
         if ($getCountRowAffected) {
             return (int) $statement->rowCount();
         }
@@ -393,13 +411,14 @@ class Database
     }
 
     /**
-     * @param       $sql
-     * @param array $parameters
+     * @param string $sql
+     * @param array  $parameters
+     *
+     * @throws Exception
      *
      * @return int
-     * @throws Exception
      */
-    public function count($sql, $parameters = [])
+    public function count(string $sql, array $parameters = [])
     {
         $statement = $this->select($sql, $parameters);
         $cursor = $statement->fetch(PDO::FETCH_ASSOC);
@@ -408,12 +427,12 @@ class Database
     }
 
     /**
-     * @param       $sql
-     * @param array $parameters
+     * @param string $sql
+     * @param array  $parameters
      *
      * @throws Exception
      */
-    public function exec($sql, $parameters = [])
+    public function exec(string $sql, array $parameters = [])
     {
         $statement = $this->prepareBind($sql, $parameters);
 
@@ -422,12 +441,12 @@ class Database
         $results = $statement->execute();
         if ($results === false) {
             $this->addError($statement);
-            throw new Exception('Error Execute Exec Query', 70);
+            throw new Exception('Error Execute Exec Query', 80);
         }
 
         $endTime = microtime(true);
 
-        $this->saveQueries($statement, $parameters, $this->getTime($startTime, $endTime));
+        $this->addQuery($statement, $parameters, $this->getTime($startTime, $endTime));
     }
 
     /**
@@ -439,13 +458,14 @@ class Database
     }
 
     /**
-     * @param       $sql
-     * @param array $parameters
+     * @param string $sql
+     * @param array  $parameters
+     *
+     * @throws Exception
      *
      * @return array
-     * @throws Exception
      */
-    public function selectAll($sql, $parameters = [])
+    public function selectAll(string $sql, array $parameters = [])
     {
         $cursor = $this->select($sql, $parameters);
 
@@ -453,13 +473,14 @@ class Database
     }
 
     /**
-     * @param       $sql
-     * @param array $parameters
+     * @param string $sql
+     * @param array  $parameters
+     *
+     * @throws Exception
      *
      * @return mixed
-     * @throws Exception
      */
-    public function selectRow($sql, $parameters = [])
+    public function selectRow($sql, array $parameters = [])
     {
         $cursor = $this->select($sql, $parameters);
         $row = $this->read($cursor);
@@ -468,13 +489,14 @@ class Database
     }
 
     /**
-     * @param       $sql
-     * @param array $parameters
+     * @param string $sql
+     * @param array  $parameters
+     *
+     * @throws Exception
      *
      * @return array
-     * @throws Exception
      */
-    public function selectCol($sql, $parameters = [])
+    public function selectCol(string $sql, array $parameters = [])
     {
         $cursor = $this->select($sql, $parameters);
         $datas = $this->readAll($cursor);
@@ -487,13 +509,14 @@ class Database
     }
 
     /**
-     * @param       $sql
-     * @param array $parameters
+     * @param string $sql
+     * @param array  $parameters
+     *
+     * @throws Exception
      *
      * @return mixed|null
-     * @throws Exception
      */
-    public function selectVar($sql, $parameters = [])
+    public function selectVar(string $sql, array $parameters = [])
     {
         $cursor = $this->select($sql, $parameters);
         $row = $this->read($cursor);
@@ -504,17 +527,17 @@ class Database
         return current($row);
     }
 
-    public function beginTransaction()
+    private function beginTransaction()
     {
         $this->pdo->beginTransaction();
     }
 
-    public function commit()
+    private function commit()
     {
         $this->pdo->commit();
     }
 
-    public function rollback()
+    private function rollback()
     {
         $this->pdo->rollBack();
     }
@@ -555,14 +578,13 @@ class Database
     public function getLastError()
     {
         $countErrors = count($this->errors);
-        if($countErrors === 0)
-        {
+        if ($countErrors === 0) {
             return null;
         }
 
         return $this->errors[$countErrors - 1];
     }
-    
+
     public function cleanErrors()
     {
         $this->errors = [];
@@ -600,21 +622,21 @@ class Database
     }
 
     /**
-     * @param $string
+     * @param string $string
      *
-     * @return mixed
+     * @return string
      */
-    private function cleanField($string)
+    private function cleanField(string $string)
     {
         return str_replace('`', '', $string);
     }
 
     /**
-     * @param $table
+     * @param string $table
      *
      * @throws Exception
      */
-    public function truncate($table)
+    public function truncate(string $table)
     {
         $table = $this->cleanField($table);
         $sql = 'TRUNCATE TABLE `' . $table . '`';
@@ -628,6 +650,7 @@ class Database
      */
     public function dropTable($tables)
     {
+        // TODO : rename dropTable and dropTables
         if (is_array($tables)) {
             $tables = array_map([$this, 'cleanField'], $tables);
             $tables = implode('`,`', $tables);
@@ -645,6 +668,7 @@ class Database
      */
     public function optimize($tables)
     {
+        // TODO : rename dropTable and dropTables
         if (is_array($tables[0])) {
             $tables = array_map([$this, 'cleanField'], $tables);
             $tables = implode('`,`', $tables);
@@ -656,11 +680,11 @@ class Database
     }
 
     /**
-     * @param $filepath
+     * @param string $filepath
      *
      * @throws Exception
      */
-    public function useSqlFile($filepath)
+    public function useSqlFile(string $filepath)
     {
         if (!file_exists($filepath)) {
             throw new Exception('File missing for useSqlFile method: ' . $filepath, 80);
@@ -672,17 +696,18 @@ class Database
     }
 
     /**
-     * @param $startTime
-     * @param $endTime
+     * @param float $startTime
+     * @param float $endTime
      *
      * @return float|int
      */
-    protected function getTime($startTime, $endTime)
+    protected function getTime(float $startTime, float $endTime)
     {
         return round(($endTime - $startTime) * 1000000) / 1000000;
     }
 
-    public function disconnect(){
+    public function disconnect()
+    {
         $this->pdo = null;
     }
 }
