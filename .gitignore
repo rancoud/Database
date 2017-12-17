@@ -11,3 +11,6 @@ composer.lock
 
 # PHP Unit
 build/
+
+# Dev Testing
+test.php
