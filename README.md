@@ -16,19 +16,31 @@ $params = ['engine' => 'mysql',
         'user'          => 'root',
         'password'      => '',
         'database'      => 'test_database'];
-$databaseConf = new DatabaseConfigurator($params);  
-$database = new Database($databaseConf, new PDODriver());  
+$databaseConf = new Configurator($params);
+
+// No singleton
+$database = new Database($databaseConf);
+
+// With singleton
+$singletonDatabase = Database::getInstance($databaseConf);
 ```
 
-## DatabaseConfigurator , DatabaseDriver , Database ?
-The configurator specify how to setup the driver.  
-So you can use the same configurator for database but use mysqli driver insted of PDO.  
-By default it's shipped with DatabaseConfiguratorDatabase and PDODriver.  
+## Configurator
+### Settings
+'engine' => 'mysql', check with PDO::getAvailableDrivers
+'host'          => '127.0.0.1',
+'user'          => 'root',
+'password'      => '',
+'database'      => 'test_database',
+'save_queries'  => true, save all queries with time
+'permanent_connection' => false, setup permanent connection
+'report_error'  => 'silent', silent or exception for reporting errors
+'charset'       => 'utf8', charset
+'parameters'    => []
 
-But you can wrote your own configurator and driver for using xml files intead of database.  
-Database is a facade wich made easier to wrote code by abstracting driver used.
+### Methods
 
-## PDODriver methods
+## Database methods
 * select  
 * read  
 * insert  
@@ -50,3 +62,28 @@ Database is a facade wich made easier to wrote code by abstracting driver used.
 * dropTable  
 * optimize  
 * useSqlFile  
+
+## How to Dev
+### Linux
+#### Coding Style
+./vendor/bin/phpcbf  
+./vendor/bin/phpcs  
+./vendor/bin/php-cs-fixer fix --diff  
+
+#### Unit Testing
+./vendor/bin/phpunit --colors  
+
+#### Code Coverage
+"vendor/bin/phpunit.bat" --colors --coverage-text --coverage-clover build/logs/clover.xml  
+
+### Windows
+#### Coding Style
+"vendor/bin/phpcbf.bat"  
+"vendor/bin/phpcs.bat"  
+"vendor/bin/php-cs-fixer.bat" fix --diff   
+
+#### Unit Testing
+"vendor/bin/phpunit.bat" --colors  
+  
+#### Code Coverage
+"vendor/bin/phpunit.bat" --colors --coverage-text --coverage-clover build/logs/clover.xml  
