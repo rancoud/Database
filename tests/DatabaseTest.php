@@ -114,6 +114,6 @@ class DatabaseTest extends TestCase
     public function testGetError()
     {
         $this->db->selectVar('SELECT namebbb FROM test WHERE id = :id', ['id' => 3]);
-        $this->assertSame(true, $this->db->hasErrors());
+        $this->assertTrue($this->db->hasErrors());
     }
 }
