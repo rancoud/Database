@@ -26,7 +26,8 @@ return PhpCsFixer\Config::create()
         'strict_comparison' => true,
         'strict_param' => true,
         'concat_space' => ['spacing' => 'one'],
-        'trailing_comma_in_multiline_array' => false
+        'trailing_comma_in_multiline_array' => false,
+        'yoda_style' => null
     ])
     ->setFinder($finder)
     ->setCacheFile(__DIR__.'/.php_cs.cache');
