@@ -57,6 +57,10 @@ class Configurator
             $this->setCharset($settings['charset']);
         }
 
+        if (!array_key_exists('parameters', $settings)) {
+            $settings['parameters'] = [];
+        }
+
         if (!is_array($settings['parameters'])) {
             throw new Exception('"parameters" settings is not an array: ' . gettype($settings['parameters']), 20);
         }
