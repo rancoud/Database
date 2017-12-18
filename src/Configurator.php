@@ -69,7 +69,7 @@ class Configurator
      *
      * @throws Exception
      */
-    private function setMandatorySettings(array $settings)
+    protected function setMandatorySettings(array $settings)
     {
         $props = ['engine', 'host', 'user', 'password', 'database'];
         foreach ($props as $prop) {
@@ -269,5 +269,40 @@ class Configurator
     public function setCharset(string $charset)
     {
         $this->charset = $charset;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDsn()
+    {
+        $engine = $this->getEngine();
+        $host = $this->getHost();
+        $database = $this->getDatabase();
+        $charset = $this->getCharset();
+
+        $dsn = $engine . ':host=' . $host . ';dbname=' . $database . ';charset=' . $charset;
+        if ($engine === 'sqlite') {
+            $dsn = 'sqlite:' . $database . ';charset=' . $charset;
+        }
+
+        return $dsn;
+    }
+
+    /**
+     * @return string
+     */
+    public function createPDOConnection()
+    {
+        $user = $this->getUser();
+        $password = $this->getPassword();
+        $parameters = $this->getParametersForPDO();
+        $dsn = $this->getDsn();
+
+        if ($this->getEngine() !== 'sqlite') {
+            return new PDO($dsn, $user, $password, $parameters);
+        }
+
+        return new PDO($dsn, null, null, $parameters);
     }
 }
