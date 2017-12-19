@@ -7,20 +7,20 @@ use Rancoud\Database\Configurator;
 use Rancoud\Database\Database;
 
 /**
- * Class DatabaseTest.
+ * Class DatabaseSqliteSilentTest.
  */
-class DatabaseTest extends TestCase
+class DatabaseSqliteSilentTest extends TestCase
 {
     /** @var Database */
     protected $db;
 
     public function setUp()
     {
-        $params = ['engine' => 'mysql',
+        $params = ['engine' => 'sqlite',
             'host'          => 'localhost',
-            'user'          => 'root',
+            'user'          => '',
             'password'      => '',
-            'database'      => 'test_database',
+            'database'      => 'test_database.db',
             'report_error'  => 'silent'];
         $databaseConf = new Configurator($params);
         $this->db = new Database($databaseConf);
@@ -33,22 +33,22 @@ class DatabaseTest extends TestCase
 
     public function testDropMultiTable()
     {
-        $this->assertNull(null, $this->db->dropTables(['test', 'toto']));
+        static::assertNull(null, $this->db->dropTables(['test', 'toto']));
     }
 
     public function testExec()
     {
-        $this->db->exec('CREATE TABLE `test` (
-          `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-          `name` VARCHAR(255) NOT NULL,
-          PRIMARY KEY (`id`) );');
-        $this->assertFalse($this->db->hasErrors());
+        $this->db->exec('CREATE TABLE test (
+                                    id   INTEGER       PRIMARY KEY AUTOINCREMENT,
+                                    name VARCHAR (255) NOT NULL
+                                );');
+        static::assertFalse($this->db->hasErrors());
     }
 
     public function testInsert()
     {
         $id = $this->db->insert('INSERT INTO test (`name`) VALUES (:name)', ['name' => 'A'], true);
-        $this->assertSame(1, $id);
+        static::assertSame(1, $id);
     }
 
     public function testUpdate()
@@ -56,13 +56,13 @@ class DatabaseTest extends TestCase
         $sql = 'UPDATE test SET name = :name WHERE id = :id';
         $params = ['id' => 1, 'name' => 'google'];
         $rowsAffected = $this->db->update($sql, $params, true);
-        $this->assertSame(1, $rowsAffected);
+        static::assertSame(1, $rowsAffected);
     }
 
     public function testDelete()
     {
         $rowsAffected = $this->db->delete('DELETE FROM test WHERE name = :name1', ['name1' => 'google'], true);
-        $this->assertSame(1, $rowsAffected);
+        static::assertSame(1, $rowsAffected);
     }
 
     public function testRead()
@@ -78,42 +78,42 @@ class DatabaseTest extends TestCase
             $res[] = $row;
         }
 
-        $this->assertSame(3, count($res));
+        static::assertSame(3, count($res));
     }
 
     public function testCount()
     {
         $count = $this->db->count('SELECT COUNT(*) FROM test');
-        $this->assertSame(3, $count);
+        static::assertSame(3, $count);
     }
 
     public function testSelectAll()
     {
         $rows = $this->db->selectAll('SELECT * FROM test');
-        $this->assertSame(3, count($rows));
+        static::assertSame(3, count($rows));
     }
 
     public function testSelectRow()
     {
         $row = $this->db->selectRow('SELECT * FROM test WHERE id = :id', ['id' => 3]);
-        $this->assertSame('B', $row['name']);
+        static::assertSame('B', $row['name']);
     }
 
     public function testSelectCol()
     {
         $col = $this->db->selectCol('SELECT id FROM test');
-        $this->assertSame(3, count($col));
+        static::assertSame(3, count($col));
     }
 
     public function testSelectVar()
     {
         $var = $this->db->selectVar('SELECT name FROM test WHERE id = :id', ['id' => 3]);
-        $this->assertSame('B', $var);
+        static::assertSame('B', $var);
     }
 
     public function testGetError()
     {
         $this->db->selectVar('SELECT namebbb FROM test WHERE id = :id', ['id' => 3]);
-        $this->assertTrue($this->db->hasErrors());
+        static::assertTrue($this->db->hasErrors());
     }
 }
