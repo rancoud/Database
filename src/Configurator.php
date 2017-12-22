@@ -30,15 +30,20 @@ class Configurator
 
     protected $charset = 'utf8';
 
+    protected $keySettings = ['engine', 'host', 'user', 'password', 'database',
+        'save_queries', 'permanent_connection', 'report_error', 'charset', 'parameters'];
+
     /**
      * DatabaseConfigurator constructor.
      *
      * @param array $settings
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function __construct(array $settings)
     {
+        $this->verifySettings($settings);
+
         $this->setMandatorySettings($settings);
 
         if (array_key_exists('save_queries', $settings)) {
@@ -62,10 +67,24 @@ class Configurator
         }
 
         if (!is_array($settings['parameters'])) {
-            throw new Exception('"parameters" settings is not an array: ' . gettype($settings['parameters']), 20);
+            throw new Exception('"parameters" settings is not an array: ' . gettype($settings['parameters']), 30);
         }
 
         $this->parameters = $settings['parameters'];
+    }
+
+    /**
+     * @param array $settings
+     *
+     * @throws Exception
+     */
+    protected function verifySettings(array $settings)
+    {
+        foreach ($settings as $key => $value) {
+            if (!in_array($key, $this->keySettings, true)) {
+                throw new Exception('"' . $key . '" settings is not recognized', 10);
+            }
+        }
     }
 
     /**
@@ -78,7 +97,7 @@ class Configurator
         $props = ['engine', 'host', 'user', 'password', 'database'];
         foreach ($props as $prop) {
             if (!isset($settings[$prop]) || !is_string($settings[$prop])) {
-                throw new Exception('"' . $prop . '" settings is not defined or not a string', 10);
+                throw new Exception('"' . $prop . '" settings is not defined or not a string', 20);
             }
 
             $this->{'set' . ucfirst($prop)}($settings[$prop]);
@@ -227,6 +246,24 @@ class Configurator
     public function disableSaveQueries()
     {
         $this->saveQueries = false;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasPermanentConnection()
+    {
+        return $this->permanentConnection;
+    }
+
+    public function enablePermanentConnection()
+    {
+        $this->permanentConnection = true;
+    }
+
+    public function disablePermanentConnection()
+    {
+        $this->permanentConnection = false;
     }
 
     /**
