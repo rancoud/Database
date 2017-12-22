@@ -58,7 +58,7 @@ class Configurator
     {
         foreach ($settings as $key => $value) {
             if (!in_array($key, $this->keySettings, true)) {
-                throw new Exception('"' . $key . '" settings is not recognized', 10);
+                throw new Exception('"' . $key . '" settings is not recognized');
             }
         }
     }
@@ -73,7 +73,7 @@ class Configurator
         $props = ['engine', 'host', 'user', 'password', 'database'];
         foreach ($props as $prop) {
             if (!isset($settings[$prop]) || !is_string($settings[$prop])) {
-                throw new Exception('"' . $prop . '" settings is not defined or not a string', 20);
+                throw new Exception('"' . $prop . '" settings is not defined or not a string');
             }
 
             $this->{'set' . ucfirst($prop)}($settings[$prop]);
@@ -125,7 +125,7 @@ class Configurator
     {
         $enginesAvailables = PDO::getAvailableDrivers();
         if (!in_array($engine, $enginesAvailables, true)) {
-            throw new Exception('The engine "' . $engine . '" is not available for PDO', 20);
+            throw new Exception('The engine "' . $engine . '" is not available for PDO');
         }
 
         $this->engine = $engine;
@@ -294,7 +294,7 @@ class Configurator
     public function setReportError(string $reportError)
     {
         if (!in_array($reportError, ['silent', 'exception'], true)) {
-            throw new Exception('The report error "' . $reportError . '" is incorrect. (silent , exception)', 30);
+            throw new Exception('The report error "' . $reportError . '" is incorrect. (silent , exception)');
         }
 
         $this->reportError = $reportError;
