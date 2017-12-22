@@ -16,7 +16,7 @@ class ConfiguratorTest extends TestCase
     {
         $params = [
             'engine'        => 'mysql',
-            'host'          => 'localhost',
+            'host'          => '127.0.0.1',
             'user'          => 'root',
             'password'      => '',
             'database'      => 'test_database'
@@ -24,7 +24,7 @@ class ConfiguratorTest extends TestCase
         $conf = new Configurator($params);
 
         static::assertSame('mysql', $conf->getEngine());
-        static::assertSame('localhost', $conf->getHost());
+        static::assertSame('127.0.0.1', $conf->getHost());
         static::assertSame('root', $conf->getUser());
         static::assertSame('', $conf->getPassword());
         static::assertSame('test_database', $conf->getDatabase());
@@ -51,7 +51,7 @@ class ConfiguratorTest extends TestCase
         static::expectException(Exception::class);
         $params = [
             'engine'        => 'engine',
-            'host'          => 'localhost',
+            'host'          => '127.0.0.1',
             'user'          => 'root',
             'password'      => '',
             'database'      => 'test_database'
@@ -64,7 +64,7 @@ class ConfiguratorTest extends TestCase
         static::expectException(Exception::class);
         $params = [
             'engine'        => 'mysql',
-            'host'          => 'localhost',
+            'host'          => '127.0.0.1',
             'user'          => 'root',
             'password'      => '',
             'database'      => 'test_database',
@@ -78,7 +78,7 @@ class ConfiguratorTest extends TestCase
         static::expectException(\TypeError::class);
         $params = [
             'engine'        => 'mysql',
-            'host'          => 'localhost',
+            'host'          => '127.0.0.1',
             'user'          => 'root',
             'password'      => '',
             'database'      => 'test_database',
@@ -91,7 +91,7 @@ class ConfiguratorTest extends TestCase
     {
         $params = [
             'engine'        => 'mysql',
-            'host'          => 'localhost',
+            'host'          => '127.0.0.1',
             'user'          => 'root',
             'password'      => '',
             'database'      => 'test_database'
@@ -107,7 +107,7 @@ class ConfiguratorTest extends TestCase
         static::expectException(Exception::class);
         $params = [
             'engine'        => 'mysql',
-            'host'          => 'localhost',
+            'host'          => '127.0.0.1',
             'user'          => 'root',
             'password'      => '',
             'database'      => 'test_database'
@@ -121,7 +121,7 @@ class ConfiguratorTest extends TestCase
     {
         $params = [
             'engine'        => 'mysql',
-            'host'          => 'localhost',
+            'host'          => '127.0.0.1',
             'user'          => 'root',
             'password'      => '',
             'database'      => 'test_database'
@@ -136,7 +136,7 @@ class ConfiguratorTest extends TestCase
     {
         $params = [
             'engine'        => 'mysql',
-            'host'          => 'localhost',
+            'host'          => '127.0.0.1',
             'user'          => 'root',
             'password'      => '',
             'database'      => 'test_database'
@@ -151,7 +151,7 @@ class ConfiguratorTest extends TestCase
     {
         $params = [
             'engine'        => 'mysql',
-            'host'          => 'localhost',
+            'host'          => '127.0.0.1',
             'user'          => 'root',
             'password'      => '',
             'database'      => 'test_database'
@@ -166,7 +166,7 @@ class ConfiguratorTest extends TestCase
     {
         $params = [
             'engine'        => 'mysql',
-            'host'          => 'localhost',
+            'host'          => '127.0.0.1',
             'user'          => 'root',
             'password'      => '',
             'database'      => 'test_database'
@@ -181,7 +181,7 @@ class ConfiguratorTest extends TestCase
     {
         $params = [
             'engine'        => 'mysql',
-            'host'          => 'localhost',
+            'host'          => '127.0.0.1',
             'user'          => 'root',
             'password'      => '',
             'database'      => 'test_database'
@@ -195,7 +195,7 @@ class ConfiguratorTest extends TestCase
     {
         $params = [
             'engine'        => 'mysql',
-            'host'          => 'localhost',
+            'host'          => '127.0.0.1',
             'user'          => 'root',
             'password'      => '',
             'database'      => 'test_database',
@@ -226,7 +226,7 @@ class ConfiguratorTest extends TestCase
     {
         $params = [
             'engine'        => 'mysql',
-            'host'          => 'localhost',
+            'host'          => '127.0.0.1',
             'user'          => 'root',
             'password'      => '',
             'database'      => 'test_database'
@@ -240,7 +240,7 @@ class ConfiguratorTest extends TestCase
     {
         $params = [
             'engine'                => 'mysql',
-            'host'                  => 'localhost',
+            'host'                  => '127.0.0.1',
             'user'                  => 'root',
             'password'              => '',
             'database'              => 'test_database',
@@ -271,7 +271,7 @@ class ConfiguratorTest extends TestCase
     {
         $params = [
             'engine'        => 'mysql',
-            'host'          => 'localhost',
+            'host'          => '127.0.0.1',
             'user'          => 'root',
             'password'      => '',
             'database'      => 'test_database'
@@ -285,7 +285,7 @@ class ConfiguratorTest extends TestCase
     {
         $params = [
             'engine'        => 'mysql',
-            'host'          => 'localhost',
+            'host'          => '127.0.0.1',
             'user'          => 'root',
             'password'      => '',
             'database'      => 'test_database',
@@ -309,7 +309,7 @@ class ConfiguratorTest extends TestCase
         static::expectException(Exception::class);
         $params = [
             'engine'        => 'mysql',
-            'host'          => 'localhost',
+            'host'          => '127.0.0.1',
             'user'          => 'root',
             'password'      => '',
             'database'      => 'test_database',
@@ -323,7 +323,7 @@ class ConfiguratorTest extends TestCase
     {
         $params = [
             'engine'        => 'mysql',
-            'host'          => 'localhost',
+            'host'          => '127.0.0.1',
             'user'          => 'root',
             'password'      => '',
             'database'      => 'test_database'
@@ -337,7 +337,7 @@ class ConfiguratorTest extends TestCase
     {
         $params = [
             'engine'        => 'mysql',
-            'host'          => 'localhost',
+            'host'          => '127.0.0.1',
             'user'          => 'root',
             'password'      => '',
             'database'      => 'test_database',
@@ -356,7 +356,7 @@ class ConfiguratorTest extends TestCase
     {
         $params = [
             'engine'        => 'mysql',
-            'host'          => 'localhost',
+            'host'          => '127.0.0.1',
             'user'          => 'root',
             'password'      => '',
             'database'      => 'test_database'
@@ -370,7 +370,7 @@ class ConfiguratorTest extends TestCase
     {
         $params = [
             'engine'        => 'mysql',
-            'host'          => 'localhost',
+            'host'          => '127.0.0.1',
             'user'          => 'root',
             'password'      => '',
             'database'      => 'test_database',
@@ -393,7 +393,7 @@ class ConfiguratorTest extends TestCase
     {
         $params = [
             'engine'        => 'mysql',
-            'host'          => 'localhost',
+            'host'          => '127.0.0.1',
             'user'          => 'root',
             'password'      => '',
             'database'      => 'test_database'
@@ -409,14 +409,14 @@ class ConfiguratorTest extends TestCase
     {
         $params = [
             'engine'        => 'mysql',
-            'host'          => 'localhost',
+            'host'          => '127.0.0.1',
             'user'          => 'root',
             'password'      => '',
             'database'      => 'test_database'
         ];
         $conf = new Configurator($params);
 
-        static::assertSame('mysql:host=localhost;dbname=test_database;charset=utf8', $conf->getDsn());
+        static::assertSame('mysql:host=127.0.0.1;dbname=test_database;charset=utf8', $conf->getDsn());
     }
 
     public function testGetDsnSqlite()
@@ -437,7 +437,7 @@ class ConfiguratorTest extends TestCase
     {
         $params = [
             'engine'        => 'mysql',
-            'host'          => 'localhost',
+            'host'          => '127.0.0.1',
             'user'          => 'root',
             'password'      => '',
             'database'      => 'test_database'
@@ -519,7 +519,7 @@ class ConfiguratorTest extends TestCase
     {
         $params = [
             'engine'        => 'mysql',
-            'host'          => 'localhost',
+            'host'          => '127.0.0.1',
             'user'          => 'root',
             'password'      => '',
             'database'      => 'test_database'
@@ -535,7 +535,7 @@ class ConfiguratorTest extends TestCase
 
         $params = [
             'engine'        => 'mysql',
-            'host'          => 'localhost',
+            'host'          => '127.0.0.1',
             'user'          => 'root',
             'password'      => 'root',
             'database'      => 'test_database'
@@ -549,7 +549,7 @@ class ConfiguratorTest extends TestCase
     {
         $params = [
             'engine'        => 'mysql',
-            'host'          => 'localhost',
+            'host'          => '127.0.0.1',
             'user'          => 'root',
             'password'      => '',
             'database'      => 'test_database',
@@ -566,7 +566,7 @@ class ConfiguratorTest extends TestCase
 
         $params = [
             'engine'        => 'mysql',
-            'host'          => 'localhost',
+            'host'          => '127.0.0.1',
             'user'          => 'root',
             'password'      => 'root',
             'database'      => 'test_database',

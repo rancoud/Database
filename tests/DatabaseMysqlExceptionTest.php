@@ -15,15 +15,16 @@ class DatabaseMysqlExceptionTest extends TestCase
     /** @var Database */
     protected $db;
 
+    protected $params = ['engine' => 'mysql',
+        'host'          => '127.0.0.1',
+        'user'          => 'root',
+        'password'      => '',
+        'database'      => 'test_database',
+        'report_error'  => 'exception'];
+
     public function setUp()
     {
-        $params = ['engine' => 'mysql',
-            'host'          => 'localhost',
-            'user'          => 'root',
-            'password'      => '',
-            'database'      => 'test_database',
-            'report_error'  => 'exception'];
-        $databaseConf = new Configurator($params);
+        $databaseConf = new Configurator($this->params);
         $this->db = new Database($databaseConf);
     }
 
@@ -117,6 +118,24 @@ class DatabaseMysqlExceptionTest extends TestCase
         static::expectException(Exception::class);
 
         $this->db->selectVar('SELECT namebbb FROM test WHERE id = :id', ['id' => 3]);
-        static::assertTrue($this->db->hasErrors());
+    }
+
+    public function testTruncateTable()
+    {
+        $this->db->truncateTable('test');
+        static::assertFalse($this->db->hasErrors());
+    }
+
+    public function testTruncateTables()
+    {
+        $this->db->truncateTables(['test', 'test']);
+        static::assertFalse($this->db->hasErrors());
+    }
+
+    public function testDisconnect()
+    {
+        $this->db->disconnect();
+
+        static::assertNull($this->db->getPdo());
     }
 }

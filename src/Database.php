@@ -701,11 +701,24 @@ class Database
      *
      * @throws Exception
      */
-    public function truncate(string $table)
+    public function truncateTable(string $table)
     {
         $table = $this->cleanField($table);
         $sql = 'TRUNCATE TABLE `' . $table . '`';
         $this->exec($sql);
+    }
+
+    /**
+     * @param array $tables
+     *
+     * @throws \Exception
+     */
+    public function truncateTables(array $tables)
+    {
+        $tables = array_map([$this, 'cleanField'], $tables);
+        foreach ($tables as $table) {
+            $this->truncateTable($table);
+        }
     }
 
     /**
