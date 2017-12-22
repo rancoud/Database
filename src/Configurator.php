@@ -20,7 +20,7 @@ class Configurator
 
     protected $database;
 
-    protected $parameters;
+    protected $parameters = [];
 
     protected $saveQueries = false;
 
@@ -46,31 +46,7 @@ class Configurator
 
         $this->setMandatorySettings($settings);
 
-        if (array_key_exists('save_queries', $settings)) {
-            $this->saveQueries = (bool) $settings['save_queries'];
-        }
-
-        if (array_key_exists('permanent_connection', $settings)) {
-            $this->permanentConnection = (bool) $settings['permanent_connection'];
-        }
-
-        if (array_key_exists('report_error', $settings)) {
-            $this->setReportError($settings['report_error']);
-        }
-
-        if (array_key_exists('charset', $settings)) {
-            $this->setCharset($settings['charset']);
-        }
-
-        if (!array_key_exists('parameters', $settings)) {
-            $settings['parameters'] = [];
-        }
-
-        if (!is_array($settings['parameters'])) {
-            throw new Exception('"parameters" settings is not an array: ' . gettype($settings['parameters']), 30);
-        }
-
-        $this->parameters = $settings['parameters'];
+        $this->setOptionnalsParameters($settings);
     }
 
     /**
@@ -101,6 +77,34 @@ class Configurator
             }
 
             $this->{'set' . ucfirst($prop)}($settings[$prop]);
+        }
+    }
+
+    /**
+     * @param array $settings
+     *
+     * @throws Exception
+     */
+    protected function setOptionnalsParameters(array $settings)
+    {
+        if (array_key_exists('save_queries', $settings)) {
+            $this->saveQueries = (bool) $settings['save_queries'];
+        }
+
+        if (array_key_exists('permanent_connection', $settings)) {
+            $this->permanentConnection = (bool) $settings['permanent_connection'];
+        }
+
+        if (array_key_exists('report_error', $settings)) {
+            $this->setReportError($settings['report_error']);
+        }
+
+        if (array_key_exists('charset', $settings)) {
+            $this->setCharset($settings['charset']);
+        }
+
+        if (array_key_exists('parameters', $settings)) {
+            $this->setParameters($settings['parameters']);
         }
     }
 
@@ -206,6 +210,14 @@ class Configurator
     public function setParameter($key, $value)
     {
         $this->parameters[$key] = $value;
+    }
+
+    /**
+     * @param array $parameters
+     */
+    public function setParameters(array $parameters)
+    {
+        $this->parameters = $parameters;
     }
 
     /**

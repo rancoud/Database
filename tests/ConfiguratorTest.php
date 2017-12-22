@@ -37,6 +37,15 @@ class ConfiguratorTest extends TestCase
         new Configurator($params);
     }
 
+    public function testConstructMandatoryException()
+    {
+        static::expectException(Exception::class);
+        $params = [
+            'database'      => 'test_database'
+        ];
+        new Configurator($params);
+    }
+
     public function testConstructMandatoryEngineException()
     {
         static::expectException(Exception::class);
@@ -60,6 +69,20 @@ class ConfiguratorTest extends TestCase
             'password'      => '',
             'database'      => 'test_database',
             'report_error'  => 'report_error'
+        ];
+        new Configurator($params);
+    }
+
+    public function testConstructInvalidSettingsParametersException()
+    {
+        static::expectException(\TypeError::class);
+        $params = [
+            'engine'        => 'mysql',
+            'host'          => 'localhost',
+            'user'          => 'root',
+            'password'      => '',
+            'database'      => 'test_database',
+            'parameters'    => 'parameters'
         ];
         new Configurator($params);
     }
@@ -364,6 +387,22 @@ class ConfiguratorTest extends TestCase
         $conf->setParameter('key', 'another_value');
 
         static::assertSame(['key' => 'another_value', 'new_key' => 'new_value'], $conf->getParameters());
+    }
+
+    public function testSetParameters()
+    {
+        $params = [
+            'engine'        => 'mysql',
+            'host'          => 'localhost',
+            'user'          => 'root',
+            'password'      => '',
+            'database'      => 'test_database'
+        ];
+        $conf = new Configurator($params);
+
+        $conf->setParameters(['key' => 'value']);
+
+        static::assertSame(['key' => 'value'], $conf->getParameters());
     }
 
     public function testGetDsnMysql()
