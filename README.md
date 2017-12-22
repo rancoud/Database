@@ -74,7 +74,10 @@ $singletonDatabase = Database::getInstance($databaseConf);
 ./vendor/bin/phpunit --colors  
 
 #### Code Coverage
-"vendor/bin/phpunit.bat" --colors --coverage-text --coverage-clover build/logs/clover.xml  
+##### Local
+./vendor/bin/phpunit --colors --coverage-html ./coverage
+##### Coverwall
+./vendor/bin/phpunit --colors --coverage-text --coverage-clover build/logs/clover.xml  
 
 ### Windows
 #### Coding Style
@@ -86,4 +89,8 @@ $singletonDatabase = Database::getInstance($databaseConf);
 "vendor/bin/phpunit.bat" --colors  
   
 #### Code Coverage
+##### Local
+"vendor/bin/phpunit.bat" --colors --coverage-html ./coverage
+
+##### Coverwall
 "vendor/bin/phpunit.bat" --colors --coverage-text --coverage-clover build/logs/clover.xml  
