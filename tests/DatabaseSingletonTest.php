@@ -16,11 +16,11 @@ class DatabaseSingletonTest extends TestCase
     protected $db;
 
     protected $params = ['engine' => 'mysql',
-        'host'          => 'localhost',
-        'user'          => 'root',
-        'password'      => '',
-        'database'      => 'test_database',
-        'report_error'  => 'exception'];
+        'host'                    => 'localhost',
+        'user'                    => 'root',
+        'password'                => '',
+        'database'                => 'test_database',
+        'report_error'            => 'exception'];
 
     public function setUp()
     {

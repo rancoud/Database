@@ -2,7 +2,6 @@
 
 namespace Rancoud\Database\Test;
 
-use Exception;
 use PHPUnit\Framework\TestCase;
 use Rancoud\Database\Configurator;
 use Rancoud\Database\Database;
@@ -16,11 +15,11 @@ class DatabaseSqliteSilentTest extends TestCase
     protected $db;
 
     protected $params = ['engine' => 'sqlite',
-        'host'          => '127.0.0.1',
-        'user'          => '',
-        'password'      => '',
-        'database'      => 'test_database.db',
-        'report_error'  => 'silent'];
+        'host'                    => '127.0.0.1',
+        'user'                    => '',
+        'password'                => '',
+        'database'                => 'test_database.db',
+        'report_error'            => 'silent'];
 
     public function setUp()
     {

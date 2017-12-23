@@ -16,11 +16,11 @@ class DatabaseSqliteExceptionTest extends TestCase
     protected $db;
 
     protected $params = ['engine' => 'sqlite',
-        'host'          => '127.0.0.1',
-        'user'          => '',
-        'password'      => '',
-        'database'      => 'test_database.db',
-        'report_error'  => 'exception'];
+        'host'                    => '127.0.0.1',
+        'user'                    => '',
+        'password'                => '',
+        'database'                => 'test_database.db',
+        'report_error'            => 'exception'];
 
     public function setUp()
     {

@@ -2,7 +2,6 @@
 
 namespace Rancoud\Database\Test;
 
-use Exception;
 use PHPUnit\Framework\TestCase;
 use Rancoud\Database\Configurator;
 use Rancoud\Database\Database;
@@ -16,11 +15,11 @@ class DatabaseMysqlSilentTest extends TestCase
     protected $db;
 
     protected $params = ['engine' => 'mysql',
-        'host'          => '127.0.0.1',
-        'user'          => 'root',
-        'password'      => '',
-        'database'      => 'test_database',
-        'report_error'  => 'silent'];
+        'host'                    => '127.0.0.1',
+        'user'                    => 'root',
+        'password'                => '',
+        'database'                => 'test_database',
+        'report_error'            => 'silent'];
 
     public function setUp()
     {
