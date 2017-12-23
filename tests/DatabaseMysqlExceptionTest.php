@@ -16,11 +16,11 @@ class DatabaseMysqlExceptionTest extends TestCase
     protected $db;
 
     protected $params = ['engine' => 'mysql',
-        'host'          => '127.0.0.1',
-        'user'          => 'root',
-        'password'      => '',
-        'database'      => 'test_database',
-        'report_error'  => 'exception'];
+        'host'                    => '127.0.0.1',
+        'user'                    => 'root',
+        'password'                => '',
+        'database'                => 'test_database',
+        'report_error'            => 'exception'];
 
     public function setUp()
     {
