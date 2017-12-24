@@ -246,7 +246,7 @@ class Database
      *
      * @throws Exception
      *
-     * @return bool|PDOStatement
+     * @return PDOStatement|null
      */
     public function select(string $sql, array $parameters = [])
     {
@@ -493,7 +493,7 @@ class Database
      *
      * @throws Exception
      *
-     * @return array
+     * @return array|null
      */
     public function selectAll(string $sql, array $parameters = [])
     {
@@ -517,7 +517,7 @@ class Database
      *
      * @throws Exception
      *
-     * @return mixed
+     * @return array|null
      */
     public function selectRow($sql, array $parameters = [])
     {
@@ -541,7 +541,7 @@ class Database
      *
      * @throws Exception
      *
-     * @return array
+     * @return array|null
      */
     public function selectCol(string $sql, array $parameters = [])
     {
@@ -569,7 +569,7 @@ class Database
      *
      * @throws Exception
      *
-     * @return mixed|null
+     * @return string|null
      */
     public function selectVar(string $sql, array $parameters = [])
     {
@@ -699,74 +699,95 @@ class Database
     /**
      * @param string $table
      *
+     * @return bool
      * @throws Exception
      */
     public function truncateTable(string $table)
     {
         $table = $this->cleanField($table);
         $sql = 'TRUNCATE TABLE `' . $table . '`';
-        $this->exec($sql);
+
+        return $this->exec($sql);
     }
 
     /**
      * @param array $tables
      *
+     * @return bool
      * @throws Exception
      */
     public function truncateTables(array $tables)
     {
+        $success = true;
+
         $tables = array_map([$this, 'cleanField'], $tables);
         foreach ($tables as $table) {
-            $this->truncateTable($table);
+            if($this->truncateTable($table) === false)
+            {
+                $success = false;
+            }
         }
+
+        return $success;
     }
 
     /**
      * @param string $table
      *
+     * @return bool
      * @throws Exception
      */
     public function dropTable(string $table)
     {
-        $this->dropTables([$table]);
+        return $this->dropTables([$table]);
     }
 
     /**
-     * @param string[] $tables
+     * @param array $tables
      *
+     * @return bool
      * @throws Exception
      */
     public function dropTables(array $tables)
     {
+        $success = true;
+
         $tables = array_map([$this, 'cleanField'], $tables);
         if ($this->configurator->getEngine() === 'sqlite') {
             foreach ($tables as $table) {
                 $sql = 'DROP TABLE IF EXISTS `' . $table . '`';
-                $this->exec($sql);
+                if($this->exec($sql) === false)
+                {
+                    $success = false;
+                }
             }
 
-            return;
+            return $success;
         }
 
         $tables = implode('`,`', $tables);
 
         $sql = 'DROP TABLE IF EXISTS `' . $tables . '`';
-        $this->exec($sql);
+        $success = $this->exec($sql);
+
+        return $success;
     }
 
     /**
      * @param string $table
      *
+     * @return bool
      * @throws Exception
      */
     public function optimizeTable(string $table)
     {
-        $this->optimizeTables([$table]);
+        return $this->optimizeTables([$table]);
     }
 
     /**
-     * @param string[] $tables
+     * @param array $tables
      *
+     * @return bool
      * @throws Exception
      */
     public function optimizeTables(array $tables)
@@ -775,12 +796,14 @@ class Database
         $tables = implode('`,`', $tables);
 
         $sql = 'OPTIMIZE TABLE `' . $tables . '`';
-        $this->exec($sql);
+
+        return $this->exec($sql);
     }
 
     /**
      * @param string $filepath
      *
+     * @return bool
      * @throws Exception
      */
     public function useSqlFile(string $filepath)
@@ -791,7 +814,7 @@ class Database
 
         $sqlFile = file_get_contents($filepath);
 
-        $this->exec($sqlFile);
+        return $this->exec($sqlFile);
     }
 
     /**
