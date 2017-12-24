@@ -49,52 +49,50 @@ $results = $database->selectAll("SELECT * FROM mytable WHERE something > :thing"
 | parameters | array | [] | extra parameters used by PDO on connection |
 
 ## Database Methods
-### General Commands
-* selectAll  
-* selectRow  
-* selectCol  
-* selectVar  
-
-* insert  
-* update  
-* delete  
-* count  
-
-* select  
-* read  
-* readAll  
-* exec  
+### General Commands  
+* selectAll(sql: string, [parameters: array = []]):array|null  
+* selectRow(sql: string, [parameters: array = []]):array|null  
+* selectCol(sql: string, [parameters: array = []]):array|null  
+* selectVar(sql: string, [parameters: array = []]):string|null  
+* insert(sql: string, [parameters: array = []], [getLastInsertId: bool = false]):int|null|bool  
+* update(sql: string, [parameters: array = []], [getCountRowAffected: bool = false]):int|null|bool  
+* delete(sql: string, [parameters: array = []], [getCountRowAffected: bool = false]):int|null|bool  
+* count(sql: string, [parameters: array = []]):int|bool  
+* exec(sql: string, [parameters: array = []]):bool  
+* select(sql: string, [parameters: array = []]):PDOStatement|null  
+* read(statement: \PDOStatement, [fetchType: int = PDO::FETCH_ASSOC]):mixed  
+* readAll(statement: \PDOStatement, [fetchType: int = PDO::FETCH_ASSOC]):array  
 
 ### Transactions
-* startTransaction  
-* completeTransaction  
+* startTransaction():void  
+* completeTransaction():void  
 
 ### Errors
-* hasErrors  
-* getErrors  
-* getLastError  
-* cleanErrors  
+* hasErrors():bool  
+* getErrors():array  
+* getLastError():array|null  
+* cleanErrors():void  
 
 ### Save Queries
-* hasSaveQueries  
-* enableSaveQueries  
-* disableSaveQueries  
-* cleanSavedQueries  
-* getSavedQueries  
+* hasSaveQueries():bool  
+* enableSaveQueries():void  
+* disableSaveQueries():void  
+* cleanSavedQueries():void  
+* getSavedQueries():array  
 
 ### Specific Commands
-* truncateTable  
-* truncateTables  
-* dropTable  
-* dropTables  
-* optimizeTable  
-* optimizeTables  
-* useSqlFile  
+* truncateTable(table: string):bool  
+* truncateTables(tables: array):bool  
+* dropTable(table: string):bool  
+* dropTables(tables: array):bool  
+* optimizeTable(table: string):bool  
+* optimizeTables(tables: array):bool  
+* useSqlFile(filepath: string):bool  
 
 ### Low Level
-* connect  
-* disconnect  
-* getPdo  
+* connect():void  
+* disconnect():void  
+* getPdo():PDO  
 
 ## How to Dev
 ### Linux
