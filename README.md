@@ -1,6 +1,6 @@
 # Database Package
 
-[![Build Status](https://travis-ci.org/rancoud/Database.svg?branch=master)](https://travis-ci.org/rancoud/Database) [![Coverage Status](https://coveralls.io/repos/github/rancoud/Database/badge.svg?branch=master)](https://coveralls.io/github/rancoud/Database?branch=master)
+[![Build Status](https://travis-ci.org/rancoud/Database.svg?branch=fix-better-exception)](https://travis-ci.org/rancoud/Database) [![Coverage Status](https://coveralls.io/repos/github/rancoud/Database/badge.svg?branch=fix-better-exception)](https://coveralls.io/github/rancoud/Database?branch=fix-better-exception)
 
 Request Database with PDO without write it.  
 
@@ -23,45 +23,78 @@ $database = new Database($databaseConf);
 
 // With singleton
 $singletonDatabase = Database::getInstance($databaseConf);
+
+// The output is always an associative array
+$results = $database->selectAll("SELECT * FROM mytable WHERE something > :thing", ['thing' => 5]);
 ```
 
 ## Configurator
 ### Settings
-'engine' => 'mysql', check with PDO::getAvailableDrivers
-'host'          => '127.0.0.1',
-'user'          => 'root',
-'password'      => '',
-'database'      => 'test_database',
-'save_queries'  => true, save all queries with time
-'permanent_connection' => false, setup permanent connection
-'report_error'  => 'silent', silent or exception for reporting errors
-'charset'       => 'utf8', charset
-'parameters'    => []
+#### Mandatory
+| Parameter | Type | Description |
+| --- | --- | --- |
+| engine | string | engine of the database, it will be check with PDO::getAvailableDrivers |
+| host | string | hostname of the database |
+| user | string | user used to connect to the database |
+| password | string | password used to connect to the database |
+| database | string | name of the database |
 
-### Methods
+#### Optionnals
+| Parameter | Type | Default value | Description |
+| --- | --- | --- | --- |
+| save_queries | bool | true | all queries will be saved in memory with execution time and the connection time |
+| permanent_connection | bool | false | use permanent connection |
+| report_error | string | 'exception' | how PDO react with errors; values used: silent \| exception |
+| charset | string | 'utf8' | set specific database charset |
+| parameters | array | [] | extra parameters used by PDO on connection |
 
-## Database methods
-* select  
-* read  
-* insert  
-* update  
-* delete  
-* count  
-* exec  
-* getDriver  
+## Database Methods
+### General Commands
 * selectAll  
 * selectRow  
 * selectCol  
 * selectVar  
-* beginTransaction  
-* commit  
-* rollback  
-* hasError  
-* getError  
-* truncate  
+
+* insert  
+* update  
+* delete  
+* count  
+
+* select  
+* read  
+* readAll  
+* exec  
+
+### Transactions
+* startTransaction  
+* completeTransaction  
+
+### Errors
+* hasErrors  
+* getErrors  
+* getLastError  
+* cleanErrors  
+
+### Save Queries
+* hasSaveQueries  
+* enableSaveQueries  
+* disableSaveQueries  
+* cleanSavedQueries  
+* getSavedQueries  
+
+### Specific Commands
+* truncateTable  
+* truncateTables  
 * dropTable  
-* optimize  
+* dropTables  
+* optimizeTable  
+* optimizeTables  
 * useSqlFile  
+
+### Low Level
+* connect  
+* disconnect  
+* getPdo  
 
 ## How to Dev
 ### Linux
