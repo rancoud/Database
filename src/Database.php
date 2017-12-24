@@ -711,7 +711,7 @@ class Database
     /**
      * @param array $tables
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function truncateTables(array $tables)
     {
