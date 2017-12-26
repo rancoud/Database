@@ -699,8 +699,9 @@ class Database
     /**
      * @param string $table
      *
-     * @return bool
      * @throws Exception
+     *
+     * @return bool
      */
     public function truncateTable(string $table)
     {
@@ -713,8 +714,9 @@ class Database
     /**
      * @param array $tables
      *
-     * @return bool
      * @throws Exception
+     *
+     * @return bool
      */
     public function truncateTables(array $tables)
     {
@@ -722,8 +724,7 @@ class Database
 
         $tables = array_map([$this, 'cleanField'], $tables);
         foreach ($tables as $table) {
-            if($this->truncateTable($table) === false)
-            {
+            if ($this->truncateTable($table) === false) {
                 $success = false;
             }
         }
@@ -734,8 +735,9 @@ class Database
     /**
      * @param string $table
      *
-     * @return bool
      * @throws Exception
+     *
+     * @return bool
      */
     public function dropTable(string $table)
     {
@@ -745,8 +747,9 @@ class Database
     /**
      * @param array $tables
      *
-     * @return bool
      * @throws Exception
+     *
+     * @return bool
      */
     public function dropTables(array $tables)
     {
@@ -756,8 +759,7 @@ class Database
         if ($this->configurator->getEngine() === 'sqlite') {
             foreach ($tables as $table) {
                 $sql = 'DROP TABLE IF EXISTS `' . $table . '`';
-                if($this->exec($sql) === false)
-                {
+                if ($this->exec($sql) === false) {
                     $success = false;
                 }
             }
@@ -776,8 +778,9 @@ class Database
     /**
      * @param string $table
      *
-     * @return bool
      * @throws Exception
+     *
+     * @return bool
      */
     public function optimizeTable(string $table)
     {
@@ -787,8 +790,9 @@ class Database
     /**
      * @param array $tables
      *
-     * @return bool
      * @throws Exception
+     *
+     * @return bool
      */
     public function optimizeTables(array $tables)
     {
@@ -803,8 +807,9 @@ class Database
     /**
      * @param string $filepath
      *
-     * @return bool
      * @throws Exception
+     *
+     * @return bool
      */
     public function useSqlFile(string $filepath)
     {
