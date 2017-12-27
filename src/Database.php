@@ -70,7 +70,7 @@ class Database
     /**
      * @throws Exception
      */
-    public function connnect()
+    public function connect()
     {
         try {
             $startTime = microtime(true);
@@ -102,7 +102,7 @@ class Database
     protected function prepareBind(string $sql, array $parameters = [])
     {
         if ($this->pdo === null) {
-            $this->connnect();
+            $this->connect();
         }
 
         $statement = null;
@@ -354,13 +354,13 @@ class Database
     /**
      * @param string $sql
      * @param array  $parameters
-     * @param bool   $getCountRowAffected
+     * @param bool   $getCountRowsAffected
      *
      * @throws Exception
      *
      * @return int|null|bool
      */
-    public function update(string $sql, array $parameters = [], bool $getCountRowAffected = false)
+    public function update(string $sql, array $parameters = [], bool $getCountRowsAffected = false)
     {
         $statement = $this->prepareBind($sql, $parameters);
 
@@ -377,7 +377,7 @@ class Database
         $this->addQuery($statement, $parameters, $this->getTime($startTime, $endTime));
 
         $countRowAffected = null;
-        if ($getCountRowAffected) {
+        if ($getCountRowsAffected) {
             $countRowAffected = (int) $statement->rowCount();
         }
 
@@ -390,13 +390,13 @@ class Database
     /**
      * @param string $sql
      * @param array  $parameters
-     * @param bool   $getCountRowAffected
+     * @param bool   $getCountRowsAffected
      *
      * @throws Exception
      *
      * @return int|null|bool
      */
-    public function delete(string $sql, array $parameters = [], bool $getCountRowAffected = false)
+    public function delete(string $sql, array $parameters = [], bool $getCountRowsAffected = false)
     {
         $statement = $this->prepareBind($sql, $parameters);
 
@@ -413,7 +413,7 @@ class Database
         $this->addQuery($statement, $parameters, $this->getTime($startTime, $endTime));
 
         $countRowAffected = null;
-        if ($getCountRowAffected) {
+        if ($getCountRowsAffected) {
             $countRowAffected = (int) $statement->rowCount();
         }
 
@@ -609,11 +609,19 @@ class Database
 
     public function startTransaction()
     {
+        if ($this->pdo === null) {
+            $this->connect();
+        }
+
         $this->beginTransaction();
     }
 
     public function completeTransaction()
     {
+        if ($this->pdo === null) {
+            $this->connect();
+        }
+
         if ($this->hasErrors()) {
             $this->rollback();
         } else {

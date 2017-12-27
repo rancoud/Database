@@ -18,7 +18,7 @@ class DatabaseSqliteSilentTest extends TestCase
         'host'                    => '127.0.0.1',
         'user'                    => '',
         'password'                => '',
-        'database'                => 'test_database.db',
+        'database'                => __DIR__ . '/test_database.db',
         'report_error'            => 'silent'];
 
     public function setUp()
