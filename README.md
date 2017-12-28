@@ -64,8 +64,8 @@ $results = $database->selectAll("SELECT * FROM mytable WHERE something > :thing"
 * readAll(statement: \PDOStatement, [fetchType: int = PDO::FETCH_ASSOC]):array  
 
 ### Transactions
-* startTransaction():void  
-* completeTransaction():void  
+* startTransaction():bool  
+* completeTransaction():bool  
 
 ### Errors
 * hasErrors():bool  
