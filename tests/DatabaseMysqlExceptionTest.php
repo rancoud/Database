@@ -343,7 +343,8 @@ class DatabaseMysqlExceptionTest extends TestCase
 
     public function testPdoParamType()
     {
-        $sql = 'SELECT :true AS `true`, :false AS `false`, :null AS `null`, :float AS `float`, :int AS `int`, :string AS `string`, :resource AS `resource`';
+        $sql = 'SELECT :true AS `true`, :false AS `false`, :null AS `null`, :float AS `float`,
+                :int AS `int`, :string AS `string`, :resource AS `resource`';
         $params = [
             'true'    => true,
             'false'   => false,
