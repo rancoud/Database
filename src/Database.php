@@ -57,11 +57,11 @@ class Database
     {
         if (self::$instance === null) {
             if ($configurator === null) {
-                throw new Exception('Configurator Missing', 10);
+                throw new Exception('Configurator Missing');
             }
             self::$instance = new self($configurator);
         } elseif ($configurator !== null) {
-            throw new Exception('Configurator Already Setup', 11);
+            throw new Exception('Configurator Already Setup');
         }
 
         return self::$instance;
@@ -86,7 +86,7 @@ class Database
             $this->addErrorConnection($e);
 
             if ($this->configurator->hasThrowException()) {
-                throw new Exception('Error Connecting Database', 20);
+                throw new Exception('Error Connecting Database');
             }
         }
     }
@@ -110,12 +110,12 @@ class Database
         try {
             $statement = $this->pdo->prepare($sql);
             if ($statement === false) {
-                throw new Exception('Error Prepare Statement', 30);
+                throw new Exception('Error Prepare Statement');
             }
         } catch (Exception $e) {
             $this->addErrorPrepare($sql, $parameters);
             if ($this->configurator->hasThrowException()) {
-                throw new Exception('Error Prepare Statement', 30);
+                throw new Exception('Error Prepare Statement');
             }
         }
 
@@ -129,19 +129,11 @@ class Database
                 $value = (string) $value;
             }
 
-            if ($param !== false) {
-                try {
-                    $success = $statement->bindValue(":$key", $value, $param);
-                    if ($success === false) {
-                        throw new Exception('Error Bind Value', 40);
-                    }
-                } catch (Exception $e) {
-                    $this->addErrorStatement($statement);
-                    if ($this->configurator->hasThrowException()) {
-                        throw new Exception('Error Bind Value', 40);
-                    }
-                }
+            if ($param === false) {
+                throw new Exception('Error Bind Value');
             }
+
+            $statement->bindValue(":$key", $value, $param);
         }
 
         return $statement;
@@ -164,6 +156,8 @@ class Database
             return PDO::PARAM_STR;
         } elseif (is_float($value)) {
             return PDO::PARAM_STR;
+        } elseif (is_resource($value)) {
+            return PDO::PARAM_LOB;
         }
 
         return false;
@@ -281,12 +275,12 @@ class Database
         try {
             $success = $statement->execute();
             if ($success === false) {
-                throw new Exception('Error Execute', 50);
+                throw new Exception('Error Execute');
             }
         } catch (Exception $e) {
             $this->addErrorStatement($statement);
             if ($this->configurator->hasThrowException()) {
-                throw new Exception('Error Execute', 50);
+                throw new Exception('Error Execute');
             }
         }
 
@@ -592,41 +586,64 @@ class Database
         return $var;
     }
 
+    /**
+     * @return bool
+     */
     protected function beginTransaction()
     {
-        $this->pdo->beginTransaction();
+        return $this->pdo->beginTransaction();
     }
 
+    /**
+     * @return bool
+     */
     protected function commit()
     {
-        $this->pdo->commit();
+        return $this->pdo->commit();
     }
 
+    /**
+     * @return bool
+     */
     protected function rollback()
     {
-        $this->pdo->rollBack();
+        return $this->pdo->rollBack();
     }
 
+    /**
+     * @throws \Exception
+     *
+     * @return bool
+     */
     public function startTransaction()
     {
         if ($this->pdo === null) {
             $this->connect();
         }
 
-        $this->beginTransaction();
+        return $this->beginTransaction();
     }
 
+    /**
+     * @throws \Exception
+     *
+     * @return bool
+     */
     public function completeTransaction()
     {
         if ($this->pdo === null) {
             $this->connect();
         }
 
-        if ($this->hasErrors()) {
-            $this->rollback();
-        } else {
-            $this->commit();
+        if ($this->pdo->inTransaction() === false) {
+            return false;
         }
+
+        if ($this->hasErrors()) {
+            return $this->rollback();
+        }
+
+        return $this->commit();
     }
 
     /**
@@ -822,7 +839,7 @@ class Database
     public function useSqlFile(string $filepath)
     {
         if (!file_exists($filepath)) {
-            throw new Exception('File missing for useSqlFile method: ' . $filepath, 60);
+            throw new Exception('File missing for useSqlFile method: ' . $filepath);
         }
 
         $sqlFile = file_get_contents($filepath);

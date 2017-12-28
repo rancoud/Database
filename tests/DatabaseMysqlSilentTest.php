@@ -136,4 +136,60 @@ class DatabaseMysqlSilentTest extends TestCase
 
         static::assertNull($this->db->getPdo());
     }
+
+    public function testExecStatementFalse()
+    {
+        $sql = 'SELECT namebbb FROM test WHERE id = :id';
+        $success = $this->db->exec($sql);
+        static::assertFalse($success);
+    }
+
+    public function testInsertStatementFalse()
+    {
+        $sql = 'a :a';
+        $success = $this->db->insert($sql);
+        static::assertNull($success);
+    }
+
+    public function testUpdateStatementFalse()
+    {
+        $sql = 'a :a';
+        $success = $this->db->update($sql);
+        static::assertNull($success);
+    }
+
+    public function testDeleteStatementFalse()
+    {
+        $sql = 'a :a';
+        $success = $this->db->delete($sql);
+        static::assertNull($success);
+    }
+
+    /*public function testCountStatementFalse()
+    {
+        $sql = 'a';
+        $success = $this->db->count($sql);
+        static::assertFalse($success);
+    }*/
+
+    public function testSelectAllStatementFalse()
+    {
+        $sql = 'a :a';
+        $success = $this->db->selectAll($sql);
+        static::assertSame([], $success);
+    }
+
+    /*public function testSelectRowStatementFalse()
+    {
+        $sql = 'a';
+        $success = $this->db->selectRow($sql);
+        static::assertSame([], $success);
+    }*/
+
+    public function testSelectColStatementFalse()
+    {
+        $sql = 'a :a';
+        $success = $this->db->selectCol($sql);
+        static::assertSame([], $success);
+    }
 }

@@ -341,6 +341,60 @@ class DatabaseMysqlExceptionTest extends TestCase
         $this->db->selectVar($sql);
     }
 
+    public function testPdoParamType()
+    {
+        $sql = 'SELECT :true AS `true`, :false AS `false`, :null AS `null`, :float AS `float`, :int AS `int`, :string AS `string`, :resource AS `resource`';
+        $params = [
+            'true'    => true,
+            'false'   => false,
+            'null'    => null,
+            'float'   => 1.2,
+            'int'     => 800,
+            'string'  => 'string',
+            'resource'=> fopen(__DIR__ . '/test-dump.sql', 'r')
+        ];
+        $row = $this->db->selectRow($sql, $params);
+
+        static::assertSame('1', $row['true']);
+        static::assertSame('0', $row['false']);
+        static::assertSame(null, $row['null']);
+        static::assertSame('1.2', $row['float']);
+        static::assertSame('800', $row['int']);
+        static::assertSame('string', $row['string']);
+        static::assertSame('-- MySQL dump', mb_substr($row['resource'], 0, 13));
+    }
+
+    public function testPdoParamTypeError()
+    {
+        $sql = 'SELECT :array AS `array`';
+        $params = ['array' => []];
+
+        try {
+            $this->db->selectRow($sql, $params);
+        } catch (Exception $e) {
+            static::assertSame('Error Bind Value', $e->getMessage());
+        }
+    }
+
+    public function testPdoParamTypeException()
+    {
+        static::expectException(Exception::class);
+
+        $sql = 'SELECT :array AS `array`';
+        $params = ['array' => []];
+        $this->db->selectRow($sql, $params);
+    }
+
+    public function testPrepareBindException()
+    {
+        static::expectException(Exception::class);
+
+        $sql = 'SELECT :a';
+        $params = [':a' => 'a'];
+        $row = $this->db->selectRow($sql, $params);
+        var_dump($row);
+    }
+
     public function testSelect()
     {
         $sql = 'SELECT * FROM test_select';
@@ -463,6 +517,8 @@ class DatabaseMysqlExceptionTest extends TestCase
 
     public function testTransaction()
     {
+        $this->db->completeTransaction();
+
         $this->db->startTransaction();
 
         $sql = 'UPDATE test_select SET name = :name WHERE id =:id';
@@ -617,15 +673,15 @@ class DatabaseMysqlExceptionTest extends TestCase
         static::assertSame('PDO', get_class($this->db->getPdo()));
     }
 
-    /*public function testConnectError()
+    public function testConnectError()
     {
-        try{
+        try {
             $params = $this->params;
-            $params['user'] = '';
+            $params['password'] = 'password';
             $databaseConf = new Configurator($params);
             $db = new Database($databaseConf);
             $db->connect();
-        } catch(Exception $e){
+        } catch (Exception $e) {
             static::assertSame('Error Connecting Database', $e->getMessage());
         }
     }
@@ -635,11 +691,11 @@ class DatabaseMysqlExceptionTest extends TestCase
         static::expectException(Exception::class);
 
         $params = $this->params;
-        $params['user'] = '';
+        $params['password'] = 'password';
         $databaseConf = new Configurator($params);
         $db = new Database($databaseConf);
         $db->connect();
-    }*/
+    }
 
     public function testGetPdo()
     {
