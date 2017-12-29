@@ -65,7 +65,7 @@ class DatabaseMysqlExceptionTest extends TestCase
     {
         static::expectException(Exception::class);
 
-        $this->db->exec('bbb');
+        $this->db->exec('aaa');
     }
 
     public function testInsert()
@@ -197,16 +197,19 @@ class DatabaseMysqlExceptionTest extends TestCase
     {
         $sql = 'SELECT * FROM test_select';
         $rows = $this->db->selectAll($sql);
+        var_dump($rows);
         static::assertSame(6, count($rows));
 
         $sql = 'SELECT * FROM test_select WHERE rank >= :rank';
         $params = ['rank' => 20];
         $rows = $this->db->selectAll($sql, $params);
+        var_dump($rows);
         static::assertSame(3, count($rows));
 
         $sql = 'SELECT * FROM test_select WHERE rank >= :rank';
         $params = ['rank' => 100];
         $rows = $this->db->selectAll($sql, $params);
+        var_dump($rows);
         static::assertSame(0, count($rows));
     }
 
@@ -234,16 +237,19 @@ class DatabaseMysqlExceptionTest extends TestCase
     {
         $sql = 'SELECT * FROM test_select';
         $rows = $this->db->selectRow($sql);
+        var_dump($rows);
         static::assertSame(4, count($rows));
 
         $sql = 'SELECT * FROM test_select WHERE rank >= :rank';
         $params = ['rank' => 20];
         $rows = $this->db->selectRow($sql, $params);
+        var_dump($rows);
         static::assertSame(4, count($rows));
 
         $sql = 'SELECT * FROM test_select WHERE rank >= :rank';
         $params = ['rank' => 100];
         $rows = $this->db->selectRow($sql, $params);
+        var_dump($rows);
         static::assertFalse($rows);
     }
 
