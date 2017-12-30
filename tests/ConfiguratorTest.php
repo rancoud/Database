@@ -529,6 +529,45 @@ class ConfiguratorTest extends TestCase
         static::assertSame($expected, $conf->getParametersForPDO());
     }
 
+    public function testGetParametersForPDOPgsql()
+    {
+        $params = [
+            'engine'        => 'pgsql',
+            'host'          => '127.0.0.1',
+            'user'          => 'postgres',
+            'password'      => '',
+            'database'      => 'test_database'
+        ];
+        $conf = new Configurator($params);
+
+        $expected = [
+            PDO::ATTR_ERRMODE    => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_PERSISTENT => false
+        ];
+        static::assertSame($expected, $conf->getParametersForPDO());
+
+        $conf->setReportError('silent');
+        $expected = [
+            PDO::ATTR_ERRMODE    => PDO::ERRMODE_SILENT,
+            PDO::ATTR_PERSISTENT => false
+        ];
+        static::assertSame($expected, $conf->getParametersForPDO());
+
+        $conf->setCharset('charset');
+        $expected = [
+            PDO::ATTR_ERRMODE    => PDO::ERRMODE_SILENT,
+            PDO::ATTR_PERSISTENT => false
+        ];
+        static::assertSame($expected, $conf->getParametersForPDO());
+
+        $conf->enablePermanentConnection();
+        $expected = [
+            PDO::ATTR_ERRMODE    => PDO::ERRMODE_SILENT,
+            PDO::ATTR_PERSISTENT => true
+        ];
+        static::assertSame($expected, $conf->getParametersForPDO());
+    }
+
     public function testCreatePDOConnectionMysqlInReportErrorException()
     {
         $params = [
@@ -591,6 +630,68 @@ class ConfiguratorTest extends TestCase
         $conf->createPDOConnection();
     }
 
+    public function testCreatePDOConnectionPgsqlInReportErrorException()
+    {
+        $params = [
+            'engine'        => 'pgsql',
+            'host'          => '127.0.0.1',
+            'user'          => 'postgres',
+            'password'      => '',
+            'database'      => 'test_database'
+        ];
+        $conf = new Configurator($params);
+
+        static::assertNotNull($conf->createPDOConnection());
+    }
+
+    public function testCreatePDOConnectionPgsqlInReportErrorExceptionThrowException()
+    {
+        static::expectException(Exception::class);
+
+        $params = [
+            'engine'        => 'pgsql',
+            'host'          => '127.0.0.1',
+            'user'          => '',
+            'password'      => '',
+            'database'      => 'test_database'
+        ];
+        $conf = new Configurator($params);
+
+        $conf->createPDOConnection();
+    }
+
+    public function testCreatePDOConnectionPgsqlInReportErrorSilent()
+    {
+        $params = [
+            'engine'        => 'pgsql',
+            'host'          => '127.0.0.1',
+            'user'          => 'postgres',
+            'password'      => '',
+            'database'      => 'test_database',
+            'report_error'  => 'silent'
+        ];
+        $conf = new Configurator($params);
+
+        static::assertNotNull($conf->createPDOConnection());
+    }
+
+    public function testCreatePDOConnectionPgsqlInReportErrorSilentErrorThrowException()
+    {
+        static::expectException(Exception::class);
+
+        $params = [
+            'engine'        => 'pgsql',
+            'host'          => '127.0.0.1',
+            'user'          => '',
+            'password'      => '',
+            'database'      => 'test_database',
+            'report_error'  => 'silent'
+        ];
+        $conf = new Configurator($params);
+
+        $conf->createPDOConnection();
+    }
+
     public function testCreatePDOConnectionSqlite()
     {
         $params = [
@@ -599,20 +700,6 @@ class ConfiguratorTest extends TestCase
             'user'          => '',
             'password'      => '',
             'database'      => __DIR__ . '/test_database.db'
-        ];
-        $conf = new Configurator($params);
-
-        static::assertNotNull($conf->createPDOConnection());
-    }
-
-    public function testCreatePDOConnectionPgsql()
-    {
-        $params = [
-            'engine'        => 'pgsql',
-            'host'          => '127.0.0.1',
-            'user'          => 'postgres',
-            'password'      => '',
-            'database'      => 'test_database'
         ];
         $conf = new Configurator($params);
 
