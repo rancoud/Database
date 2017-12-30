@@ -332,11 +332,10 @@ class Configurator
         $engine = $this->getEngine();
         $host = $this->getHost();
         $database = $this->getDatabase();
-        $charset = $this->getCharset();
 
-        $dsn = $engine . ':host=' . $host . ';dbname=' . $database . ';charset=' . $charset;
+        $dsn = $engine . ':host=' . $host . ';dbname=' . $database;
         if ($engine === 'sqlite') {
-            $dsn = 'sqlite:' . $database . ';charset=' . $charset;
+            $dsn = 'sqlite:' . $database;
         }
 
         return $dsn;

@@ -416,7 +416,7 @@ class ConfiguratorTest extends TestCase
         ];
         $conf = new Configurator($params);
 
-        static::assertSame('mysql:host=127.0.0.1;dbname=test_database;charset=utf8', $conf->getDsn());
+        static::assertSame('mysql:host=127.0.0.1;dbname=test_database', $conf->getDsn());
     }
 
     public function testGetDsnSqlite()
@@ -426,11 +426,25 @@ class ConfiguratorTest extends TestCase
             'host'          => '',
             'user'          => '',
             'password'      => '',
-            'database'      => 'test_database.db'
+            'database'      => __DIR__ . '/test_database.db'
         ];
         $conf = new Configurator($params);
 
-        static::assertSame('sqlite:test_database.db;charset=utf8', $conf->getDsn());
+        static::assertSame('sqlite:'.__DIR__ .'/test_database.db', $conf->getDsn());
+    }
+
+    public function testGetDsnPgsql()
+    {
+        $params = [
+            'engine'        => 'pgsql',
+            'host'          => '127.0.0.1',
+            'user'          => 'postgres',
+            'password'      => '',
+            'database'      => 'test_database'
+        ];
+        $conf = new Configurator($params);
+
+        static::assertSame('pgsql:host=127.0.0.1;dbname=test_database', $conf->getDsn());
     }
 
     public function testGetParametersForPDOMysql()
@@ -483,7 +497,7 @@ class ConfiguratorTest extends TestCase
             'host'          => '',
             'user'          => '',
             'password'      => '',
-            'database'      => 'test_database.db'
+            'database'      => __DIR__ . '/test_database.db'
         ];
         $conf = new Configurator($params);
 
@@ -515,7 +529,7 @@ class ConfiguratorTest extends TestCase
         static::assertSame($expected, $conf->getParametersForPDO());
     }
 
-    public function testCreatePDOConectionMysqlInReportErrorException()
+    public function testCreatePDOConnectionMysqlInReportErrorException()
     {
         $params = [
             'engine'        => 'mysql',
@@ -529,7 +543,7 @@ class ConfiguratorTest extends TestCase
         static::assertNotNull($conf->createPDOConnection());
     }
 
-    public function testCreatePDOConectionMysqlInReportErrorExceptionThrowException()
+    public function testCreatePDOConnectionMysqlInReportErrorExceptionThrowException()
     {
         static::expectException(Exception::class);
 
@@ -545,7 +559,7 @@ class ConfiguratorTest extends TestCase
         $conf->createPDOConnection();
     }
 
-    public function testCreatePDOConectionMysqlInReportErrorSilent()
+    public function testCreatePDOConnectionMysqlInReportErrorSilent()
     {
         $params = [
             'engine'        => 'mysql',
@@ -560,7 +574,7 @@ class ConfiguratorTest extends TestCase
         static::assertNotNull($conf->createPDOConnection());
     }
 
-    public function testCreatePDOConectionMysqlInReportErrorSilentErrorThrowException()
+    public function testCreatePDOConnectionMysqlInReportErrorSilentErrorThrowException()
     {
         static::expectException(Exception::class);
 
@@ -577,14 +591,28 @@ class ConfiguratorTest extends TestCase
         $conf->createPDOConnection();
     }
 
-    public function testCreatePDOConectionSqlite()
+    public function testCreatePDOConnectionSqlite()
     {
         $params = [
             'engine'        => 'sqlite',
             'host'          => '',
             'user'          => '',
             'password'      => '',
-            'database'      => 'test_database.db'
+            'database'      => __DIR__ . '/test_database.db'
+        ];
+        $conf = new Configurator($params);
+
+        static::assertNotNull($conf->createPDOConnection());
+    }
+
+    public function testCreatePDOConnectionPgsql()
+    {
+        $params = [
+            'engine'        => 'pgsql',
+            'host'          => '127.0.0.1',
+            'user'          => 'postgres',
+            'password'      => '',
+            'database'      => 'test_database'
         ];
         $conf = new Configurator($params);
 

@@ -197,19 +197,19 @@ class DatabaseMysqlExceptionTest extends TestCase
     {
         $sql = 'SELECT * FROM test_select';
         $rows = $this->db->selectAll($sql);
-        var_dump($rows);
+        //var_dump($rows);
         static::assertSame(6, count($rows));
 
         $sql = 'SELECT * FROM test_select WHERE rank >= :rank';
         $params = ['rank' => 20];
         $rows = $this->db->selectAll($sql, $params);
-        var_dump($rows);
+        //var_dump($rows);
         static::assertSame(3, count($rows));
 
         $sql = 'SELECT * FROM test_select WHERE rank >= :rank';
         $params = ['rank' => 100];
         $rows = $this->db->selectAll($sql, $params);
-        var_dump($rows);
+        //var_dump($rows);
         static::assertSame(0, count($rows));
     }
 
@@ -237,19 +237,19 @@ class DatabaseMysqlExceptionTest extends TestCase
     {
         $sql = 'SELECT * FROM test_select';
         $rows = $this->db->selectRow($sql);
-        var_dump($rows);
+        //var_dump($rows);
         static::assertSame(4, count($rows));
 
         $sql = 'SELECT * FROM test_select WHERE rank >= :rank';
         $params = ['rank' => 20];
         $rows = $this->db->selectRow($sql, $params);
-        var_dump($rows);
+        //var_dump($rows);
         static::assertSame(4, count($rows));
 
         $sql = 'SELECT * FROM test_select WHERE rank >= :rank';
         $params = ['rank' => 100];
         $rows = $this->db->selectRow($sql, $params);
-        var_dump($rows);
+        //var_dump($rows);
         static::assertFalse($rows);
     }
 
@@ -312,19 +312,19 @@ class DatabaseMysqlExceptionTest extends TestCase
 
     public function testSelectVar()
     {
-        $sql = 'SELECT * FROM test_select';
-        $rows = $this->db->selectVar($sql);
-        static::assertSame(1, count($rows));
+        $sql = 'SELECT id FROM test_select';
+        $var = $this->db->selectVar($sql);
+        static::assertSame('1', $var);
 
-        $sql = 'SELECT * FROM test_select WHERE rank >= :rank';
+        $sql = 'SELECT id FROM test_select WHERE rank >= :rank';
         $params = ['rank' => 20];
-        $rows = $this->db->selectVar($sql, $params);
-        static::assertSame(1, count($rows));
+        $var = $this->db->selectVar($sql, $params);
+        static::assertSame('3', $var);
 
         $sql = 'SELECT * FROM test_select WHERE rank >= :rank';
         $params = ['rank' => 100];
-        $rows = $this->db->selectVar($sql, $params);
-        static::assertSame(0, count($rows));
+        $var = $this->db->selectVar($sql, $params);
+        static::assertNull($var);
     }
 
     public function testSelectVarError()
@@ -399,7 +399,7 @@ class DatabaseMysqlExceptionTest extends TestCase
         $sql = 'SELECT :a';
         $params = [':a' => 'a'];
         $row = $this->db->selectRow($sql, $params);
-        var_dump($row);
+        //var_dump($row);
     }
 
     public function testSelect()
@@ -456,7 +456,7 @@ class DatabaseMysqlExceptionTest extends TestCase
         $params = ['rank' => 100];
         $statement = $this->db->select($sql, $params);
         $row = $this->db->read($statement);
-        static::assertSame(1, count($row));
+        static::assertFalse($row);
 
         $rows = [];
         $statement = $this->db->select('SELECT * FROM test_select');
@@ -510,7 +510,7 @@ class DatabaseMysqlExceptionTest extends TestCase
             $this->db->readAll(null);
         }catch(Exception $e)
         {
-            var_dump($e->getMessage());
+            //var_dump($e->getMessage());
             static::assertSame('Error Execute', $e->getMessage());
         }
     }*/
