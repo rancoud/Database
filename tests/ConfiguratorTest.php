@@ -430,7 +430,7 @@ class ConfiguratorTest extends TestCase
         ];
         $conf = new Configurator($params);
 
-        static::assertSame('sqlite:'.__DIR__ .'/test_database.db', $conf->getDsn());
+        static::assertSame('sqlite:' . __DIR__ . '/test_database.db', $conf->getDsn());
     }
 
     public function testGetDsnPgsql()
