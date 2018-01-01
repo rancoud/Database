@@ -7,7 +7,6 @@ use PDOStatement;
 use PHPUnit\Framework\TestCase;
 use Rancoud\Database\Configurator;
 use Rancoud\Database\Database;
-use TypeError;
 
 /**
  * Class DatabaseMysqlExceptionTest.
@@ -17,12 +16,53 @@ class DatabaseMysqlExceptionTest extends TestCase
     /** @var Database */
     protected $db;
 
-    protected $params = ['engine' => 'mysql',
-        'host'                    => '127.0.0.1',
-        'user'                    => 'root',
-        'password'                => '',
-        'database'                => 'test_database',
-        'report_error'            => 'exception'];
+    protected $params = [
+        'engine'       => 'mysql',
+        'host'         => '127.0.0.1',
+        'user'         => 'root',
+        'password'     => '',
+        'database'     => 'test_database',
+        'report_error' => 'exception'
+    ];
+
+    protected $data = [
+        [
+            'id'      => '1',
+            'name'    => 'A',
+            'rank'    => '0',
+            'comment' => null,
+        ],
+        [
+            'id'      => '2',
+            'name'    => 'B',
+            'rank'    => '10',
+            'comment' => 'yes',
+        ],
+        [
+            'id'      => '3',
+            'name'    => 'C',
+            'rank'    => '20',
+            'comment' => 'maybe',
+        ],
+        [
+            'id'      => '4',
+            'name'    => 'D',
+            'rank'    => '30',
+            'comment' => 'no',
+        ],
+        [
+            'id'      => '5',
+            'name'    => 'E',
+            'rank'    => '25',
+            'comment' => null,
+        ],
+        [
+            'id'      => '6',
+            'name'    => 'F',
+            'rank'    => '5',
+            'comment' => null,
+        ]
+    ];
 
     public function setUp()
     {
@@ -32,6 +72,7 @@ class DatabaseMysqlExceptionTest extends TestCase
 
     public function tearDown()
     {
+        $this->db->disconnect();
         $this->db = null;
     }
 
@@ -44,10 +85,10 @@ class DatabaseMysqlExceptionTest extends TestCase
 
     public function testExec()
     {
-        $success = $this->db->exec('CREATE TABLE `test` (
-          `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-          `name` VARCHAR(255) NOT NULL,
-          PRIMARY KEY (`id`) );');
+        $success = $this->db->exec('CREATE TABLE test (
+          id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+          name VARCHAR(255) NOT NULL,
+          PRIMARY KEY (id) );');
 
         static::assertTrue($success);
     }
@@ -70,24 +111,33 @@ class DatabaseMysqlExceptionTest extends TestCase
 
     public function testInsert()
     {
-        $sql = 'INSERT INTO test (`name`) VALUES ("A")';
+        $sql = 'INSERT INTO test (name) VALUES ("A")';
         $id = $this->db->insert($sql);
-        static::assertSame(null, $id);
+        static::assertSame(true, $id);
 
-        $sql = 'INSERT INTO test (`name`) VALUES (:name)';
+        $count = $this->db->count('SELECT COUNT(*) FROM test WHERE name="A" AND id=1');
+        static::assertSame(1, $count);
+
+        $sql = 'INSERT INTO test (name) VALUES (:name)';
         $params = ['name' => 'B'];
         $id = $this->db->insert($sql, $params);
-        static::assertSame(null, $id);
+        static::assertSame(true, $id);
+
+        $count = $this->db->count('SELECT COUNT(*) FROM test WHERE name="B" AND id=2');
+        static::assertSame(1, $count);
 
         $params = ['name' => 'C'];
         $getLastInsertId = true;
         $id = $this->db->insert($sql, $params, $getLastInsertId);
         static::assertSame(3, $id);
+
+        $count = $this->db->count('SELECT COUNT(*) FROM test WHERE name="C" AND id=3');
+        static::assertSame(1, $count);
     }
 
     public function testInsertError()
     {
-        $sql = 'INSERT INTO test (`name`) VALUES (:name)';
+        $sql = 'INSERT INTO test (name) VALUES (:name)';
 
         try {
             $this->db->insert($sql);
@@ -100,7 +150,7 @@ class DatabaseMysqlExceptionTest extends TestCase
     {
         static::expectException(Exception::class);
 
-        $sql = 'INSERT INTO test (`name`) VALUES (:name)';
+        $sql = 'INSERT INTO test (name) VALUES (:name)';
 
         $this->db->insert($sql);
     }
@@ -109,17 +159,26 @@ class DatabaseMysqlExceptionTest extends TestCase
     {
         $sql = 'UPDATE test SET name = "AA" WHERE id = 1';
         $rowsAffected = $this->db->update($sql);
-        static::assertSame(null, $rowsAffected);
+        static::assertSame(true, $rowsAffected);
+
+        $count = $this->db->count('SELECT COUNT(*) FROM test WHERE name="AA" AND id=1');
+        static::assertSame(1, $count);
 
         $sql = 'UPDATE test SET name = :name WHERE id = :id';
         $params = ['id' => 2, 'name' => 'BB'];
         $rowsAffected = $this->db->update($sql, $params);
-        static::assertSame(null, $rowsAffected);
+        static::assertSame(true, $rowsAffected);
+
+        $count = $this->db->count('SELECT COUNT(*) FROM test WHERE name="BB" AND id=2');
+        static::assertSame(1, $count);
 
         $params = ['id' => 3, 'name' => 'CC'];
         $getCountRowsAffected = true;
         $rowsAffected = $this->db->update($sql, $params, $getCountRowsAffected);
         static::assertSame(1, $rowsAffected);
+
+        $count = $this->db->count('SELECT COUNT(*) FROM test WHERE name="CC" AND id=3');
+        static::assertSame(1, $count);
     }
 
     public function testUpdateError()
@@ -146,17 +205,26 @@ class DatabaseMysqlExceptionTest extends TestCase
     {
         $sql = 'DELETE FROM test WHERE id = 1';
         $rowsAffected = $this->db->delete($sql);
-        static::assertSame(null, $rowsAffected);
+        static::assertSame(true, $rowsAffected);
+
+        $count = $this->db->count('SELECT COUNT(*) FROM test WHERE id=1');
+        static::assertSame(0, $count);
 
         $sql = 'DELETE FROM test WHERE id = :id';
         $params = ['id' => 2];
         $rowsAffected = $this->db->delete($sql, $params);
-        static::assertSame(null, $rowsAffected);
+        static::assertSame(true, $rowsAffected);
+
+        $count = $this->db->count('SELECT COUNT(*) FROM test WHERE id=2');
+        static::assertSame(0, $count);
 
         $params = ['id' => 3];
         $getCountRowsAffected = true;
         $rowsAffected = $this->db->delete($sql, $params, $getCountRowsAffected);
         static::assertSame(1, $rowsAffected);
+
+        $count = $this->db->count('SELECT COUNT(*) FROM test WHERE id=3');
+        static::assertSame(0, $count);
     }
 
     public function testDeleteError()
@@ -181,7 +249,7 @@ class DatabaseMysqlExceptionTest extends TestCase
 
     public function testUseSqlFile()
     {
-        $success = $this->db->useSqlFile(__DIR__ . '/test-dump.sql');
+        $success = $this->db->useSqlFile(__DIR__ . '/test-dump-mysql.sql');
 
         static::assertTrue($success);
     }
@@ -197,20 +265,20 @@ class DatabaseMysqlExceptionTest extends TestCase
     {
         $sql = 'SELECT * FROM test_select';
         $rows = $this->db->selectAll($sql);
-        //var_dump($rows);
-        static::assertSame(6, count($rows));
+        static::assertSame($this->data, $rows);
 
         $sql = 'SELECT * FROM test_select WHERE rank >= :rank';
         $params = ['rank' => 20];
         $rows = $this->db->selectAll($sql, $params);
-        //var_dump($rows);
-        static::assertSame(3, count($rows));
+        $data[] = $this->data[2];
+        $data[] = $this->data[3];
+        $data[] = $this->data[4];
+        static::assertSame($data, $rows);
 
         $sql = 'SELECT * FROM test_select WHERE rank >= :rank';
         $params = ['rank' => 100];
         $rows = $this->db->selectAll($sql, $params);
-        //var_dump($rows);
-        static::assertSame(0, count($rows));
+        static::assertSame([], $rows);
     }
 
     public function testSelectAllError()
@@ -236,21 +304,18 @@ class DatabaseMysqlExceptionTest extends TestCase
     public function testSelectRow()
     {
         $sql = 'SELECT * FROM test_select';
-        $rows = $this->db->selectRow($sql);
-        //var_dump($rows);
-        static::assertSame(4, count($rows));
+        $row = $this->db->selectRow($sql);
+        static::assertSame($this->data[0], $row);
 
         $sql = 'SELECT * FROM test_select WHERE rank >= :rank';
         $params = ['rank' => 20];
-        $rows = $this->db->selectRow($sql, $params);
-        //var_dump($rows);
-        static::assertSame(4, count($rows));
+        $row = $this->db->selectRow($sql, $params);
+        static::assertSame($this->data[2], $row);
 
         $sql = 'SELECT * FROM test_select WHERE rank >= :rank';
         $params = ['rank' => 100];
-        $rows = $this->db->selectRow($sql, $params);
-        //var_dump($rows);
-        static::assertFalse($rows);
+        $row = $this->db->selectRow($sql, $params);
+        static::assertSame([], $row);
     }
 
     public function testSelectRowError()
@@ -276,18 +341,18 @@ class DatabaseMysqlExceptionTest extends TestCase
     public function testSelectCol()
     {
         $sql = 'SELECT * FROM test_select';
-        $rows = $this->db->selectCol($sql);
-        static::assertSame(6, count($rows));
+        $col = $this->db->selectCol($sql);
+        static::assertSame(['1', '2', '3', '4', '5', '6'], $col);
 
-        $sql = 'SELECT * FROM test_select WHERE rank >= :rank';
+        $sql = 'SELECT name FROM test_select WHERE rank >= :rank';
         $params = ['rank' => 20];
-        $rows = $this->db->selectCol($sql, $params);
-        static::assertSame(3, count($rows));
+        $col = $this->db->selectCol($sql, $params);
+        static::assertSame(['C', 'D', 'E'], $col);
 
-        $sql = 'SELECT * FROM test_select WHERE rank >= :rank';
+        $sql = 'SELECT rank FROM test_select WHERE rank >= :rank';
         $params = ['rank' => 100];
-        $rows = $this->db->selectCol($sql, $params);
-        static::assertSame(0, count($rows));
+        $col = $this->db->selectCol($sql, $params);
+        static::assertSame([], $col);
     }
 
     public function testSelectColError()
@@ -316,15 +381,15 @@ class DatabaseMysqlExceptionTest extends TestCase
         $var = $this->db->selectVar($sql);
         static::assertSame('1', $var);
 
-        $sql = 'SELECT id FROM test_select WHERE rank >= :rank';
+        $sql = 'SELECT name FROM test_select WHERE rank >= :rank';
         $params = ['rank' => 20];
         $var = $this->db->selectVar($sql, $params);
-        static::assertSame('3', $var);
+        static::assertSame('C', $var);
 
-        $sql = 'SELECT * FROM test_select WHERE rank >= :rank';
+        $sql = 'SELECT rank FROM test_select WHERE rank >= :rank';
         $params = ['rank' => 100];
         $var = $this->db->selectVar($sql, $params);
-        static::assertNull($var);
+        static::assertFalse($var);
     }
 
     public function testSelectVarError()
@@ -358,7 +423,7 @@ class DatabaseMysqlExceptionTest extends TestCase
             'float'   => 1.2,
             'int'     => 800,
             'string'  => 'string',
-            'resource'=> fopen(__DIR__ . '/test-dump.sql', 'r')
+            'resource'=> fopen(__DIR__ . '/test-dump-mysql.sql', 'r')
         ];
         $row = $this->db->selectRow($sql, $params);
 
@@ -373,7 +438,7 @@ class DatabaseMysqlExceptionTest extends TestCase
 
     public function testPdoParamTypeError()
     {
-        $sql = 'SELECT :array AS `array`';
+        $sql = 'SELECT :array AS array';
         $params = ['array' => []];
 
         try {
@@ -387,7 +452,7 @@ class DatabaseMysqlExceptionTest extends TestCase
     {
         static::expectException(Exception::class);
 
-        $sql = 'SELECT :array AS `array`';
+        $sql = 'SELECT :array AS array';
         $params = ['array' => []];
         $this->db->selectRow($sql, $params);
     }
@@ -467,23 +532,6 @@ class DatabaseMysqlExceptionTest extends TestCase
         static::assertSame(6, count($rows));
     }
 
-    /*public function testReadError()
-    {
-        try{
-            $this->db->read(null);
-        }catch(Exception $e)
-        {
-            static::assertSame('Error Execute', $e->getMessage());
-        }
-    }*/
-
-    public function testReadException()
-    {
-        static::expectException(TypeError::class);
-
-        $this->db->read(null);
-    }
-
     public function testReadAll()
     {
         $sql = 'SELECT * FROM test_select';
@@ -504,28 +552,8 @@ class DatabaseMysqlExceptionTest extends TestCase
         static::assertSame(0, count($rows));
     }
 
-    /*public function testReadAllError()
-    {
-        try{
-            $this->db->readAll(null);
-        }catch(Exception $e)
-        {
-            //var_dump($e->getMessage());
-            static::assertSame('Error Execute', $e->getMessage());
-        }
-    }*/
-
-    public function testReadAllException()
-    {
-        static::expectException(TypeError::class);
-
-        $this->db->readAll(null);
-    }
-
     public function testTransaction()
     {
-        $this->db->completeTransaction();
-
         $this->db->startTransaction();
 
         $sql = 'UPDATE test_select SET name = :name WHERE id =:id';
@@ -545,42 +573,24 @@ class DatabaseMysqlExceptionTest extends TestCase
             $this->db->startTransaction();
 
             $sql = 'UPDATE test_select SET name = :name WHERE id =:id';
-            $params = ['name' => 'my name', 'id' => 1];
+            $params = ['name' => 'A', 'id' => 1];
             $this->db->update($sql, $params);
+
+            $sql = 'SELECT name FROM test_select WHERE id = :id';
+            $params = ['id' => 1];
+            static::assertSame('A', $this->db->selectVar($sql, $params));
+
+            $this->db->selectVar($sql);
+
+            $this->db->commitTransaction();
+        } catch (Exception $e) {
+            $this->db->rollbackTransaction();
 
             $sql = 'SELECT name FROM test_select WHERE id = :id';
             $params = ['id' => 1];
             static::assertSame('my name', $this->db->selectVar($sql, $params));
-
-            $this->db->selectVar($sql);
-
-            $this->db->completeTransaction();
-        } catch (Exception $e) {
-            $this->db->completeTransaction();
-
-            $sql = 'SELECT name FROM test_select WHERE id = :id';
-            $params = ['id' => 1];
-            //static::assertSame('A', $this->db->selectVar($sql, $params));
         }
     }
-
-    /*public function testTransactionException()
-    {
-        try{
-            $this->db->startTransaction();
-
-            $sql = 'UPDATE test_select SET name = :name WHERE id =:id';
-            $params = ['name' => 'my name', 'id' => 1];
-            $this->db->update($sql, $params);
-
-            $this->db->completeTransaction();
-        }
-        catch (Exception $e){
-            $sql = 'SELECT name FROM test_select WHERE id = :id';
-            $params = ['id' => 1];
-            static::assertSame('A', $this->db->selectVar($sql, $params));
-        }
-    }*/
 
     // errors
 
@@ -624,11 +634,11 @@ class DatabaseMysqlExceptionTest extends TestCase
 
         static::assertSame([], $this->db->getSavedQueries());
 
-        $this->testSelectAll('SELECT * FROM test_select');
+        $this->db->selectAll('SELECT * FROM test_select');
 
         $queries = $this->db->getSavedQueries();
 
-        static::assertSame(4, count($queries));
+        static::assertSame(2, count($queries));
 
         $this->db->cleanSavedQueries();
 
@@ -657,16 +667,6 @@ class DatabaseMysqlExceptionTest extends TestCase
     public function testDropTables()
     {
         static::assertTrue($this->db->dropTables(['test', 'toto']));
-    }
-
-    public function testOptimizeTable()
-    {
-        static::assertTrue($this->db->optimizeTable('test'));
-    }
-
-    public function testOptimizeTables()
-    {
-        static::assertTrue($this->db->optimizeTables(['test', 'test_select']));
     }
 
     // low level

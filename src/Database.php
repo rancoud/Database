@@ -316,7 +316,7 @@ class Database
      *
      * @throws Exception
      *
-     * @return int|null|bool
+     * @return int|bool
      */
     public function insert(string $sql, array $parameters = [], bool $getLastInsertId = false)
     {
@@ -328,13 +328,16 @@ class Database
 
         $startTime = microtime(true);
 
-        $this->executeStatement($statement);
+        $success = $this->executeStatement($statement);
+        if ($success === false) {
+            return false;
+        }
 
         $endTime = microtime(true);
 
         $this->addQuery($statement, $parameters, $this->getTime($startTime, $endTime));
 
-        $lastInsertId = null;
+        $lastInsertId = true;
         if ($getLastInsertId === true) {
             $lastInsertId = (int) $this->pdo->lastInsertId();
         }
@@ -352,7 +355,7 @@ class Database
      *
      * @throws Exception
      *
-     * @return int|null|bool
+     * @return int|bool
      */
     public function update(string $sql, array $parameters = [], bool $getCountRowsAffected = false)
     {
@@ -364,13 +367,16 @@ class Database
 
         $startTime = microtime(true);
 
-        $this->executeStatement($statement);
+        $success = $this->executeStatement($statement);
+        if ($success === false) {
+            return false;
+        }
 
         $endTime = microtime(true);
 
         $this->addQuery($statement, $parameters, $this->getTime($startTime, $endTime));
 
-        $countRowAffected = null;
+        $countRowAffected = true;
         if ($getCountRowsAffected) {
             $countRowAffected = (int) $statement->rowCount();
         }
@@ -388,7 +394,7 @@ class Database
      *
      * @throws Exception
      *
-     * @return int|null|bool
+     * @return int|bool
      */
     public function delete(string $sql, array $parameters = [], bool $getCountRowsAffected = false)
     {
@@ -400,13 +406,16 @@ class Database
 
         $startTime = microtime(true);
 
-        $this->executeStatement($statement);
+        $success = $this->executeStatement($statement);
+        if ($success === false) {
+            return false;
+        }
 
         $endTime = microtime(true);
 
         $this->addQuery($statement, $parameters, $this->getTime($startTime, $endTime));
 
-        $countRowAffected = null;
+        $countRowAffected = true;
         if ($getCountRowsAffected) {
             $countRowAffected = (int) $statement->rowCount();
         }
@@ -511,7 +520,7 @@ class Database
      *
      * @throws Exception
      *
-     * @return array|null
+     * @return array
      */
     public function selectRow($sql, array $parameters = [])
     {
@@ -522,6 +531,9 @@ class Database
         }
 
         $row = $this->read($statement);
+        if ($row === false) {
+            $row = [];
+        }
 
         $statement->closeCursor();
         $statement = null;
@@ -563,16 +575,16 @@ class Database
      *
      * @throws Exception
      *
-     * @return string|null
+     * @return string|bool
      */
     public function selectVar(string $sql, array $parameters = [])
     {
-        $var = null;
+        $var = false;
 
         $statement = $this->select($sql, $parameters);
 
         if ($statement === null) {
-            return null;
+            return false;
         }
 
         $row = $this->read($statement);
@@ -647,6 +659,42 @@ class Database
     }
 
     /**
+     * @throws Exception
+     *
+     * @return bool
+     */
+    public function commitTransaction()
+    {
+        if ($this->pdo === null) {
+            $this->connect();
+        }
+
+        if ($this->pdo->inTransaction() === false) {
+            return false;
+        }
+
+        return $this->commit();
+    }
+
+    /**
+     * @throws Exception
+     *
+     * @return bool
+     */
+    public function rollbackTransaction()
+    {
+        if ($this->pdo === null) {
+            $this->connect();
+        }
+
+        if ($this->pdo->inTransaction() === false) {
+            return false;
+        }
+
+        return $this->rollback();
+    }
+
+    /**
      * @return bool
      */
     public function hasErrors()
@@ -712,16 +760,6 @@ class Database
     }
 
     /**
-     * @param string $string
-     *
-     * @return string
-     */
-    protected function cleanField(string $string)
-    {
-        return str_replace('`', '', $string);
-    }
-
-    /**
      * @param string $table
      *
      * @throws Exception
@@ -730,8 +768,7 @@ class Database
      */
     public function truncateTable(string $table)
     {
-        $table = $this->cleanField($table);
-        $sql = 'TRUNCATE TABLE `' . $table . '`';
+        $sql = 'TRUNCATE TABLE ' . $table;
 
         return $this->exec($sql);
     }
@@ -747,7 +784,6 @@ class Database
     {
         $success = true;
 
-        $tables = array_map([$this, 'cleanField'], $tables);
         foreach ($tables as $table) {
             if ($this->truncateTable($table) === false) {
                 $success = false;
@@ -780,10 +816,9 @@ class Database
     {
         $success = true;
 
-        $tables = array_map([$this, 'cleanField'], $tables);
         if ($this->configurator->getEngine() === 'sqlite') {
             foreach ($tables as $table) {
-                $sql = 'DROP TABLE IF EXISTS `' . $table . '`';
+                $sql = 'DROP TABLE IF EXISTS ' . $table;
                 if ($this->exec($sql) === false) {
                     $success = false;
                 }
@@ -792,41 +827,12 @@ class Database
             return $success;
         }
 
-        $tables = implode('`,`', $tables);
+        $tables = implode(',', $tables);
 
-        $sql = 'DROP TABLE IF EXISTS `' . $tables . '`';
+        $sql = 'DROP TABLE IF EXISTS ' . $tables;
         $success = $this->exec($sql);
 
         return $success;
-    }
-
-    /**
-     * @param string $table
-     *
-     * @throws Exception
-     *
-     * @return bool
-     */
-    public function optimizeTable(string $table)
-    {
-        return $this->optimizeTables([$table]);
-    }
-
-    /**
-     * @param array $tables
-     *
-     * @throws Exception
-     *
-     * @return bool
-     */
-    public function optimizeTables(array $tables)
-    {
-        $tables = array_map([$this, 'cleanField'], $tables);
-        $tables = implode('`,`', $tables);
-
-        $sql = 'OPTIMIZE TABLE `' . $tables . '`';
-
-        return $this->exec($sql);
     }
 
     /**
