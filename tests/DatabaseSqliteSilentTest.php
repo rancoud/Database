@@ -14,12 +14,14 @@ class DatabaseSqliteSilentTest extends TestCase
     /** @var Database */
     protected $db;
 
-    protected $params = ['engine' => 'sqlite',
-        'host'                    => '127.0.0.1',
-        'user'                    => '',
-        'password'                => '',
-        'database'                => __DIR__ . '/test_database.db',
-        'report_error'            => 'silent'];
+    protected $params = [
+        'engine'       => 'sqlite',
+        'host'         => '127.0.0.1',
+        'user'         => '',
+        'password'     => '',
+        'database'     => __DIR__ . '/test_database.db',
+        'report_error' => 'silent'
+    ];
 
     public function setUp()
     {
@@ -48,7 +50,7 @@ class DatabaseSqliteSilentTest extends TestCase
 
     public function testInsert()
     {
-        $id = $this->db->insert('INSERT INTO test (`name`) VALUES (:name)', ['name' => 'A'], true);
+        $id = $this->db->insert('INSERT INTO test (name) VALUES (:name)', ['name' => 'A'], true);
         static::assertSame(1, $id);
     }
 
@@ -70,9 +72,9 @@ class DatabaseSqliteSilentTest extends TestCase
     {
         $res = [];
 
-        $id = $this->db->insert('INSERT INTO test (`name`) VALUES (:name)', ['name' => 'A'], true);
-        $id = $this->db->insert('INSERT INTO test (`name`) VALUES (:name)', ['name' => 'B'], true);
-        $id = $this->db->insert('INSERT INTO test (`name`) VALUES (:name)', ['name' => 'C'], true);
+        $id = $this->db->insert('INSERT INTO test (name) VALUES (:name)', ['name' => 'A'], true);
+        $id = $this->db->insert('INSERT INTO test (name) VALUES (:name)', ['name' => 'B'], true);
+        $id = $this->db->insert('INSERT INTO test (name) VALUES (:name)', ['name' => 'C'], true);
 
         $cursor = $this->db->select('SELECT * FROM test');
         while ($row = $this->db->read($cursor)) {

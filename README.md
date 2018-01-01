@@ -85,8 +85,6 @@ $results = $database->selectAll("SELECT * FROM mytable WHERE something > :thing"
 * truncateTables(tables: array):bool  
 * dropTable(table: string):bool  
 * dropTables(tables: array):bool  
-* optimizeTable(table: string):bool  
-* optimizeTables(tables: array):bool  
 * useSqlFile(filepath: string):bool  
 
 ### Low Level
