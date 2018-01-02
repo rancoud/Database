@@ -1,8 +1,8 @@
 # Database Package
 
-[![Build Status](https://travis-ci.org/rancoud/Database.svg?branch=fix-better-exception)](https://travis-ci.org/rancoud/Database) [![Coverage Status](https://coveralls.io/repos/github/rancoud/Database/badge.svg?branch=fix-better-exception)](https://coveralls.io/github/rancoud/Database?branch=fix-better-exception)
+[![Build Status](https://travis-ci.org/rancoud/Database.svg?branch=master)](https://travis-ci.org/rancoud/Database) [![Coverage Status](https://coveralls.io/repos/github/rancoud/Database/badge.svg?branch=master)](https://coveralls.io/github/rancoud/Database?branch=master)
 
-Request Database with PDO without write it.  
+Request Database (use PDO).  
 
 ## Installation
 ```php
