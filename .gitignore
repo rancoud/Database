@@ -11,3 +11,9 @@ composer.lock
 
 # PHP Unit
 build/
+
+# Dev / Testing
+test.php
+test_database.db*
+coverage/*
+!coverage/.gitkeep
