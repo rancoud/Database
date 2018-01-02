@@ -50,13 +50,13 @@ $results = $database->selectAll("SELECT * FROM mytable WHERE something > :thing"
 
 ## Database Methods
 ### General Commands  
-* selectAll(sql: string, [parameters: array = []]):array|null  
-* selectRow(sql: string, [parameters: array = []]):array|null  
-* selectCol(sql: string, [parameters: array = []]):array|null  
-* selectVar(sql: string, [parameters: array = []]):string|null  
-* insert(sql: string, [parameters: array = []], [getLastInsertId: bool = false]):int|null|bool  
-* update(sql: string, [parameters: array = []], [getCountRowAffected: bool = false]):int|null|bool  
-* delete(sql: string, [parameters: array = []], [getCountRowAffected: bool = false]):int|null|bool  
+* selectAll(sql: string, [parameters: array = []]):array|bool  
+* selectRow(sql: string, [parameters: array = []]):array|bool  
+* selectCol(sql: string, [parameters: array = []]):array|bool  
+* selectVar(sql: string, [parameters: array = []]):mixed|bool  
+* insert(sql: string, [parameters: array = []], [getLastInsertId: bool = false]):int|bool  
+* update(sql: string, [parameters: array = []], [getCountRowAffected: bool = false]):int|bool  
+* delete(sql: string, [parameters: array = []], [getCountRowAffected: bool = false]):int|bool  
 * count(sql: string, [parameters: array = []]):int|bool  
 * exec(sql: string, [parameters: array = []]):bool  
 * select(sql: string, [parameters: array = []]):PDOStatement|null  
@@ -66,6 +66,8 @@ $results = $database->selectAll("SELECT * FROM mytable WHERE something > :thing"
 ### Transactions
 * startTransaction():bool  
 * completeTransaction():bool  
+* commitTransaction():bool  
+* rollbackTransaction():bool  
 
 ### Errors
 * hasErrors():bool  
