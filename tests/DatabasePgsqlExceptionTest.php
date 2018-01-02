@@ -678,30 +678,6 @@ class DatabasePgsqlExceptionTest extends TestCase
         static::assertSame('PDO', get_class($this->db->getPdo()));
     }
 
-    public function testConnectError()
-    {
-        try {
-            $params = $this->params;
-            $params['user'] = '';
-            $databaseConf = new Configurator($params);
-            $db = new Database($databaseConf);
-            $db->connect();
-        } catch (Exception $e) {
-            static::assertSame('Error Connecting Database', $e->getMessage());
-        }
-    }
-
-    public function testConnectException()
-    {
-        static::expectException(Exception::class);
-
-        $params = $this->params;
-        $params['user'] = '';
-        $databaseConf = new Configurator($params);
-        $db = new Database($databaseConf);
-        $db->connect();
-    }
-
     public function testGetPdo()
     {
         static::assertNull($this->db->getPdo());

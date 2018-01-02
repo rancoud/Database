@@ -644,22 +644,6 @@ class ConfiguratorTest extends TestCase
         static::assertNotNull($conf->createPDOConnection());
     }
 
-    public function testCreatePDOConnectionPgsqlInReportErrorExceptionThrowException()
-    {
-        static::expectException(Exception::class);
-
-        $params = [
-            'engine'        => 'pgsql',
-            'host'          => '127.0.0.1',
-            'user'          => '',
-            'password'      => '',
-            'database'      => 'test_database'
-        ];
-        $conf = new Configurator($params);
-
-        $conf->createPDOConnection();
-    }
-
     public function testCreatePDOConnectionPgsqlInReportErrorSilent()
     {
         $params = [
@@ -673,23 +657,6 @@ class ConfiguratorTest extends TestCase
         $conf = new Configurator($params);
 
         static::assertNotNull($conf->createPDOConnection());
-    }
-
-    public function testCreatePDOConnectionPgsqlInReportErrorSilentErrorThrowException()
-    {
-        static::expectException(Exception::class);
-
-        $params = [
-            'engine'        => 'pgsql',
-            'host'          => '127.0.0.1',
-            'user'          => '',
-            'password'      => '',
-            'database'      => 'test_database',
-            'report_error'  => 'silent'
-        ];
-        $conf = new Configurator($params);
-
-        $conf->createPDOConnection();
     }
 
     public function testCreatePDOConnectionSqlite()
