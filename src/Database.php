@@ -496,14 +496,14 @@ class Database
      *
      * @throws Exception
      *
-     * @return array|null
+     * @return array|bool
      */
     public function selectAll(string $sql, array $parameters = [])
     {
         $statement = $this->select($sql, $parameters);
 
         if ($statement === null) {
-            return null;
+            return false;
         }
 
         $results = $this->readAll($statement);
@@ -520,14 +520,14 @@ class Database
      *
      * @throws Exception
      *
-     * @return array
+     * @return array|bool
      */
     public function selectRow($sql, array $parameters = [])
     {
         $statement = $this->select($sql, $parameters);
 
         if ($statement === null) {
-            return null;
+            return false;
         }
 
         $row = $this->read($statement);
@@ -547,14 +547,14 @@ class Database
      *
      * @throws Exception
      *
-     * @return array|null
+     * @return array|bool
      */
     public function selectCol(string $sql, array $parameters = [])
     {
         $statement = $this->select($sql, $parameters);
 
         if ($statement === null) {
-            return null;
+            return false;
         }
 
         $datas = $this->readAll($statement);
@@ -575,7 +575,7 @@ class Database
      *
      * @throws Exception
      *
-     * @return string|bool
+     * @return mixed|bool
      */
     public function selectVar(string $sql, array $parameters = [])
     {
@@ -599,30 +599,6 @@ class Database
     }
 
     /**
-     * @return bool
-     */
-    protected function beginTransaction()
-    {
-        return $this->pdo->beginTransaction();
-    }
-
-    /**
-     * @return bool
-     */
-    protected function commit()
-    {
-        return $this->pdo->commit();
-    }
-
-    /**
-     * @return bool
-     */
-    protected function rollback()
-    {
-        return $this->pdo->rollBack();
-    }
-
-    /**
      * @throws \Exception
      *
      * @return bool
@@ -633,7 +609,7 @@ class Database
             $this->connect();
         }
 
-        return $this->beginTransaction();
+        return $this->pdo->beginTransaction();
     }
 
     /**
@@ -652,10 +628,14 @@ class Database
         }
 
         if ($this->hasErrors()) {
-            return $this->rollback();
+            $this->pdo->rollBack();
+
+            return false;
         }
 
-        return $this->commit();
+        $this->pdo->commit();
+
+        return true;
     }
 
     /**
@@ -673,7 +653,7 @@ class Database
             return false;
         }
 
-        return $this->commit();
+        return $this->pdo->commit();
     }
 
     /**
@@ -691,7 +671,7 @@ class Database
             return false;
         }
 
-        return $this->rollback();
+        return $this->pdo->rollBack();
     }
 
     /**
@@ -769,6 +749,9 @@ class Database
     public function truncateTable(string $table)
     {
         $sql = 'TRUNCATE TABLE ' . $table;
+        if ($this->configurator->getEngine() === 'sqlite') {
+            $sql = 'DELETE FROM ' . $table;
+        }
 
         return $this->exec($sql);
     }

@@ -592,6 +592,30 @@ class DatabaseMysqlExceptionTest extends TestCase
         }
     }
 
+    public function testInTransactionError()
+    {
+        $success = $this->db->completeTransaction();
+        static::assertFalse($success);
+
+        $success = $this->db->commitTransaction();
+        static::assertFalse($success);
+
+        $success = $this->db->rollbackTransaction();
+        static::assertFalse($success);
+
+        $db = new Database(new Configurator($this->params));
+        $success = $db->completeTransaction();
+        static::assertFalse($success);
+
+        $db = new Database(new Configurator($this->params));
+        $success = $db->commitTransaction();
+        static::assertFalse($success);
+
+        $db = new Database(new Configurator($this->params));
+        $success = $db->rollbackTransaction();
+        static::assertFalse($success);
+    }
+
     // errors
 
     public function testErrors()

@@ -122,14 +122,14 @@ class DatabaseSqliteSilentTest extends TestCase
 
     public function testTruncateTable()
     {
-        //$this->db->truncateTable('test');
-        //static::assertFalse($this->db->hasErrors());
+        $this->db->truncateTable('test');
+        static::assertFalse($this->db->hasErrors());
     }
 
     public function testTruncateTables()
     {
-        //$this->db->truncateTables(['test', 'test']);
-        //static::assertFalse($this->db->hasErrors());
+        $this->db->truncateTables(['test', 'test']);
+        static::assertFalse($this->db->hasErrors());
     }
 
     public function testDisconnect()
@@ -178,20 +178,20 @@ class DatabaseSqliteSilentTest extends TestCase
     {
         $sql = 'a :a';
         $success = $this->db->selectAll($sql);
-        static::assertNull($success);
+        static::assertFalse($success);
     }
 
     public function testSelectRowStatementFalse()
     {
         $sql = 'a';
         $success = $this->db->selectRow($sql);
-        static::assertNull($success);
+        static::assertFalse($success);
     }
 
     public function testSelectColStatementFalse()
     {
         $sql = 'a :a';
         $success = $this->db->selectCol($sql);
-        static::assertNull($success);
+        static::assertFalse($success);
     }
 }
