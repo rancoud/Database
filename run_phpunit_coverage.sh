@@ -1,0 +1,1 @@
+./vendor/bin/phpunit --colors --coverage-html ./coverage

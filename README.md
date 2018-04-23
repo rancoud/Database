@@ -95,28 +95,5 @@ $results = $database->selectAll("SELECT * FROM mytable WHERE something > :thing"
 * getPdo():PDO  
 
 ## How to Dev
-### Linux
-#### Coding Style
-./vendor/bin/phpcbf  
-./vendor/bin/phpcs  
-./vendor/bin/php-cs-fixer fix --diff  
-#### Unit Testing
-./vendor/bin/phpunit --colors  
-#### Code Coverage
-##### Local
-./vendor/bin/phpunit --colors --coverage-html ./coverage
-##### Coveralls.io
-./vendor/bin/phpunit --colors --coverage-text --coverage-clover build/logs/clover.xml  
-
-### Windows
-#### Coding Style
-"vendor/bin/phpcbf.bat"  
-"vendor/bin/phpcs.bat"  
-"vendor/bin/php-cs-fixer.bat" fix --diff   
-#### Unit Testing
-"vendor/bin/phpunit.bat" --colors  
-#### Code Coverage
-##### Local
-"vendor/bin/phpunit.bat" --colors --coverage-html ./coverage
-##### Coveralls.io
-"vendor/bin/phpunit.bat" --colors --coverage-text --coverage-clover build/logs/clover.xml  
+`./run_all_commands.sh` for php-cs-fixer and phpunit and coverage  
+`./run_php_unit_coverage.sh` for phpunit and coverage  
