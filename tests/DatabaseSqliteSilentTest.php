@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Rancoud\Database\Test;
 
 use PHPUnit\Framework\TestCase;
@@ -72,9 +74,9 @@ class DatabaseSqliteSilentTest extends TestCase
     {
         $res = [];
 
-        $id = $this->db->insert('INSERT INTO test (name) VALUES (:name)', ['name' => 'A'], true);
-        $id = $this->db->insert('INSERT INTO test (name) VALUES (:name)', ['name' => 'B'], true);
-        $id = $this->db->insert('INSERT INTO test (name) VALUES (:name)', ['name' => 'C'], true);
+        $this->db->insert('INSERT INTO test (name) VALUES (:name)', ['name' => 'A'], true);
+        $this->db->insert('INSERT INTO test (name) VALUES (:name)', ['name' => 'B'], true);
+        $this->db->insert('INSERT INTO test (name) VALUES (:name)', ['name' => 'C'], true);
 
         $cursor = $this->db->select('SELECT * FROM test');
         while ($row = $this->db->read($cursor)) {

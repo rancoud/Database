@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Rancoud\Database\Test;
 
-use Exception;
 use PDOStatement;
 use PHPUnit\Framework\TestCase;
 use Rancoud\Database\Configurator;
 use Rancoud\Database\Database;
+use Rancoud\Database\DatabaseException;
 
 /**
  * Class DatabaseSqliteExceptionTest.
@@ -92,18 +94,10 @@ class DatabaseSqliteExceptionTest extends TestCase
         static::assertTrue($success);
     }
 
-    public function testExecError()
-    {
-        try {
-            $this->db->exec('aaa');
-        } catch (Exception $e) {
-            static::assertSame('Error Prepare Statement', $e->getMessage());
-        }
-    }
-
     public function testExecException()
     {
-        static::expectException(Exception::class);
+        static::expectException(DatabaseException::class);
+        static::expectExceptionMessage('Error Prepare Statement');
 
         $this->db->exec('aaa');
     }
@@ -125,20 +119,10 @@ class DatabaseSqliteExceptionTest extends TestCase
         static::assertSame(3, $id);
     }
 
-    public function testInsertError()
-    {
-        $sql = 'INSERT INTO test (name) VALUES (:name)';
-
-        try {
-            $this->db->insert($sql);
-        } catch (Exception $e) {
-            static::assertSame('Error Execute', $e->getMessage());
-        }
-    }
-
     public function testInsertException()
     {
-        static::expectException(Exception::class);
+        static::expectException(DatabaseException::class);
+        static::expectExceptionMessage('Error Execute');
 
         $sql = 'INSERT INTO test (name) VALUES (:name)';
 
@@ -199,7 +183,8 @@ class DatabaseSqliteExceptionTest extends TestCase
 
     public function testUseSqlFileException()
     {
-        static::expectException(Exception::class);
+        static::expectException(DatabaseException::class);
+        static::expectExceptionMessage('File missing for useSqlFile method: ./missing-dump.sql');
 
         $this->db->useSqlFile('./missing-dump.sql');
     }
@@ -327,21 +312,10 @@ class DatabaseSqliteExceptionTest extends TestCase
         static::assertSame('-- MySQL dump', mb_substr($row['resource'], 0, 13));
     }
 
-    public function testPdoParamTypeError()
-    {
-        $sql = 'SELECT :array AS array';
-        $params = ['array' => []];
-
-        try {
-            $this->db->selectRow($sql, $params);
-        } catch (Exception $e) {
-            static::assertSame('Error Bind Value', $e->getMessage());
-        }
-    }
-
     public function testPdoParamTypeException()
     {
-        static::expectException(Exception::class);
+        static::expectException(DatabaseException::class);
+        static::expectExceptionMessage('Error Bind Value');
 
         $sql = 'SELECT :array AS array';
         $params = ['array' => []];
@@ -350,12 +324,12 @@ class DatabaseSqliteExceptionTest extends TestCase
 
     public function testPrepareBindException()
     {
-        static::expectException(Exception::class);
+        static::expectException(DatabaseException::class);
+        static::expectExceptionMessage('Error Execute');
 
         $sql = 'SELECT :a';
         $params = [':a' => 'a'];
-        $row = $this->db->selectRow($sql, $params);
-        //var_dump($row);
+        $this->db->selectRow($sql, $params);
     }
 
     public function testSelect()
@@ -456,7 +430,7 @@ class DatabaseSqliteExceptionTest extends TestCase
             $this->db->selectVar($sql);
 
             $this->db->completeTransaction();
-        } catch (Exception $e) {
+        } catch (DatabaseException $e) {
             $this->db->completeTransaction();
 
             $sql = 'SELECT name FROM test_select WHERE id = :id';
@@ -475,7 +449,7 @@ class DatabaseSqliteExceptionTest extends TestCase
 
         try {
             $this->db->selectVar('SELECT name FROM test WHERE id = :id');
-        } catch (Exception $e) {
+        } catch (DatabaseException $e) {
             static::assertTrue($this->db->hasErrors());
             static::assertSame(4, count($this->db->getLastError()));
 

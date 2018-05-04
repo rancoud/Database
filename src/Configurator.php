@@ -1,44 +1,67 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Rancoud\Database;
 
-use Exception;
 use PDO;
+use PDOException;
 
 /**
  * Class Configurator.
  */
 class Configurator
 {
+    /** @var string */
     protected $engine;
 
+    /** @var string */
     protected $host;
 
+    /** @var string */
     protected $user;
 
+    /** @var string */
     protected $password;
 
+    /** @var string */
     protected $database;
 
+    /** @var array */
     protected $parameters = [];
 
+    /** @var bool */
     protected $saveQueries = false;
 
+    /** @var bool */
     protected $permanentConnection = false;
 
+    /** @var string */
     protected $reportError = 'exception';
 
+    /** @var string */
     protected $charset = 'utf8';
 
-    protected $keySettings = ['engine', 'host', 'user', 'password', 'database',
-        'save_queries', 'permanent_connection', 'report_error', 'charset', 'parameters'];
+    /** @var string[] */
+    protected $keySettings = [
+        'engine',
+        'host',
+        'user',
+        'password',
+        'database',
+        'save_queries',
+        'permanent_connection',
+        'report_error',
+        'charset',
+        'parameters'
+    ];
 
     /**
      * DatabaseConfigurator constructor.
      *
      * @param array $settings
      *
-     * @throws Exception
+     * @throws DatabaseException
      */
     public function __construct(array $settings)
     {
@@ -52,13 +75,13 @@ class Configurator
     /**
      * @param array $settings
      *
-     * @throws Exception
+     * @throws DatabaseException
      */
-    protected function verifySettings(array $settings)
+    protected function verifySettings(array $settings): void
     {
         foreach ($settings as $key => $value) {
             if (!in_array($key, $this->keySettings, true)) {
-                throw new Exception('"' . $key . '" settings is not recognized');
+                throw new DatabaseException('"' . $key . '" settings is not recognized');
             }
         }
     }
@@ -66,14 +89,14 @@ class Configurator
     /**
      * @param array $settings
      *
-     * @throws Exception
+     * @throws DatabaseException
      */
-    protected function setMandatorySettings(array $settings)
+    protected function setMandatorySettings(array $settings): void
     {
         $props = ['engine', 'host', 'user', 'password', 'database'];
         foreach ($props as $prop) {
             if (!isset($settings[$prop]) || !is_string($settings[$prop])) {
-                throw new Exception('"' . $prop . '" settings is not defined or not a string');
+                throw new DatabaseException('"' . $prop . '" settings is not defined or not a string');
             }
 
             $this->{'set' . ucfirst($prop)}($settings[$prop]);
@@ -83,9 +106,9 @@ class Configurator
     /**
      * @param array $settings
      *
-     * @throws Exception
+     * @throws DatabaseException
      */
-    protected function setOptionnalsParameters(array $settings)
+    protected function setOptionnalsParameters(array $settings): void
     {
         if (array_key_exists('save_queries', $settings)) {
             $this->saveQueries = (bool) $settings['save_queries'];
@@ -111,7 +134,7 @@ class Configurator
     /**
      * @return string
      */
-    public function getEngine()
+    public function getEngine(): string
     {
         return $this->engine;
     }
@@ -119,13 +142,13 @@ class Configurator
     /**
      * @param string $engine
      *
-     * @throws Exception
+     * @throws DatabaseException
      */
-    public function setEngine(string $engine)
+    public function setEngine(string $engine): void
     {
         $enginesAvailables = PDO::getAvailableDrivers();
         if (!in_array($engine, $enginesAvailables, true)) {
-            throw new Exception('The engine "' . $engine . '" is not available for PDO');
+            throw new DatabaseException('The engine "' . $engine . '" is not available for PDO');
         }
 
         $this->engine = $engine;
@@ -134,7 +157,7 @@ class Configurator
     /**
      * @return string
      */
-    public function getHost()
+    public function getHost(): string
     {
         return $this->host;
     }
@@ -142,7 +165,7 @@ class Configurator
     /**
      * @param string $host
      */
-    public function setHost(string $host)
+    public function setHost(string $host): void
     {
         $this->host = $host;
     }
@@ -150,7 +173,7 @@ class Configurator
     /**
      * @return string
      */
-    public function getUser()
+    public function getUser(): string
     {
         return $this->user;
     }
@@ -158,7 +181,7 @@ class Configurator
     /**
      * @param string $user
      */
-    public function setUser(string $user)
+    public function setUser(string $user): void
     {
         $this->user = $user;
     }
@@ -166,7 +189,7 @@ class Configurator
     /**
      * @return string
      */
-    public function getPassword()
+    public function getPassword(): string
     {
         return $this->password;
     }
@@ -174,7 +197,7 @@ class Configurator
     /**
      * @param string $password
      */
-    public function setPassword(string $password)
+    public function setPassword(string $password): void
     {
         $this->password = $password;
     }
@@ -182,7 +205,7 @@ class Configurator
     /**
      * @return string
      */
-    public function getDatabase()
+    public function getDatabase(): string
     {
         return $this->database;
     }
@@ -190,7 +213,7 @@ class Configurator
     /**
      * @param string $database
      */
-    public function setDatabase(string $database)
+    public function setDatabase(string $database): void
     {
         $this->database = $database;
     }
@@ -198,7 +221,7 @@ class Configurator
     /**
      * @return array
      */
-    public function getParameters()
+    public function getParameters(): array
     {
         return $this->parameters;
     }
@@ -207,7 +230,7 @@ class Configurator
      * @param mixed $key
      * @param mixed $value
      */
-    public function setParameter($key, $value)
+    public function setParameter($key, $value): void
     {
         $this->parameters[$key] = $value;
     }
@@ -215,7 +238,7 @@ class Configurator
     /**
      * @param array $parameters
      */
-    public function setParameters(array $parameters)
+    public function setParameters(array $parameters): void
     {
         $this->parameters = $parameters;
     }
@@ -223,7 +246,7 @@ class Configurator
     /**
      * @return array
      */
-    public function getParametersForPDO()
+    public function getParametersForPDO(): array
     {
         $parameters = $this->getParameters();
 
@@ -245,17 +268,17 @@ class Configurator
     /**
      * @return bool
      */
-    public function hasSaveQueries()
+    public function hasSaveQueries(): bool
     {
         return $this->saveQueries;
     }
 
-    public function enableSaveQueries()
+    public function enableSaveQueries(): void
     {
         $this->saveQueries = true;
     }
 
-    public function disableSaveQueries()
+    public function disableSaveQueries(): void
     {
         $this->saveQueries = false;
     }
@@ -263,17 +286,17 @@ class Configurator
     /**
      * @return bool
      */
-    public function hasPermanentConnection()
+    public function hasPermanentConnection(): bool
     {
         return $this->permanentConnection;
     }
 
-    public function enablePermanentConnection()
+    public function enablePermanentConnection(): void
     {
         $this->permanentConnection = true;
     }
 
-    public function disablePermanentConnection()
+    public function disablePermanentConnection(): void
     {
         $this->permanentConnection = false;
     }
@@ -281,7 +304,7 @@ class Configurator
     /**
      * @return string
      */
-    public function getReportError()
+    public function getReportError(): string
     {
         return $this->reportError;
     }
@@ -289,12 +312,12 @@ class Configurator
     /**
      * @param string $reportError
      *
-     * @throws Exception
+     * @throws DatabaseException
      */
-    public function setReportError(string $reportError)
+    public function setReportError(string $reportError): void
     {
         if (!in_array($reportError, ['silent', 'exception'], true)) {
-            throw new Exception('The report error "' . $reportError . '" is incorrect. (silent , exception)');
+            throw new DatabaseException('The report error "' . $reportError . '" is incorrect. (silent , exception)');
         }
 
         $this->reportError = $reportError;
@@ -303,7 +326,7 @@ class Configurator
     /**
      * @return bool
      */
-    public function hasThrowException()
+    public function hasThrowException(): bool
     {
         return $this->reportError === 'exception';
     }
@@ -311,7 +334,7 @@ class Configurator
     /**
      * @return string
      */
-    public function getCharset()
+    public function getCharset(): string
     {
         return $this->charset;
     }
@@ -319,7 +342,7 @@ class Configurator
     /**
      * @param string $charset
      */
-    public function setCharset(string $charset)
+    public function setCharset(string $charset): void
     {
         $this->charset = $charset;
     }
@@ -327,7 +350,7 @@ class Configurator
     /**
      * @return string
      */
-    public function getDsn()
+    public function getDsn(): string
     {
         $engine = $this->getEngine();
         $host = $this->getHost();
@@ -342,19 +365,25 @@ class Configurator
     }
 
     /**
-     * @return string
+     * @throws DatabaseException
+     *
+     * @return PDO
      */
-    public function createPDOConnection()
+    public function createPDOConnection(): PDO
     {
         $user = $this->getUser();
         $password = $this->getPassword();
         $parameters = $this->getParametersForPDO();
         $dsn = $this->getDsn();
 
-        if ($this->getEngine() !== 'sqlite') {
-            return new PDO($dsn, $user, $password, $parameters);
-        }
+        try {
+            if ($this->getEngine() !== 'sqlite') {
+                return new PDO($dsn, $user, $password, $parameters);
+            }
 
-        return new PDO($dsn, null, null, $parameters);
+            return new PDO($dsn, null, null, $parameters);
+        } catch (PDOException $e) {
+            throw new DatabaseException($e->getMessage());
+        }
     }
 }

@@ -1,11 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Rancoud\Database\Test;
 
-use Exception;
 use PDO;
 use PHPUnit\Framework\TestCase;
 use Rancoud\Database\Configurator;
+use Rancoud\Database\DatabaseException;
+use TypeError;
 
 /**
  * Class ConfiguratorTest.
@@ -32,14 +35,18 @@ class ConfiguratorTest extends TestCase
 
     public function testConstructInvalidSettingsException()
     {
-        static::expectException(Exception::class);
+        static::expectException(DatabaseException::class);
+        static::expectExceptionMessage('"azerty" settings is not recognized');
+
         $params = ['azerty' => true];
         new Configurator($params);
     }
 
     public function testConstructMandatoryException()
     {
-        static::expectException(Exception::class);
+        static::expectException(DatabaseException::class);
+        static::expectExceptionMessage('"engine" settings is not defined or not a string');
+        
         $params = [
             'database'      => 'test_database'
         ];
@@ -48,7 +55,9 @@ class ConfiguratorTest extends TestCase
 
     public function testConstructMandatoryEngineException()
     {
-        static::expectException(Exception::class);
+        static::expectException(DatabaseException::class);
+        static::expectExceptionMessage('The engine "engine" is not available for PDO');
+        
         $params = [
             'engine'        => 'engine',
             'host'          => '127.0.0.1',
@@ -61,7 +70,9 @@ class ConfiguratorTest extends TestCase
 
     public function testConstructReportErrorException()
     {
-        static::expectException(Exception::class);
+        static::expectException(DatabaseException::class);
+        static::expectExceptionMessage('The report error "report_error" is incorrect. (silent , exception)');
+        
         $params = [
             'engine'        => 'mysql',
             'host'          => '127.0.0.1',
@@ -75,7 +86,8 @@ class ConfiguratorTest extends TestCase
 
     public function testConstructInvalidSettingsParametersException()
     {
-        static::expectException(\TypeError::class);
+        static::expectException(TypeError::class);
+        
         $params = [
             'engine'        => 'mysql',
             'host'          => '127.0.0.1',
@@ -104,7 +116,9 @@ class ConfiguratorTest extends TestCase
 
     public function testSetEngineException()
     {
-        static::expectException(Exception::class);
+        static::expectException(DatabaseException::class);
+        static::expectExceptionMessage('The engine "engine" is not available for PDO');
+
         $params = [
             'engine'        => 'mysql',
             'host'          => '127.0.0.1',
@@ -306,7 +320,9 @@ class ConfiguratorTest extends TestCase
 
     public function testSetReportErrorException()
     {
-        static::expectException(Exception::class);
+        static::expectException(DatabaseException::class);
+        static::expectExceptionMessage('The report error "report_error" is incorrect. (silent , exception)');
+
         $params = [
             'engine'        => 'mysql',
             'host'          => '127.0.0.1',
@@ -584,7 +600,8 @@ class ConfiguratorTest extends TestCase
 
     public function testCreatePDOConnectionMysqlInReportErrorExceptionThrowException()
     {
-        static::expectException(Exception::class);
+        static::expectException(DatabaseException::class);
+        static::expectExceptionMessage("SQLSTATE[HY000] [1045] Access denied for user 'root'@'localhost' (using password: YES)");
 
         $params = [
             'engine'        => 'mysql',
@@ -615,7 +632,8 @@ class ConfiguratorTest extends TestCase
 
     public function testCreatePDOConnectionMysqlInReportErrorSilentErrorThrowException()
     {
-        static::expectException(Exception::class);
+        static::expectException(DatabaseException::class);
+        static::expectExceptionMessage("SQLSTATE[HY000] [1045] Access denied for user 'root'@'localhost' (using password: YES)");
 
         $params = [
             'engine'        => 'mysql',

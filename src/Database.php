@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Rancoud\Database;
 
 use Exception;
 use PDO;
+use PDOException;
 use PDOStatement;
 
 /**
@@ -49,26 +52,26 @@ class Database
     /**
      * @param Configurator|null $configurator
      *
-     * @throws Exception
+     * @throws DatabaseException
      *
      * @return Database
      */
-    public static function getInstance(Configurator $configurator = null)
+    public static function getInstance(Configurator $configurator = null): self
     {
         if (self::$instance === null) {
             if ($configurator === null) {
-                throw new Exception('Configurator Missing');
+                throw new DatabaseException('Configurator Missing');
             }
             self::$instance = new self($configurator);
         } elseif ($configurator !== null) {
-            throw new Exception('Configurator Already Setup');
+            throw new DatabaseException('Configurator Already Setup');
         }
 
         return self::$instance;
     }
 
     /**
-     * @throws Exception
+     * @throws DatabaseException
      */
     public function connect()
     {
@@ -86,7 +89,7 @@ class Database
             $this->addErrorConnection($e);
 
             if ($this->configurator->hasThrowException()) {
-                throw new Exception('Error Connecting Database');
+                throw new DatabaseException('Error Connecting Database');
             }
         }
     }
@@ -95,11 +98,11 @@ class Database
      * @param string $sql
      * @param array  $parameters
      *
-     * @throws Exception
+     * @throws DatabaseException
      *
      * @return PDOStatement
      */
-    protected function prepareBind(string $sql, array $parameters = [])
+    protected function prepareBind(string $sql, array $parameters = []): ?PDOStatement
     {
         if ($this->pdo === null) {
             $this->connect();
@@ -115,7 +118,7 @@ class Database
         } catch (Exception $e) {
             $this->addErrorPrepare($sql, $parameters);
             if ($this->configurator->hasThrowException()) {
-                throw new Exception('Error Prepare Statement');
+                throw new DatabaseException('Error Prepare Statement');
             }
         }
 
@@ -130,10 +133,14 @@ class Database
             }
 
             if ($param === false) {
-                throw new Exception('Error Bind Value');
+                throw new DatabaseException('Error Bind Value');
             }
 
-            $statement->bindValue(":$key", $value, $param);
+            try {
+                $statement->bindValue(":$key", $value, $param);
+            } catch (PDOException $e) {
+                throw new DatabaseException($e->getMessage());
+            }
         }
 
         return $statement;
@@ -166,7 +173,7 @@ class Database
     /**
      * @param PDOStatement $statement
      */
-    protected function addErrorStatement(PDOStatement $statement)
+    protected function addErrorStatement(PDOStatement $statement): void
     {
         $this->errors[] = [
             'query'       => $statement->queryString,
@@ -179,7 +186,7 @@ class Database
     /**
      * @param Exception $exception
      */
-    protected function addErrorConnection(Exception $exception)
+    protected function addErrorConnection(Exception $exception): void
     {
         $this->errors[] = [
             'query'       => $this->configurator->getDsn(),
@@ -193,7 +200,7 @@ class Database
      * @param string $sql
      * @param array  $parameters
      */
-    protected function addErrorPrepare(string $sql, array $parameters)
+    protected function addErrorPrepare(string $sql, array $parameters): void
     {
         $this->errors[] = [
             'query'       => $sql,
@@ -208,7 +215,7 @@ class Database
      * @param array        $parameters
      * @param float        $time
      */
-    protected function addQuery(PDOStatement $statement, array $parameters, float $time)
+    protected function addQuery(PDOStatement $statement, array $parameters, float $time): void
     {
         if ($this->configurator->hasSaveQueries()) {
             $this->savedQueries[] = [
@@ -224,7 +231,7 @@ class Database
      *
      * @return string
      */
-    protected function getDumpParams(PDOStatement $statement)
+    protected function getDumpParams(PDOStatement $statement): string
     {
         ob_start();
         $statement->debugDumpParams();
@@ -242,7 +249,7 @@ class Database
      *
      * @return PDOStatement|null
      */
-    public function select(string $sql, array $parameters = [])
+    public function select(string $sql, array $parameters = []): ?PDOStatement
     {
         $statement = $this->prepareBind($sql, $parameters);
 
@@ -268,7 +275,7 @@ class Database
      *
      * @return bool
      */
-    protected function executeStatement(PDOStatement $statement)
+    protected function executeStatement(PDOStatement $statement): bool
     {
         $success = false;
 
@@ -280,7 +287,7 @@ class Database
         } catch (Exception $e) {
             $this->addErrorStatement($statement);
             if ($this->configurator->hasThrowException()) {
-                throw new Exception('Error Execute');
+                throw new DatabaseException('Error Execute');
             }
         }
 
@@ -304,7 +311,7 @@ class Database
      *
      * @return array
      */
-    public function readAll(PDOStatement $statement, $fetchType = PDO::FETCH_ASSOC)
+    public function readAll(PDOStatement $statement, $fetchType = PDO::FETCH_ASSOC): array
     {
         return $statement->fetchAll($fetchType);
     }
@@ -460,7 +467,7 @@ class Database
      *
      * @return bool
      */
-    public function exec(string $sql, array $parameters = [])
+    public function exec(string $sql, array $parameters = []): bool
     {
         $statement = $this->prepareBind($sql, $parameters);
 
@@ -483,9 +490,9 @@ class Database
     }
 
     /**
-     * @return PDO
+     * @return PDO|null
      */
-    public function getPdo()
+    public function getPdo(): ?PDO
     {
         return $this->pdo;
     }
@@ -599,11 +606,11 @@ class Database
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      *
      * @return bool
      */
-    public function startTransaction()
+    public function startTransaction(): bool
     {
         if ($this->pdo === null) {
             $this->connect();
@@ -613,11 +620,11 @@ class Database
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      *
      * @return bool
      */
-    public function completeTransaction()
+    public function completeTransaction(): bool
     {
         if ($this->pdo === null) {
             $this->connect();
@@ -643,7 +650,7 @@ class Database
      *
      * @return bool
      */
-    public function commitTransaction()
+    public function commitTransaction(): bool
     {
         if ($this->pdo === null) {
             $this->connect();
@@ -661,7 +668,7 @@ class Database
      *
      * @return bool
      */
-    public function rollbackTransaction()
+    public function rollbackTransaction(): bool
     {
         if ($this->pdo === null) {
             $this->connect();
@@ -677,7 +684,7 @@ class Database
     /**
      * @return bool
      */
-    public function hasErrors()
+    public function hasErrors(): bool
     {
         return !empty($this->errors);
     }
@@ -685,7 +692,7 @@ class Database
     /**
      * @return array
      */
-    public function getErrors()
+    public function getErrors(): array
     {
         return $this->errors;
     }
@@ -693,7 +700,7 @@ class Database
     /**
      * @return array|null
      */
-    public function getLastError()
+    public function getLastError(): ?array
     {
         $countErrors = count($this->errors);
         if ($countErrors === 0) {
@@ -703,7 +710,7 @@ class Database
         return $this->errors[$countErrors - 1];
     }
 
-    public function cleanErrors()
+    public function cleanErrors(): void
     {
         $this->errors = [];
     }
@@ -711,22 +718,22 @@ class Database
     /**
      * @return bool
      */
-    public function hasSaveQueries()
+    public function hasSaveQueries(): bool
     {
         return $this->configurator->hasSaveQueries();
     }
 
-    public function enableSaveQueries()
+    public function enableSaveQueries(): void
     {
         $this->configurator->enableSaveQueries();
     }
 
-    public function disableSaveQueries()
+    public function disableSaveQueries(): void
     {
         $this->configurator->disableSaveQueries();
     }
 
-    public function cleanSavedQueries()
+    public function cleanSavedQueries(): void
     {
         $this->savedQueries = [];
     }
@@ -734,7 +741,7 @@ class Database
     /**
      * @return array
      */
-    public function getSavedQueries()
+    public function getSavedQueries(): array
     {
         return $this->savedQueries;
     }
@@ -746,7 +753,7 @@ class Database
      *
      * @return bool
      */
-    public function truncateTable(string $table)
+    public function truncateTable(string $table): bool
     {
         $sql = 'TRUNCATE TABLE ' . $table;
         if ($this->configurator->getEngine() === 'sqlite') {
@@ -763,7 +770,7 @@ class Database
      *
      * @return bool
      */
-    public function truncateTables(array $tables)
+    public function truncateTables(array $tables): bool
     {
         $success = true;
 
@@ -783,7 +790,7 @@ class Database
      *
      * @return bool
      */
-    public function dropTable(string $table)
+    public function dropTable(string $table): bool
     {
         return $this->dropTables([$table]);
     }
@@ -795,7 +802,7 @@ class Database
      *
      * @return bool
      */
-    public function dropTables(array $tables)
+    public function dropTables(array $tables): bool
     {
         $success = true;
 
@@ -825,10 +832,10 @@ class Database
      *
      * @return bool
      */
-    public function useSqlFile(string $filepath)
+    public function useSqlFile(string $filepath): bool
     {
         if (!file_exists($filepath)) {
-            throw new Exception('File missing for useSqlFile method: ' . $filepath);
+            throw new DatabaseException('File missing for useSqlFile method: ' . $filepath);
         }
 
         $sqlFile = file_get_contents($filepath);
@@ -840,14 +847,14 @@ class Database
      * @param float $startTime
      * @param float $endTime
      *
-     * @return float|int
+     * @return float
      */
-    protected function getTime(float $startTime, float $endTime)
+    protected function getTime(float $startTime, float $endTime): float
     {
         return round(($endTime - $startTime) * 1000000) / 1000000;
     }
 
-    public function disconnect()
+    public function disconnect(): void
     {
         $this->pdo = null;
     }

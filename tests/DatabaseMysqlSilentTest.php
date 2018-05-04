@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Rancoud\Database\Test;
 
-use Exception;
 use PDOStatement;
 use PHPUnit\Framework\TestCase;
 use Rancoud\Database\Configurator;
 use Rancoud\Database\Database;
+use Rancoud\Database\DatabaseException;
 
 /**
  * Class DatabaseMysqlSilentTest.
@@ -96,7 +98,6 @@ class DatabaseMysqlSilentTest extends TestCase
     public function testExecError()
     {
         $this->db->exec('aaa');
-        $this->db->hasErrors();
         static::assertTrue($this->db->hasErrors());
     }
 
@@ -208,7 +209,8 @@ class DatabaseMysqlSilentTest extends TestCase
 
     public function testUseSqlFileException()
     {
-        static::expectException(Exception::class);
+        static::expectException(DatabaseException::class);
+        static::expectExceptionMessage('File missing for useSqlFile method: ./missing-dump.sql');
 
         $this->db->useSqlFile('./missing-dump.sql');
     }
@@ -343,14 +345,15 @@ class DatabaseMysqlSilentTest extends TestCase
 
         try {
             $this->db->selectRow($sql, $params);
-        } catch (Exception $e) {
+        } catch (DatabaseException $e) {
             static::assertSame('Error Bind Value', $e->getMessage());
         }
     }
 
     public function testPdoParamTypeException()
     {
-        static::expectException(Exception::class);
+        static::expectException(DatabaseException::class);
+        static::expectExceptionMessage('Error Bind Value');
 
         $sql = 'SELECT :array AS array';
         $params = ['array' => []];
@@ -453,7 +456,7 @@ class DatabaseMysqlSilentTest extends TestCase
             $this->db->selectVar($sql);
 
             $this->db->commitTransaction();
-        } catch (Exception $e) {
+        } catch (DatabaseException $e) {
             $this->db->rollbackTransaction();
 
             $sql = 'SELECT name FROM test_select WHERE id = :id';
@@ -508,7 +511,7 @@ class DatabaseMysqlSilentTest extends TestCase
 
         try {
             $this->db->selectVar('SELECT name FROM test WHERE id = :id');
-        } catch (Exception $e) {
+        } catch (DatabaseException $e) {
             static::assertTrue($this->db->hasErrors());
             static::assertSame(4, count($this->db->getLastError()));
 

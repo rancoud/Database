@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Rancoud\Database\Test;
 
-use Exception;
 use PHPUnit\Framework\TestCase;
 use Rancoud\Database\Configurator;
 use Rancoud\Database\Database;
+use Rancoud\Database\DatabaseException;
 
 /**
  * Class DatabaseSingletonTest.
@@ -29,14 +31,17 @@ class DatabaseSingletonTest extends TestCase
         $databaseConf = new Configurator($this->params);
         $this->db = new Database($databaseConf);
     }
-
+    
+    /** @runInSeparateProcess  */
     public function testSingletonEmptyConfiguratorException()
     {
-        static::expectException(Exception::class);
+        static::expectException(DatabaseException::class);
+        static::expectExceptionMessage('Configurator Missing');
 
         Database::getInstance();
     }
-
+    
+    /** @runInSeparateProcess  */
     public function testSingleton()
     {
         $db = Database::getInstance(new Configurator($this->params));
@@ -44,10 +49,13 @@ class DatabaseSingletonTest extends TestCase
         static::assertSame(get_class($db), 'Rancoud\Database\Database');
     }
 
+    /** @runInSeparateProcess  */
     public function testSingletonCallTwiceWithConfiguratorException()
     {
-        static::expectException(Exception::class);
+        static::expectException(DatabaseException::class);
+        static::expectExceptionMessage('Configurator Already Setup');
 
+        Database::getInstance(new Configurator($this->params));
         Database::getInstance(new Configurator($this->params));
     }
 }
