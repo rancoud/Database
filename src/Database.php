@@ -245,7 +245,7 @@ class Database
      * @param string $sql
      * @param array  $parameters
      *
-     * @throws Exception
+     * @throws DatabaseException
      *
      * @return PDOStatement|null
      */
@@ -271,7 +271,7 @@ class Database
     /**
      * @param PDOStatement $statement
      *
-     * @throws Exception
+     * @throws DatabaseException
      *
      * @return bool
      */
@@ -321,7 +321,7 @@ class Database
      * @param array  $parameters
      * @param bool   $getLastInsertId
      *
-     * @throws Exception
+     * @throws DatabaseException
      *
      * @return int|bool
      */
@@ -360,7 +360,7 @@ class Database
      * @param array  $parameters
      * @param bool   $getCountRowsAffected
      *
-     * @throws Exception
+     * @throws DatabaseException
      *
      * @return int|bool
      */
@@ -399,7 +399,7 @@ class Database
      * @param array  $parameters
      * @param bool   $getCountRowsAffected
      *
-     * @throws Exception
+     * @throws DatabaseException
      *
      * @return int|bool
      */
@@ -437,7 +437,7 @@ class Database
      * @param string $sql
      * @param array  $parameters
      *
-     * @throws Exception
+     * @throws DatabaseException
      *
      * @return int|bool
      */
@@ -463,7 +463,7 @@ class Database
      * @param string $sql
      * @param array  $parameters
      *
-     * @throws Exception
+     * @throws DatabaseException
      *
      * @return bool
      */
@@ -501,7 +501,7 @@ class Database
      * @param string $sql
      * @param array  $parameters
      *
-     * @throws Exception
+     * @throws DatabaseException
      *
      * @return array|bool
      */
@@ -525,7 +525,7 @@ class Database
      * @param string $sql
      * @param array  $parameters
      *
-     * @throws Exception
+     * @throws DatabaseException
      *
      * @return array|bool
      */
@@ -552,7 +552,7 @@ class Database
      * @param string $sql
      * @param array  $parameters
      *
-     * @throws Exception
+     * @throws DatabaseException
      *
      * @return array|bool
      */
@@ -580,7 +580,7 @@ class Database
      * @param string $sql
      * @param array  $parameters
      *
-     * @throws Exception
+     * @throws DatabaseException
      *
      * @return mixed|bool
      */
@@ -606,7 +606,7 @@ class Database
     }
 
     /**
-     * @throws Exception
+     * @throws DatabaseException
      *
      * @return bool
      */
@@ -620,7 +620,7 @@ class Database
     }
 
     /**
-     * @throws Exception
+     * @throws DatabaseException
      *
      * @return bool
      */
@@ -646,7 +646,7 @@ class Database
     }
 
     /**
-     * @throws Exception
+     * @throws DatabaseException
      *
      * @return bool
      */
@@ -664,7 +664,7 @@ class Database
     }
 
     /**
-     * @throws Exception
+     * @throws DatabaseException
      *
      * @return bool
      */
@@ -749,7 +749,7 @@ class Database
     /**
      * @param string $table
      *
-     * @throws Exception
+     * @throws DatabaseException
      *
      * @return bool
      */
@@ -766,7 +766,7 @@ class Database
     /**
      * @param array $tables
      *
-     * @throws Exception
+     * @throws DatabaseException
      *
      * @return bool
      */
@@ -786,7 +786,7 @@ class Database
     /**
      * @param string $table
      *
-     * @throws Exception
+     * @throws DatabaseException
      *
      * @return bool
      */
@@ -798,7 +798,7 @@ class Database
     /**
      * @param array $tables
      *
-     * @throws Exception
+     * @throws DatabaseException
      *
      * @return bool
      */
@@ -828,7 +828,7 @@ class Database
     /**
      * @param string $filepath
      *
-     * @throws Exception
+     * @throws DatabaseException
      *
      * @return bool
      */
