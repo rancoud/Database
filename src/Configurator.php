@@ -80,7 +80,7 @@ class Configurator
     protected function verifySettings(array $settings): void
     {
         foreach ($settings as $key => $value) {
-            if (!in_array($key, $this->keySettings, true)) {
+            if (!\in_array($key, $this->keySettings, true)) {
                 throw new DatabaseException('"' . $key . '" settings is not recognized');
             }
         }
@@ -95,7 +95,7 @@ class Configurator
     {
         $props = ['engine', 'host', 'user', 'password', 'database'];
         foreach ($props as $prop) {
-            if (!isset($settings[$prop]) || !is_string($settings[$prop])) {
+            if (!isset($settings[$prop]) || !\is_string($settings[$prop])) {
                 throw new DatabaseException('"' . $prop . '" settings is not defined or not a string');
             }
 
@@ -147,7 +147,7 @@ class Configurator
     public function setEngine(string $engine): void
     {
         $enginesAvailables = PDO::getAvailableDrivers();
-        if (!in_array($engine, $enginesAvailables, true)) {
+        if (!\in_array($engine, $enginesAvailables, true)) {
             throw new DatabaseException('The engine "' . $engine . '" is not available for PDO');
         }
 
@@ -316,7 +316,7 @@ class Configurator
      */
     public function setReportError(string $reportError): void
     {
-        if (!in_array($reportError, ['silent', 'exception'], true)) {
+        if (!\in_array($reportError, ['silent', 'exception'], true)) {
             throw new DatabaseException('The report error "' . $reportError . '" is incorrect. (silent , exception)');
         }
 

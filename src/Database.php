@@ -128,7 +128,7 @@ class Database
 
         foreach ($parameters as $key => $value) {
             $param = $this->getPdoParamType($value);
-            if (is_float($value)) {
+            if (\is_float($value)) {
                 $value = (string) $value;
             }
 
@@ -153,17 +153,17 @@ class Database
      */
     protected function getPdoParamType($value)
     {
-        if (is_int($value)) {
+        if (\is_int($value)) {
             return PDO::PARAM_INT;
-        } elseif (is_bool($value)) {
+        } elseif (\is_bool($value)) {
             return PDO::PARAM_BOOL;
         } elseif (null === $value) {
             return PDO::PARAM_NULL;
-        } elseif (is_string($value)) {
+        } elseif (\is_string($value)) {
             return PDO::PARAM_STR;
-        } elseif (is_float($value)) {
+        } elseif (\is_float($value)) {
             return PDO::PARAM_STR;
-        } elseif (is_resource($value)) {
+        } elseif (\is_resource($value)) {
             return PDO::PARAM_LOB;
         }
 
@@ -702,7 +702,7 @@ class Database
      */
     public function getLastError(): ?array
     {
-        $countErrors = count($this->errors);
+        $countErrors = \count($this->errors);
         if ($countErrors === 0) {
             return null;
         }
