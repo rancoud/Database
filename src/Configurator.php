@@ -99,7 +99,7 @@ class Configurator
                 throw new DatabaseException('"' . $prop . '" settings is not defined or not a string');
             }
 
-            $this->{'set' . ucfirst($prop)}($settings[$prop]);
+            $this->{'set' . \ucfirst($prop)}($settings[$prop]);
         }
     }
 
@@ -110,23 +110,23 @@ class Configurator
      */
     protected function setOptionnalsParameters(array $settings): void
     {
-        if (array_key_exists('save_queries', $settings)) {
+        if (\array_key_exists('save_queries', $settings)) {
             $this->saveQueries = (bool) $settings['save_queries'];
         }
 
-        if (array_key_exists('permanent_connection', $settings)) {
+        if (\array_key_exists('permanent_connection', $settings)) {
             $this->permanentConnection = (bool) $settings['permanent_connection'];
         }
 
-        if (array_key_exists('report_error', $settings)) {
+        if (\array_key_exists('report_error', $settings)) {
             $this->setReportError($settings['report_error']);
         }
 
-        if (array_key_exists('charset', $settings)) {
+        if (\array_key_exists('charset', $settings)) {
             $this->setCharset($settings['charset']);
         }
 
-        if (array_key_exists('parameters', $settings)) {
+        if (\array_key_exists('parameters', $settings)) {
             $this->setParameters($settings['parameters']);
         }
     }

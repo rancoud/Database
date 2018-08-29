@@ -76,11 +76,11 @@ class Database
     public function connect()
     {
         try {
-            $startTime = microtime(true);
+            $startTime = \microtime(true);
 
             $this->pdo = $this->configurator->createPDOConnection();
 
-            $endTime = microtime(true);
+            $endTime = \microtime(true);
 
             if ($this->configurator->hasSaveQueries()) {
                 $this->savedQueries[] = ['Connection' => $this->getTime($startTime, $endTime)];
@@ -233,10 +233,10 @@ class Database
      */
     protected function getDumpParams(PDOStatement $statement): string
     {
-        ob_start();
+        \ob_start();
         $statement->debugDumpParams();
-        $result = ob_get_contents();
-        ob_end_clean();
+        $result = \ob_get_contents();
+        \ob_end_clean();
 
         return $result;
     }
@@ -257,11 +257,11 @@ class Database
             return null;
         }
 
-        $startTime = microtime(true);
+        $startTime = \microtime(true);
 
         $this->executeStatement($statement);
 
-        $endTime = microtime(true);
+        $endTime = \microtime(true);
 
         $this->addQuery($statement, $parameters, $this->getTime($startTime, $endTime));
 
@@ -333,14 +333,14 @@ class Database
             return false;
         }
 
-        $startTime = microtime(true);
+        $startTime = \microtime(true);
 
         $success = $this->executeStatement($statement);
         if ($success === false) {
             return false;
         }
 
-        $endTime = microtime(true);
+        $endTime = \microtime(true);
 
         $this->addQuery($statement, $parameters, $this->getTime($startTime, $endTime));
 
@@ -372,14 +372,14 @@ class Database
             return false;
         }
 
-        $startTime = microtime(true);
+        $startTime = \microtime(true);
 
         $success = $this->executeStatement($statement);
         if ($success === false) {
             return false;
         }
 
-        $endTime = microtime(true);
+        $endTime = \microtime(true);
 
         $this->addQuery($statement, $parameters, $this->getTime($startTime, $endTime));
 
@@ -411,14 +411,14 @@ class Database
             return false;
         }
 
-        $startTime = microtime(true);
+        $startTime = \microtime(true);
 
         $success = $this->executeStatement($statement);
         if ($success === false) {
             return false;
         }
 
-        $endTime = microtime(true);
+        $endTime = \microtime(true);
 
         $this->addQuery($statement, $parameters, $this->getTime($startTime, $endTime));
 
@@ -451,7 +451,7 @@ class Database
 
         $cursor = $statement->fetch(PDO::FETCH_ASSOC);
 
-        $count = (int) current($cursor);
+        $count = (int) \current($cursor);
 
         $statement->closeCursor();
         $statement = null;
@@ -475,11 +475,11 @@ class Database
             return false;
         }
 
-        $startTime = microtime(true);
+        $startTime = \microtime(true);
 
         $success = $this->executeStatement($statement);
 
-        $endTime = microtime(true);
+        $endTime = \microtime(true);
 
         $this->addQuery($statement, $parameters, $this->getTime($startTime, $endTime));
 
@@ -567,7 +567,7 @@ class Database
         $datas = $this->readAll($statement);
         $col = [];
         foreach ($datas as $data) {
-            $col[] = current($data);
+            $col[] = \current($data);
         }
 
         $statement->closeCursor();
@@ -596,7 +596,7 @@ class Database
 
         $row = $this->read($statement);
         if ($row !== false) {
-            $var = current($row);
+            $var = \current($row);
         }
 
         $statement->closeCursor();
@@ -817,7 +817,7 @@ class Database
             return $success;
         }
 
-        $tables = implode(',', $tables);
+        $tables = \implode(',', $tables);
 
         $sql = 'DROP TABLE IF EXISTS ' . $tables;
         $success = $this->exec($sql);
@@ -834,11 +834,11 @@ class Database
      */
     public function useSqlFile(string $filepath): bool
     {
-        if (!file_exists($filepath)) {
+        if (!\file_exists($filepath)) {
             throw new DatabaseException('File missing for useSqlFile method: ' . $filepath);
         }
 
-        $sqlFile = file_get_contents($filepath);
+        $sqlFile = \file_get_contents($filepath);
 
         return $this->exec($sqlFile);
     }
@@ -851,7 +851,7 @@ class Database
      */
     protected function getTime(float $startTime, float $endTime): float
     {
-        return round(($endTime - $startTime) * 1000000) / 1000000;
+        return \round(($endTime - $startTime) * 1000000) / 1000000;
     }
 
     public function disconnect(): void

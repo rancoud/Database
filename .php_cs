@@ -14,6 +14,7 @@ return PhpCsFixer\Config::create()
         'array_syntax' => ['syntax' => 'short'],
         'linebreak_after_opening_tag' => true,
         'mb_str_functions' => true,
+        'native_function_invocation' => true,
         'no_php4_constructor' => true,
         'no_unreachable_default_argument_value' => true,
         'no_useless_else' => true,
