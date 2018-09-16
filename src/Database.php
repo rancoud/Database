@@ -607,6 +607,7 @@ class Database
 
     /**
      * @throws DatabaseException
+     * @throws PDOException
      *
      * @return bool
      */

@@ -29,7 +29,9 @@ $results = $database->selectAll("SELECT * FROM mytable WHERE something > :thing"
 ```
 
 ## Configurator
-### Settings
+### Constructor Settings
+Here it's the description of the array passed to the construct  
+
 #### Mandatory
 | Parameter | Type | Description |
 | --- | --- | --- |
@@ -48,51 +50,89 @@ $results = $database->selectAll("SELECT * FROM mytable WHERE something > :thing"
 | charset | string | 'utf8' | set specific database charset |
 | parameters | array | [] | extra parameters used by PDO on connection |
 
-## Database Methods
+### Methods
+* createPDOConnection(): PDO  
+* disablePermanentConnection(): void  
+* disableSaveQueries(): void  
+* enablePermanentConnection(): void  
+* enableSaveQueries(): void  
+* getCharset(): string  
+* getDatabase(): string  
+* getDsn(): string  
+* getEngine(): string  
+* getHost(): string  
+* getParameters(): array  
+* getParametersForPDO(): array  
+* getPassword(): string  
+* getReportError(): string  
+* getUser(): string  
+* hasPermanentConnection(): bool  
+* hasSaveQueries(): bool  
+* hasThrowException(): bool  
+* setCharset(charset: string): void  
+* setDatabase(database: string): void  
+* setEngine(engine: string): void  
+* setHost(host: string): void  
+* setParameter(key: mixed, value: mixed): void  
+* setParameters(parameters: array): void  
+* setPassword(password: string): void  
+* setReportError(reportError: string): void  
+* setUser(user: string): void  
+
+## Database
+### Constructor
+#### Mandatory
+| Parameter | Type | Description |
+| --- | --- | --- |
+| configurator | Configurator | Database configuration |
+
 ### General Commands  
-* selectAll(sql: string, [parameters: array = []]):array|bool  
-* selectRow(sql: string, [parameters: array = []]):array|bool  
-* selectCol(sql: string, [parameters: array = []]):array|bool  
-* selectVar(sql: string, [parameters: array = []]):mixed|bool  
-* insert(sql: string, [parameters: array = []], [getLastInsertId: bool = false]):int|bool  
-* update(sql: string, [parameters: array = []], [getCountRowAffected: bool = false]):int|bool  
-* delete(sql: string, [parameters: array = []], [getCountRowAffected: bool = false]):int|bool  
-* count(sql: string, [parameters: array = []]):int|bool  
-* exec(sql: string, [parameters: array = []]):bool  
-* select(sql: string, [parameters: array = []]):PDOStatement|null  
-* read(statement: \PDOStatement, [fetchType: int = PDO::FETCH_ASSOC]):mixed  
-* readAll(statement: \PDOStatement, [fetchType: int = PDO::FETCH_ASSOC]):array  
+* selectAll(sql: string, [parameters: array = []]): array|bool  
+* selectRow(sql: string, [parameters: array = []]): array|bool  
+* selectCol(sql: string, [parameters: array = []]): array|bool  
+* selectVar(sql: string, [parameters: array = []]): mixed|bool  
+* insert(sql: string, [parameters: array = []], [getLastInsertId: bool = false]): int|bool  
+* update(sql: string, [parameters: array = []], [getCountRowAffected: bool = false]): int|bool  
+* delete(sql: string, [parameters: array = []], [getCountRowAffected: bool = false]): int|bool  
+* count(sql: string, [parameters: array = []]): int|bool  
+* exec(sql: string, [parameters: array = []]): bool  
+* select(sql: string, [parameters: array = []]): ?PDOStatement  
+* read(statement: PDOStatement, [fetchType: int = PDO::FETCH_ASSOC]): mixed  
+* readAll(statement: PDOStatement, [fetchType: int = PDO::FETCH_ASSOC]): array  
 
 ### Transactions
-* startTransaction():bool  
-* completeTransaction():bool  
-* commitTransaction():bool  
-* rollbackTransaction():bool  
+* startTransaction(): bool  
+* completeTransaction(): bool  
+* commitTransaction(): bool  
+* rollbackTransaction(): bool  
 
 ### Errors
-* hasErrors():bool  
-* getErrors():array  
-* getLastError():array|null  
-* cleanErrors():void  
+* hasErrors(): bool  
+* getErrors(): array  
+* getLastError(): ?array  
+* cleanErrors(): void  
 
 ### Save Queries
-* hasSaveQueries():bool  
-* enableSaveQueries():void  
-* disableSaveQueries():void  
-* cleanSavedQueries():void  
-* getSavedQueries():array  
+* hasSaveQueries(): bool  
+* enableSaveQueries(): void  
+* disableSaveQueries(): void  
+* cleanSavedQueries(): void  
+* getSavedQueries(): array  
 
 ### Specific Commands
-* truncateTable(table: string):bool  
-* truncateTables(tables: array):bool  
-* dropTable(table: string):bool  
-* dropTables(tables: array):bool  
-* useSqlFile(filepath: string):bool  
+* truncateTable(table: string): bool  
+* truncateTables(tables: array): bool  
+* dropTable(table: string): bool  
+* dropTables(tables: array): bool  
+* useSqlFile(filepath: string): bool  
 
 ### Low Level
-* connect():void  
-* disconnect():void  
-* getPdo():PDO  
+* connect(): void  
+* disconnect(): void  
+* getPdo(): ?PDO  
+
+### Static Method
+* getInstance([configurator: Configurator = null]): self  
 
 ## How to Dev
 `./run_all_commands.sh` for php-cs-fixer and phpunit and coverage  
