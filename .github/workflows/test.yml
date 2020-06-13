@@ -12,8 +12,6 @@ jobs:
       matrix:
         os:
           - ubuntu-latest
-          - macOS-latest
-          - windows-latest
 
     services:
       mysql:
