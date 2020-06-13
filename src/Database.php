@@ -17,27 +17,27 @@ class Database
     /**
      * @var Configurator
      */
-    protected $configurator = null;
+    protected ?Configurator $configurator = null;
 
     /**
      * @var PDO
      */
-    protected $pdo = null;
+    protected ?PDO $pdo = null;
 
     /**
      * @var array
      */
-    protected $errors = [];
+    protected array $errors = [];
 
     /**
      * @var array
      */
-    protected $savedQueries = [];
+    protected array $savedQueries = [];
 
     /**
      * @var Database
      */
-    protected static $instance;
+    protected static Database $instance;
 
     /**
      * Database constructor.
@@ -73,7 +73,7 @@ class Database
     /**
      * @throws DatabaseException
      */
-    public function connect()
+    public function connect(): void
     {
         try {
             $startTime = \microtime(true);
@@ -170,9 +170,6 @@ class Database
         return false;
     }
 
-    /**
-     * @param PDOStatement $statement
-     */
     protected function addErrorStatement(PDOStatement $statement): void
     {
         $this->errors[] = [
@@ -183,9 +180,6 @@ class Database
         ];
     }
 
-    /**
-     * @param Exception $exception
-     */
     protected function addErrorConnection(Exception $exception): void
     {
         $this->errors[] = [
@@ -196,10 +190,6 @@ class Database
         ];
     }
 
-    /**
-     * @param string $sql
-     * @param array  $parameters
-     */
     protected function addErrorPrepare(string $sql, array $parameters): void
     {
         $this->errors[] = [
@@ -210,11 +200,6 @@ class Database
         ];
     }
 
-    /**
-     * @param PDOStatement $statement
-     * @param array        $parameters
-     * @param float        $time
-     */
     protected function addQuery(PDOStatement $statement, array $parameters, float $time): void
     {
         if ($this->configurator->hasSaveQueries()) {
@@ -226,11 +211,6 @@ class Database
         }
     }
 
-    /**
-     * @param PDOStatement $statement
-     *
-     * @return string
-     */
     protected function getDumpParams(PDOStatement $statement): string
     {
         \ob_start();
@@ -489,9 +469,6 @@ class Database
         return $success;
     }
 
-    /**
-     * @return PDO|null
-     */
     public function getPdo(): ?PDO
     {
         return $this->pdo;
@@ -608,8 +585,6 @@ class Database
     /**
      * @throws DatabaseException
      * @throws PDOException
-     *
-     * @return bool
      */
     public function startTransaction(): bool
     {
@@ -622,8 +597,6 @@ class Database
 
     /**
      * @throws DatabaseException
-     *
-     * @return bool
      */
     public function completeTransaction(): bool
     {
@@ -648,8 +621,6 @@ class Database
 
     /**
      * @throws DatabaseException
-     *
-     * @return bool
      */
     public function commitTransaction(): bool
     {
@@ -666,8 +637,6 @@ class Database
 
     /**
      * @throws DatabaseException
-     *
-     * @return bool
      */
     public function rollbackTransaction(): bool
     {
@@ -682,25 +651,16 @@ class Database
         return $this->pdo->rollBack();
     }
 
-    /**
-     * @return bool
-     */
     public function hasErrors(): bool
     {
         return !empty($this->errors);
     }
 
-    /**
-     * @return array
-     */
     public function getErrors(): array
     {
         return $this->errors;
     }
 
-    /**
-     * @return array|null
-     */
     public function getLastError(): ?array
     {
         $countErrors = \count($this->errors);
@@ -716,9 +676,6 @@ class Database
         $this->errors = [];
     }
 
-    /**
-     * @return bool
-     */
     public function hasSaveQueries(): bool
     {
         return $this->configurator->hasSaveQueries();
@@ -739,9 +696,6 @@ class Database
         $this->savedQueries = [];
     }
 
-    /**
-     * @return array
-     */
     public function getSavedQueries(): array
     {
         return $this->savedQueries;
@@ -844,12 +798,6 @@ class Database
         return $this->exec($sqlFile);
     }
 
-    /**
-     * @param float $startTime
-     * @param float $endTime
-     *
-     * @return float
-     */
     protected function getTime(float $startTime, float $endTime): float
     {
         return \round(($endTime - $startTime) * 1000000) / 1000000;

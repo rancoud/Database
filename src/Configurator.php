@@ -13,37 +13,37 @@ use PDOException;
 class Configurator
 {
     /** @var string */
-    protected $engine;
+    protected string $engine;
 
     /** @var string */
-    protected $host;
+    protected string $host;
 
     /** @var string */
-    protected $user;
+    protected string $user;
 
     /** @var string */
-    protected $password;
+    protected string $password;
 
     /** @var string */
-    protected $database;
+    protected string $database;
 
     /** @var array */
-    protected $parameters = [];
+    protected array $parameters = [];
 
     /** @var bool */
-    protected $saveQueries = false;
+    protected bool $saveQueries = false;
 
     /** @var bool */
-    protected $permanentConnection = false;
+    protected bool $permanentConnection = false;
 
     /** @var string */
-    protected $reportError = 'exception';
+    protected string $reportError = 'exception';
 
     /** @var string */
-    protected $charset = 'utf8';
+    protected string $charset = 'utf8';
 
     /** @var string[] */
-    protected $keySettings = [
+    protected array $keySettings = [
         'engine',
         'host',
         'user',
@@ -131,9 +131,6 @@ class Configurator
         }
     }
 
-    /**
-     * @return string
-     */
     public function getEngine(): string
     {
         return $this->engine;
@@ -154,73 +151,46 @@ class Configurator
         $this->engine = $engine;
     }
 
-    /**
-     * @return string
-     */
     public function getHost(): string
     {
         return $this->host;
     }
 
-    /**
-     * @param string $host
-     */
     public function setHost(string $host): void
     {
         $this->host = $host;
     }
 
-    /**
-     * @return string
-     */
     public function getUser(): string
     {
         return $this->user;
     }
 
-    /**
-     * @param string $user
-     */
     public function setUser(string $user): void
     {
         $this->user = $user;
     }
 
-    /**
-     * @return string
-     */
     public function getPassword(): string
     {
         return $this->password;
     }
 
-    /**
-     * @param string $password
-     */
     public function setPassword(string $password): void
     {
         $this->password = $password;
     }
 
-    /**
-     * @return string
-     */
     public function getDatabase(): string
     {
         return $this->database;
     }
 
-    /**
-     * @param string $database
-     */
     public function setDatabase(string $database): void
     {
         $this->database = $database;
     }
 
-    /**
-     * @return array
-     */
     public function getParameters(): array
     {
         return $this->parameters;
@@ -235,17 +205,11 @@ class Configurator
         $this->parameters[$key] = $value;
     }
 
-    /**
-     * @param array $parameters
-     */
     public function setParameters(array $parameters): void
     {
         $this->parameters = $parameters;
     }
 
-    /**
-     * @return array
-     */
     public function getParametersForPDO(): array
     {
         $parameters = $this->getParameters();
@@ -265,9 +229,6 @@ class Configurator
         return $parameters;
     }
 
-    /**
-     * @return bool
-     */
     public function hasSaveQueries(): bool
     {
         return $this->saveQueries;
@@ -283,9 +244,6 @@ class Configurator
         $this->saveQueries = false;
     }
 
-    /**
-     * @return bool
-     */
     public function hasPermanentConnection(): bool
     {
         return $this->permanentConnection;
@@ -301,9 +259,6 @@ class Configurator
         $this->permanentConnection = false;
     }
 
-    /**
-     * @return string
-     */
     public function getReportError(): string
     {
         return $this->reportError;
@@ -323,33 +278,21 @@ class Configurator
         $this->reportError = $reportError;
     }
 
-    /**
-     * @return bool
-     */
     public function hasThrowException(): bool
     {
         return $this->reportError === 'exception';
     }
 
-    /**
-     * @return string
-     */
     public function getCharset(): string
     {
         return $this->charset;
     }
 
-    /**
-     * @param string $charset
-     */
     public function setCharset(string $charset): void
     {
         $this->charset = $charset;
     }
 
-    /**
-     * @return string
-     */
     public function getDsn(): string
     {
         $engine = $this->getEngine();
@@ -366,8 +309,6 @@ class Configurator
 
     /**
      * @throws DatabaseException
-     *
-     * @return PDO
      */
     public function createPDOConnection(): PDO
     {

@@ -26,14 +26,14 @@ class DatabaseSingletonTest extends TestCase
         'report_error' => 'exception'
     ];
 
-    public function setUp()
+    public function setUp(): void
     {
         $databaseConf = new Configurator($this->params);
         $this->db = new Database($databaseConf);
     }
     
     /** @runInSeparateProcess  */
-    public function testSingletonEmptyConfiguratorException()
+    public function testSingletonEmptyConfiguratorException(): void
     {
         static::expectException(DatabaseException::class);
         static::expectExceptionMessage('Configurator Missing');
@@ -42,7 +42,7 @@ class DatabaseSingletonTest extends TestCase
     }
     
     /** @runInSeparateProcess  */
-    public function testSingleton()
+    public function testSingleton(): void
     {
         $db = Database::getInstance(new Configurator($this->params));
 
@@ -50,7 +50,7 @@ class DatabaseSingletonTest extends TestCase
     }
 
     /** @runInSeparateProcess  */
-    public function testSingletonCallTwiceWithConfiguratorException()
+    public function testSingletonCallTwiceWithConfiguratorException(): void
     {
         static::expectException(DatabaseException::class);
         static::expectExceptionMessage('Configurator Already Setup');

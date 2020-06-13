@@ -14,34 +14,34 @@ use Rancoud\Database\Database;
 class DatabaseSqliteSilentTest extends TestCase
 {
     /** @var Database */
-    protected $db;
+    protected Database $db;
 
-    protected $params = [
-        'engine'       => 'sqlite',
-        'host'         => '127.0.0.1',
-        'user'         => '',
-        'password'     => '',
-        'database'     => __DIR__ . '/test_database.db',
+    protected array $params = [
+        'engine' => 'sqlite',
+        'host' => '127.0.0.1',
+        'user' => '',
+        'password' => '',
+        'database' => __DIR__ . '/test_database.db',
         'report_error' => 'silent'
     ];
 
-    public function setUp()
+    public function setUp(): void
     {
         $databaseConf = new Configurator($this->params);
         $this->db = new Database($databaseConf);
     }
 
-    public function testDropOneTable()
+    public function testDropOneTable(): void
     {
         static::assertNull(null, $this->db->dropTable('test'));
     }
 
-    public function testDropMultiTable()
+    public function testDropMultiTable(): void
     {
         static::assertNull(null, $this->db->dropTables(['test', 'toto']));
     }
 
-    public function testExec()
+    public function testExec(): void
     {
         $this->db->exec('CREATE TABLE test (
                                     id   INTEGER       PRIMARY KEY AUTOINCREMENT,
@@ -50,13 +50,13 @@ class DatabaseSqliteSilentTest extends TestCase
         static::assertFalse($this->db->hasErrors());
     }
 
-    public function testInsert()
+    public function testInsert(): void
     {
         $id = $this->db->insert('INSERT INTO test (name) VALUES (:name)', ['name' => 'A'], true);
         static::assertSame(1, $id);
     }
 
-    public function testUpdate()
+    public function testUpdate(): void
     {
         $sql = 'UPDATE test SET name = :name WHERE id = :id';
         $params = ['id' => 1, 'name' => 'google'];
@@ -64,13 +64,13 @@ class DatabaseSqliteSilentTest extends TestCase
         static::assertSame(1, $rowsAffected);
     }
 
-    public function testDelete()
+    public function testDelete(): void
     {
         $rowsAffected = $this->db->delete('DELETE FROM test WHERE name = :name1', ['name1' => 'google'], true);
         static::assertSame(1, $rowsAffected);
     }
 
-    public function testRead()
+    public function testRead(): void
     {
         $res = [];
 
@@ -86,111 +86,111 @@ class DatabaseSqliteSilentTest extends TestCase
         static::assertSame(3, count($res));
     }
 
-    public function testCount()
+    public function testCount(): void
     {
         $count = $this->db->count('SELECT COUNT(*) FROM test');
         static::assertSame(3, $count);
     }
 
-    public function testSelectAll()
+    public function testSelectAll(): void
     {
         $rows = $this->db->selectAll('SELECT * FROM test');
         static::assertSame(3, count($rows));
     }
 
-    public function testSelectRow()
+    public function testSelectRow(): void
     {
         $row = $this->db->selectRow('SELECT * FROM test WHERE id = :id', ['id' => 3]);
         static::assertSame('B', $row['name']);
     }
 
-    public function testSelectCol()
+    public function testSelectCol(): void
     {
         $col = $this->db->selectCol('SELECT id FROM test');
         static::assertSame(3, count($col));
     }
 
-    public function testSelectVar()
+    public function testSelectVar(): void
     {
         $var = $this->db->selectVar('SELECT name FROM test WHERE id = :id', ['id' => 3]);
         static::assertSame('B', $var);
     }
 
-    public function testGetError()
+    public function testGetError(): void
     {
         $this->db->selectVar('SELECT namebbb FROM test WHERE id = :id', ['id' => 3]);
         static::assertTrue($this->db->hasErrors());
     }
 
-    public function testTruncateTable()
+    public function testTruncateTable(): void
     {
         $this->db->truncateTable('test');
         static::assertFalse($this->db->hasErrors());
     }
 
-    public function testTruncateTables()
+    public function testTruncateTables(): void
     {
         $this->db->truncateTables(['test', 'test']);
         static::assertFalse($this->db->hasErrors());
     }
 
-    public function testDisconnect()
+    public function testDisconnect(): void
     {
         $this->db->disconnect();
 
         static::assertNull($this->db->getPdo());
     }
 
-    public function testExecStatementFalse()
+    public function testExecStatementFalse(): void
     {
         $sql = 'SELECT namebbb FROM test WHERE id = :id';
         $success = $this->db->exec($sql);
         static::assertFalse($success);
     }
 
-    public function testInsertStatementFalse()
+    public function testInsertStatementFalse(): void
     {
         $sql = 'a :a';
         $success = $this->db->insert($sql);
         static::assertFalse($success);
     }
 
-    public function testUpdateStatementFalse()
+    public function testUpdateStatementFalse(): void
     {
         $sql = 'a :a';
         $success = $this->db->update($sql);
         static::assertFalse($success);
     }
 
-    public function testDeleteStatementFalse()
+    public function testDeleteStatementFalse(): void
     {
         $sql = 'a :a';
         $success = $this->db->delete($sql);
         static::assertFalse($success);
     }
 
-    public function testCountStatementFalse()
+    public function testCountStatementFalse(): void
     {
         $sql = 'a';
         $success = $this->db->count($sql);
         static::assertFalse($success);
     }
 
-    public function testSelectAllStatementFalse()
+    public function testSelectAllStatementFalse(): void
     {
         $sql = 'a :a';
         $success = $this->db->selectAll($sql);
         static::assertFalse($success);
     }
 
-    public function testSelectRowStatementFalse()
+    public function testSelectRowStatementFalse(): void
     {
         $sql = 'a';
         $success = $this->db->selectRow($sql);
         static::assertFalse($success);
     }
 
-    public function testSelectColStatementFalse()
+    public function testSelectColStatementFalse(): void
     {
         $sql = 'a :a';
         $success = $this->db->selectCol($sql);

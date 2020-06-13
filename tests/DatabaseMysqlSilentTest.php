@@ -66,26 +66,26 @@ class DatabaseMysqlSilentTest extends TestCase
         ]
     ];
 
-    public function setUp()
+    public function setUp(): void
     {
         $databaseConf = new Configurator($this->params);
         $this->db = new Database($databaseConf);
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         $this->db->disconnect();
         $this->db = null;
     }
 
-    public function testFirstLaunch()
+    public function testFirstLaunch(): void
     {
         $success = $this->db->dropTables(['test', 'test_select']);
 
         static::assertTrue($success);
     }
 
-    public function testExec()
+    public function testExec(): void
     {
         $success = $this->db->exec('CREATE TABLE test (
           id INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -95,13 +95,13 @@ class DatabaseMysqlSilentTest extends TestCase
         static::assertTrue($success);
     }
 
-    public function testExecError()
+    public function testExecError(): void
     {
         $this->db->exec('aaa');
         static::assertTrue($this->db->hasErrors());
     }
 
-    public function testInsert()
+    public function testInsert(): void
     {
         $sql = 'INSERT INTO test (name) VALUES ("A")';
         $id = $this->db->insert($sql);
@@ -127,14 +127,14 @@ class DatabaseMysqlSilentTest extends TestCase
         static::assertSame(1, $count);
     }
 
-    public function testInsertError()
+    public function testInsertError(): void
     {
         $sql = 'a :a';
         $success = $this->db->insert($sql);
         static::assertFalse($success);
     }
 
-    public function testUpdate()
+    public function testUpdate(): void
     {
         $sql = 'UPDATE test SET name = "AA" WHERE id = 1';
         $rowsAffected = $this->db->update($sql);
@@ -160,14 +160,14 @@ class DatabaseMysqlSilentTest extends TestCase
         static::assertSame(1, $count);
     }
 
-    public function testUpdateError()
+    public function testUpdateError(): void
     {
         $sql = 'a :a';
         $success = $this->db->update($sql);
         static::assertFalse($success);
     }
 
-    public function testDelete()
+    public function testDelete(): void
     {
         $sql = 'DELETE FROM test WHERE id = 1';
         $rowsAffected = $this->db->delete($sql);
@@ -193,21 +193,21 @@ class DatabaseMysqlSilentTest extends TestCase
         static::assertSame(0, $count);
     }
 
-    public function testDeleteError()
+    public function testDeleteError(): void
     {
         $sql = 'a :a';
         $success = $this->db->delete($sql);
         static::assertFalse($success);
     }
 
-    public function testUseSqlFile()
+    public function testUseSqlFile(): void
     {
         $success = $this->db->useSqlFile(__DIR__ . '/test-dump-mysql.sql');
 
         static::assertTrue($success);
     }
 
-    public function testUseSqlFileException()
+    public function testUseSqlFileException(): void
     {
         static::expectException(DatabaseException::class);
         static::expectExceptionMessage('File missing for useSqlFile method: ./missing-dump.sql');
@@ -215,7 +215,7 @@ class DatabaseMysqlSilentTest extends TestCase
         $this->db->useSqlFile('./missing-dump.sql');
     }
 
-    public function testSelectAll()
+    public function testSelectAll(): void
     {
         $sql = 'SELECT * FROM test_select';
         $rows = $this->db->selectAll($sql);
@@ -235,14 +235,14 @@ class DatabaseMysqlSilentTest extends TestCase
         static::assertSame([], $rows);
     }
 
-    public function testSelectAllError()
+    public function testSelectAllError(): void
     {
         $sql = 'a :a';
         $success = $this->db->selectAll($sql);
         static::assertSame([], $success);
     }
 
-    public function testSelectRow()
+    public function testSelectRow(): void
     {
         $sql = 'SELECT * FROM test_select';
         $row = $this->db->selectRow($sql);
@@ -259,14 +259,14 @@ class DatabaseMysqlSilentTest extends TestCase
         static::assertSame([], $row);
     }
 
-    public function testSelectRowError()
+    public function testSelectRowError(): void
     {
         $sql = 'a';
         $success = $this->db->selectRow($sql);
         static::assertSame([], $success);
     }
 
-    public function testSelectCol()
+    public function testSelectCol(): void
     {
         $sql = 'SELECT * FROM test_select';
         $col = $this->db->selectCol($sql);
@@ -283,14 +283,14 @@ class DatabaseMysqlSilentTest extends TestCase
         static::assertSame([], $col);
     }
 
-    public function testSelectColError()
+    public function testSelectColError(): void
     {
         $sql = 'a :a';
         $success = $this->db->selectCol($sql);
         static::assertSame([], $success);
     }
 
-    public function testSelectVar()
+    public function testSelectVar(): void
     {
         $sql = 'SELECT id FROM test_select';
         $var = $this->db->selectVar($sql);
@@ -307,14 +307,14 @@ class DatabaseMysqlSilentTest extends TestCase
         static::assertFalse($var);
     }
 
-    public function testSelectVarError()
+    public function testSelectVarError(): void
     {
         $sql = 'a :a';
         $variable = $this->db->selectVar($sql);
         static::assertSame(false, $variable);
     }
 
-    public function testPdoParamType()
+    public function testPdoParamType(): void
     {
         $sql = 'SELECT :true AS `true`, :false AS `false`, :null AS `null`, :float AS `float`,
                 :int AS `int`, :string AS `string`, :resource AS `resource`';
@@ -338,7 +338,7 @@ class DatabaseMysqlSilentTest extends TestCase
         static::assertSame('-- MySQL dump', mb_substr($row['resource'], 0, 13));
     }
 
-    public function testPdoParamTypeError()
+    public function testPdoParamTypeError(): void
     {
         $sql = 'SELECT :array AS array';
         $params = ['array' => []];
@@ -350,7 +350,7 @@ class DatabaseMysqlSilentTest extends TestCase
         }
     }
 
-    public function testPdoParamTypeException()
+    public function testPdoParamTypeException(): void
     {
         static::expectException(DatabaseException::class);
         static::expectExceptionMessage('Error Bind Value');
@@ -360,7 +360,7 @@ class DatabaseMysqlSilentTest extends TestCase
         $this->db->selectRow($sql, $params);
     }
 
-    public function testSelect()
+    public function testSelect(): void
     {
         $sql = 'SELECT * FROM test_select';
         $statement = $this->db->select($sql);
@@ -377,7 +377,7 @@ class DatabaseMysqlSilentTest extends TestCase
         static::assertSame(PDOStatement::class, get_class($statement));
     }
 
-    public function testRead()
+    public function testRead(): void
     {
         $sql = 'SELECT * FROM test_select';
         $statement = $this->db->select($sql);
@@ -405,7 +405,7 @@ class DatabaseMysqlSilentTest extends TestCase
         static::assertSame(6, count($rows));
     }
 
-    public function testReadAll()
+    public function testReadAll(): void
     {
         $sql = 'SELECT * FROM test_select';
         $statement = $this->db->select($sql);
@@ -425,7 +425,7 @@ class DatabaseMysqlSilentTest extends TestCase
         static::assertSame(0, count($rows));
     }
 
-    public function testTransaction()
+    public function testTransaction(): void
     {
         $this->db->startTransaction();
 
@@ -440,7 +440,7 @@ class DatabaseMysqlSilentTest extends TestCase
         static::assertSame('my name', $this->db->selectVar($sql, $params));
     }
 
-    public function testTransactionError()
+    public function testTransactionError(): void
     {
         try {
             $this->db->startTransaction();
@@ -465,7 +465,7 @@ class DatabaseMysqlSilentTest extends TestCase
         }
     }
 
-    public function testTransactionCOmpleteError()
+    public function testTransactionCOmpleteError(): void
     {
         $this->db->startTransaction();
 
@@ -477,7 +477,7 @@ class DatabaseMysqlSilentTest extends TestCase
         static::assertFalse($success);
     }
 
-    public function testInTransactionError()
+    public function testInTransactionError(): void
     {
         $success = $this->db->completeTransaction();
         static::assertFalse($success);
@@ -503,7 +503,7 @@ class DatabaseMysqlSilentTest extends TestCase
 
     // errors
 
-    public function testErrors()
+    public function testErrors(): void
     {
         static::assertFalse($this->db->hasErrors());
         static::assertSame([], $this->db->getErrors());
@@ -525,7 +525,7 @@ class DatabaseMysqlSilentTest extends TestCase
 
     // save queries
 
-    public function testSaveQueries()
+    public function testSaveQueries(): void
     {
         static::assertFalse($this->db->hasSaveQueries());
 
@@ -558,29 +558,29 @@ class DatabaseMysqlSilentTest extends TestCase
 
     // specific command
 
-    public function testTruncateTable()
+    public function testTruncateTable(): void
     {
         static::assertTrue($this->db->truncateTable('test'));
     }
 
-    public function testTruncateTables()
+    public function testTruncateTables(): void
     {
         static::assertTrue($this->db->truncateTables(['test', 'test_select']));
     }
 
-    public function testDropTable()
+    public function testDropTable(): void
     {
         static::assertTrue($this->db->dropTable('test'));
     }
 
-    public function testDropTables()
+    public function testDropTables(): void
     {
         static::assertTrue($this->db->dropTables(['test', 'toto']));
     }
 
     // low level
 
-    public function testConnect()
+    public function testConnect(): void
     {
         static::assertNull($this->db->getPdo());
 
@@ -589,7 +589,7 @@ class DatabaseMysqlSilentTest extends TestCase
         static::assertSame('PDO', get_class($this->db->getPdo()));
     }
 
-    public function testConnectError()
+    public function testConnectError(): void
     {
         $params = $this->params;
         $params['password'] = 'password';
@@ -599,7 +599,7 @@ class DatabaseMysqlSilentTest extends TestCase
         static::assertTrue($db->hasErrors());
     }
 
-    public function testGetPdo()
+    public function testGetPdo(): void
     {
         static::assertNull($this->db->getPdo());
 
@@ -608,7 +608,7 @@ class DatabaseMysqlSilentTest extends TestCase
         static::assertSame('PDO', get_class($this->db->getPdo()));
     }
 
-    public function testDisconnect()
+    public function testDisconnect(): void
     {
         $this->db->connect();
 

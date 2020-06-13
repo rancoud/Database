@@ -15,7 +15,7 @@ use TypeError;
  */
 class ConfiguratorTest extends TestCase
 {
-    public function testConstructMandatory()
+    public function testConstructMandatory(): void
     {
         $params = [
             'engine'        => 'mysql',
@@ -33,7 +33,7 @@ class ConfiguratorTest extends TestCase
         static::assertSame('test_database', $conf->getDatabase());
     }
 
-    public function testConstructInvalidSettingsException()
+    public function testConstructInvalidSettingsException(): void
     {
         static::expectException(DatabaseException::class);
         static::expectExceptionMessage('"azerty" settings is not recognized');
@@ -42,7 +42,7 @@ class ConfiguratorTest extends TestCase
         new Configurator($params);
     }
 
-    public function testConstructMandatoryException()
+    public function testConstructMandatoryException(): void
     {
         static::expectException(DatabaseException::class);
         static::expectExceptionMessage('"engine" settings is not defined or not a string');
@@ -53,7 +53,7 @@ class ConfiguratorTest extends TestCase
         new Configurator($params);
     }
 
-    public function testConstructMandatoryEngineException()
+    public function testConstructMandatoryEngineException(): void
     {
         static::expectException(DatabaseException::class);
         static::expectExceptionMessage('The engine "engine" is not available for PDO');
@@ -68,7 +68,7 @@ class ConfiguratorTest extends TestCase
         new Configurator($params);
     }
 
-    public function testConstructReportErrorException()
+    public function testConstructReportErrorException(): void
     {
         static::expectException(DatabaseException::class);
         static::expectExceptionMessage('The report error "report_error" is incorrect. (silent , exception)');
@@ -84,7 +84,7 @@ class ConfiguratorTest extends TestCase
         new Configurator($params);
     }
 
-    public function testConstructInvalidSettingsParametersException()
+    public function testConstructInvalidSettingsParametersException(): void
     {
         static::expectException(TypeError::class);
         
@@ -99,7 +99,7 @@ class ConfiguratorTest extends TestCase
         new Configurator($params);
     }
 
-    public function testSetEngine()
+    public function testSetEngine(): void
     {
         $params = [
             'engine'        => 'mysql',
@@ -114,7 +114,7 @@ class ConfiguratorTest extends TestCase
         static::assertSame('sqlite', $conf->getEngine());
     }
 
-    public function testSetEngineException()
+    public function testSetEngineException(): void
     {
         static::expectException(DatabaseException::class);
         static::expectExceptionMessage('The engine "engine" is not available for PDO');
@@ -131,7 +131,7 @@ class ConfiguratorTest extends TestCase
         $conf->setEngine('engine');
     }
 
-    public function testSetHost()
+    public function testSetHost(): void
     {
         $params = [
             'engine'        => 'mysql',
@@ -146,7 +146,7 @@ class ConfiguratorTest extends TestCase
         static::assertSame('host', $conf->getHost());
     }
 
-    public function testSetUser()
+    public function testSetUser(): void
     {
         $params = [
             'engine'        => 'mysql',
@@ -161,7 +161,7 @@ class ConfiguratorTest extends TestCase
         static::assertSame('user', $conf->getUser());
     }
 
-    public function testSetPassword()
+    public function testSetPassword(): void
     {
         $params = [
             'engine'        => 'mysql',
@@ -176,7 +176,7 @@ class ConfiguratorTest extends TestCase
         static::assertSame('password', $conf->getPassword());
     }
 
-    public function testSetDatabase()
+    public function testSetDatabase(): void
     {
         $params = [
             'engine'        => 'mysql',
@@ -191,7 +191,7 @@ class ConfiguratorTest extends TestCase
         static::assertSame('database', $conf->getDatabase());
     }
 
-    public function testDefaultSaveQueriesFalse()
+    public function testDefaultSaveQueriesFalse(): void
     {
         $params = [
             'engine'        => 'mysql',
@@ -205,7 +205,7 @@ class ConfiguratorTest extends TestCase
         static::assertFalse($conf->hasSaveQueries());
     }
 
-    public function testSaveQueries()
+    public function testSaveQueries(): void
     {
         $params = [
             'engine'        => 'mysql',
@@ -236,7 +236,7 @@ class ConfiguratorTest extends TestCase
         static::assertTrue($conf->hasSaveQueries());
     }
 
-    public function testDefaultPermanentConnectionFalse()
+    public function testDefaultPermanentConnectionFalse(): void
     {
         $params = [
             'engine'        => 'mysql',
@@ -250,7 +250,7 @@ class ConfiguratorTest extends TestCase
         static::assertFalse($conf->hasPermanentConnection());
     }
 
-    public function testPermanentConnection()
+    public function testPermanentConnection(): void
     {
         $params = [
             'engine'                => 'mysql',
@@ -281,7 +281,7 @@ class ConfiguratorTest extends TestCase
         static::assertTrue($conf->hasPermanentConnection());
     }
 
-    public function testDefaultReportErrorException()
+    public function testDefaultReportErrorException(): void
     {
         $params = [
             'engine'        => 'mysql',
@@ -295,7 +295,7 @@ class ConfiguratorTest extends TestCase
         static::assertSame('exception', $conf->getReportError());
     }
 
-    public function testReportError()
+    public function testReportError(): void
     {
         $params = [
             'engine'        => 'mysql',
@@ -318,7 +318,7 @@ class ConfiguratorTest extends TestCase
         static::assertTrue($conf->hasThrowException());
     }
 
-    public function testSetReportErrorException()
+    public function testSetReportErrorException(): void
     {
         static::expectException(DatabaseException::class);
         static::expectExceptionMessage('The report error "report_error" is incorrect. (silent , exception)');
@@ -335,7 +335,7 @@ class ConfiguratorTest extends TestCase
         $conf->setReportError('report_error');
     }
 
-    public function testDefaultGetCharsetUtf8()
+    public function testDefaultGetCharsetUtf8(): void
     {
         $params = [
             'engine'        => 'mysql',
@@ -349,7 +349,7 @@ class ConfiguratorTest extends TestCase
         static::assertSame('utf8', $conf->getCharset());
     }
 
-    public function testSetCharset()
+    public function testSetCharset(): void
     {
         $params = [
             'engine'        => 'mysql',
@@ -368,7 +368,7 @@ class ConfiguratorTest extends TestCase
         static::assertSame('new_charset', $conf->getCharset());
     }
 
-    public function testDefaultGetParametersEmpty()
+    public function testDefaultGetParametersEmpty(): void
     {
         $params = [
             'engine'        => 'mysql',
@@ -382,7 +382,7 @@ class ConfiguratorTest extends TestCase
         static::assertSame([], $conf->getParameters());
     }
 
-    public function testSetParameterKeyValue()
+    public function testSetParameterKeyValue(): void
     {
         $params = [
             'engine'        => 'mysql',
@@ -405,7 +405,7 @@ class ConfiguratorTest extends TestCase
         static::assertSame(['key' => 'another_value', 'new_key' => 'new_value'], $conf->getParameters());
     }
 
-    public function testSetParameters()
+    public function testSetParameters(): void
     {
         $params = [
             'engine'        => 'mysql',
@@ -421,7 +421,7 @@ class ConfiguratorTest extends TestCase
         static::assertSame(['key' => 'value'], $conf->getParameters());
     }
 
-    public function testGetDsnMysql()
+    public function testGetDsnMysql(): void
     {
         $params = [
             'engine'        => 'mysql',
@@ -435,7 +435,7 @@ class ConfiguratorTest extends TestCase
         static::assertSame('mysql:host=127.0.0.1;dbname=test_database', $conf->getDsn());
     }
 
-    public function testGetDsnSqlite()
+    public function testGetDsnSqlite(): void
     {
         $params = [
             'engine'        => 'sqlite',
@@ -449,7 +449,7 @@ class ConfiguratorTest extends TestCase
         static::assertSame('sqlite:' . __DIR__ . '/test_database.db', $conf->getDsn());
     }
 
-    public function testGetDsnPgsql()
+    public function testGetDsnPgsql(): void
     {
         $params = [
             'engine'        => 'pgsql',
@@ -463,7 +463,7 @@ class ConfiguratorTest extends TestCase
         static::assertSame('pgsql:host=127.0.0.1;dbname=test_database', $conf->getDsn());
     }
 
-    public function testGetParametersForPDOMysql()
+    public function testGetParametersForPDOMysql(): void
     {
         $params = [
             'engine'        => 'mysql',
@@ -506,7 +506,7 @@ class ConfiguratorTest extends TestCase
         static::assertSame($expected, $conf->getParametersForPDO());
     }
 
-    public function testGetParametersForPDOSqlite()
+    public function testGetParametersForPDOSqlite(): void
     {
         $params = [
             'engine'        => 'sqlite',
@@ -545,7 +545,7 @@ class ConfiguratorTest extends TestCase
         static::assertSame($expected, $conf->getParametersForPDO());
     }
 
-    public function testGetParametersForPDOPgsql()
+    public function testGetParametersForPDOPgsql(): void
     {
         $params = [
             'engine'        => 'pgsql',
@@ -584,7 +584,7 @@ class ConfiguratorTest extends TestCase
         static::assertSame($expected, $conf->getParametersForPDO());
     }
 
-    public function testCreatePDOConnectionMysqlInReportErrorException()
+    public function testCreatePDOConnectionMysqlInReportErrorException(): void
     {
         $params = [
             'engine'        => 'mysql',
@@ -598,7 +598,7 @@ class ConfiguratorTest extends TestCase
         static::assertNotNull($conf->createPDOConnection());
     }
 
-    public function testCreatePDOConnectionMysqlInReportErrorExceptionThrowException()
+    public function testCreatePDOConnectionMysqlInReportErrorExceptionThrowException(): void
     {
         static::expectException(DatabaseException::class);
         static::expectExceptionMessage("SQLSTATE[HY000] [1045] Access denied for user 'root'@'localhost' (using password: YES)");
@@ -615,7 +615,7 @@ class ConfiguratorTest extends TestCase
         $conf->createPDOConnection();
     }
 
-    public function testCreatePDOConnectionMysqlInReportErrorSilent()
+    public function testCreatePDOConnectionMysqlInReportErrorSilent(): void
     {
         $params = [
             'engine'        => 'mysql',
@@ -630,7 +630,7 @@ class ConfiguratorTest extends TestCase
         static::assertNotNull($conf->createPDOConnection());
     }
 
-    public function testCreatePDOConnectionMysqlInReportErrorSilentErrorThrowException()
+    public function testCreatePDOConnectionMysqlInReportErrorSilentErrorThrowException(): void
     {
         static::expectException(DatabaseException::class);
         static::expectExceptionMessage("SQLSTATE[HY000] [1045] Access denied for user 'root'@'localhost' (using password: YES)");
@@ -648,7 +648,7 @@ class ConfiguratorTest extends TestCase
         $conf->createPDOConnection();
     }
 
-    public function testCreatePDOConnectionPgsqlInReportErrorException()
+    public function testCreatePDOConnectionPgsqlInReportErrorException(): void
     {
         $params = [
             'engine'        => 'pgsql',
@@ -662,7 +662,7 @@ class ConfiguratorTest extends TestCase
         static::assertNotNull($conf->createPDOConnection());
     }
 
-    public function testCreatePDOConnectionPgsqlInReportErrorSilent()
+    public function testCreatePDOConnectionPgsqlInReportErrorSilent(): void
     {
         $params = [
             'engine'        => 'pgsql',
@@ -677,7 +677,7 @@ class ConfiguratorTest extends TestCase
         static::assertNotNull($conf->createPDOConnection());
     }
 
-    public function testCreatePDOConnectionSqlite()
+    public function testCreatePDOConnectionSqlite(): void
     {
         $params = [
             'engine'        => 'sqlite',

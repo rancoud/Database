@@ -1,6 +1,12 @@
 # Database Package
 
-[![Build Status](https://travis-ci.org/rancoud/Database.svg?branch=master)](https://travis-ci.org/rancoud/Database) [![Coverage Status](https://coveralls.io/repos/github/rancoud/Database/badge.svg?branch=master)](https://coveralls.io/github/rancoud/Database?branch=master)
+![Packagist PHP Version Support](https://img.shields.io/packagist/php-v/rancoud/database)
+[![Packagist Version](https://img.shields.io/packagist/v/rancoud/database)](https://packagist.org/packages/rancoud/database)
+[![Packagist Downloads](https://img.shields.io/packagist/dt/rancoud/database)](https://packagist.org/packages/rancoud/database)
+[![Composer dependencies](https://img.shields.io/badge/dependencies-0-brightgreen)](https://github.com/rancoud/Pagination/blob/master/composer.json)
+[![Test workflow](https://img.shields.io/github/workflow/status/rancoud/database/test?label=test&logo=github)](https://github.com/rancoud/database/actions?workflow=test)
+[![Codecov](https://img.shields.io/codecov/c/github/rancoud/database?logo=codecov)](https://codecov.io/gh/rancoud/database)
+[![composer.lock](https://poser.pugx.org/rancoud/database/composerlock)](https://packagist.org/packages/rancoud/database)
 
 Request Database (use PDO).  
 
@@ -135,5 +141,6 @@ Here it's the description of the array passed to the construct
 * getInstance([configurator: Configurator = null]): self  
 
 ## How to Dev
-`./run_all_commands.sh` for php-cs-fixer and phpunit and coverage  
-`./run_php_unit_coverage.sh` for phpunit and coverage  
+`composer ci` for php-cs-fixer and phpunit and coverage  
+`composer lint` for php-cs-fixer  
+`composer test` for phpunit and coverage  

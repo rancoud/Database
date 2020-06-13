@@ -66,26 +66,26 @@ class DatabasePgsqlExceptionTest extends TestCase
         ]
     ];
 
-    public function setUp()
+    public function setUp(): void
     {
         $databaseConf = new Configurator($this->params);
         $this->db = new Database($databaseConf);
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         $this->db->disconnect();
         $this->db = null;
     }
 
-    public function testFirstLaunch()
+    public function testFirstLaunch(): void
     {
         $success = $this->db->dropTables(['test', 'test_select']);
 
         static::assertTrue($success);
     }
 
-    public function testExec()
+    public function testExec(): void
     {
         $success = $this->db->exec('CREATE TABLE test (
     id SERIAL PRIMARY KEY,
@@ -95,7 +95,7 @@ class DatabasePgsqlExceptionTest extends TestCase
         static::assertTrue($success);
     }
 
-    public function testExecException()
+    public function testExecException(): void
     {
         static::expectException(DatabaseException::class);
         static::expectExceptionMessage('Error Execute');
@@ -103,7 +103,7 @@ class DatabasePgsqlExceptionTest extends TestCase
         $this->db->exec('aaa');
     }
 
-    public function testInsert()
+    public function testInsert(): void
     {
         $sql = "INSERT INTO test (name) VALUES ('A')";
         $id = $this->db->insert($sql);
@@ -129,7 +129,7 @@ class DatabasePgsqlExceptionTest extends TestCase
         static::assertSame(1, $count);
     }
 
-    public function testInsertException()
+    public function testInsertException(): void
     {
         static::expectException(DatabaseException::class);
         static::expectExceptionMessage('Error Execute');
@@ -139,7 +139,7 @@ class DatabasePgsqlExceptionTest extends TestCase
         $this->db->insert($sql);
     }
 
-    public function testUpdate()
+    public function testUpdate(): void
     {
         $sql = "UPDATE test SET name = 'AA' WHERE id = 1";
         $rowsAffected = $this->db->update($sql);
@@ -165,7 +165,7 @@ class DatabasePgsqlExceptionTest extends TestCase
         static::assertSame(1, $count);
     }
 
-    public function testUpdateException()
+    public function testUpdateException(): void
     {
         static::expectException(DatabaseException::class);
         static::expectExceptionMessage('Error Execute');
@@ -175,7 +175,7 @@ class DatabasePgsqlExceptionTest extends TestCase
         $this->db->update($sql);
     }
 
-    public function testDelete()
+    public function testDelete(): void
     {
         $sql = 'DELETE FROM test WHERE id = 1';
         $rowsAffected = $this->db->delete($sql);
@@ -201,7 +201,7 @@ class DatabasePgsqlExceptionTest extends TestCase
         static::assertSame(0, $count);
     }
 
-    public function testDeleteException()
+    public function testDeleteException(): void
     {
         static::expectException(DatabaseException::class);
         static::expectExceptionMessage('Error Execute');
@@ -211,7 +211,7 @@ class DatabasePgsqlExceptionTest extends TestCase
         $this->db->delete($sql);
     }
 
-    public function testUseSqlFile()
+    public function testUseSqlFile(): void
     {
         $success = $this->db->useSqlFile(__DIR__ . '/test-dump-pgsql-create-table.sql');
         static::assertTrue($success);
@@ -220,7 +220,7 @@ class DatabasePgsqlExceptionTest extends TestCase
         static::assertTrue($success);
     }
 
-    public function testUseSqlFileException()
+    public function testUseSqlFileException(): void
     {
         static::expectException(DatabaseException::class);
         static::expectExceptionMessage('File missing for useSqlFile method: ./missing-dump.sql');
@@ -228,7 +228,7 @@ class DatabasePgsqlExceptionTest extends TestCase
         $this->db->useSqlFile('./missing-dump.sql');
     }
 
-    public function testSelectAll()
+    public function testSelectAll(): void
     {
         $sql = 'SELECT * FROM test_select';
         $rows = $this->db->selectAll($sql);
@@ -248,7 +248,7 @@ class DatabasePgsqlExceptionTest extends TestCase
         static::assertSame([], $rows);
     }
 
-    public function testSelectAllException()
+    public function testSelectAllException(): void
     {
         static::expectException(DatabaseException::class);
         static::expectExceptionMessage('Error Execute');
@@ -258,7 +258,7 @@ class DatabasePgsqlExceptionTest extends TestCase
         $this->db->selectAll($sql);
     }
 
-    public function testSelectRow()
+    public function testSelectRow(): void
     {
         $sql = 'SELECT * FROM test_select';
         $row = $this->db->selectRow($sql);
@@ -275,7 +275,7 @@ class DatabasePgsqlExceptionTest extends TestCase
         static::assertSame([], $row);
     }
 
-    public function testSelectRowException()
+    public function testSelectRowException(): void
     {
         static::expectException(DatabaseException::class);
         static::expectExceptionMessage('Error Execute');
@@ -285,7 +285,7 @@ class DatabasePgsqlExceptionTest extends TestCase
         $this->db->selectRow($sql);
     }
 
-    public function testSelectCol()
+    public function testSelectCol(): void
     {
         $sql = 'SELECT * FROM test_select';
         $col = $this->db->selectCol($sql);
@@ -302,7 +302,7 @@ class DatabasePgsqlExceptionTest extends TestCase
         static::assertSame([], $col);
     }
 
-    public function testSelectColException()
+    public function testSelectColException(): void
     {
         static::expectException(DatabaseException::class);
         static::expectExceptionMessage('Error Execute');
@@ -312,7 +312,7 @@ class DatabasePgsqlExceptionTest extends TestCase
         $this->db->selectCol($sql);
     }
 
-    public function testSelectVar()
+    public function testSelectVar(): void
     {
         $sql = 'SELECT id FROM test_select';
         $var = $this->db->selectVar($sql);
@@ -329,7 +329,7 @@ class DatabasePgsqlExceptionTest extends TestCase
         static::assertFalse($var);
     }
 
-    public function testSelectVarException()
+    public function testSelectVarException(): void
     {
         static::expectException(DatabaseException::class);
         static::expectExceptionMessage('Error Execute');
@@ -339,7 +339,7 @@ class DatabasePgsqlExceptionTest extends TestCase
         $this->db->selectVar($sql);
     }
 
-    public function testPdoParamTypeException()
+    public function testPdoParamTypeException(): void
     {
         static::expectException(DatabaseException::class);
         static::expectExceptionMessage('Error Bind Value');
@@ -349,7 +349,7 @@ class DatabasePgsqlExceptionTest extends TestCase
         $this->db->selectRow($sql, $params);
     }
 
-    public function testPrepareBindException()
+    public function testPrepareBindException(): void
     {
         static::expectException(DatabaseException::class);
         static::expectExceptionMessage('SQLSTATE[HY093]: Invalid parameter number: ::a');
@@ -359,7 +359,7 @@ class DatabasePgsqlExceptionTest extends TestCase
         $this->db->selectRow($sql, $params);
     }
 
-    public function testSelect()
+    public function testSelect(): void
     {
         $sql = 'SELECT * FROM test_select';
         $statement = $this->db->select($sql);
@@ -376,7 +376,7 @@ class DatabasePgsqlExceptionTest extends TestCase
         static::assertSame(PDOStatement::class, get_class($statement));
     }
 
-    public function testSelectException()
+    public function testSelectException(): void
     {
         static::expectException(DatabaseException::class);
         static::expectExceptionMessage('Error Execute');
@@ -386,7 +386,7 @@ class DatabasePgsqlExceptionTest extends TestCase
         $this->db->select($sql);
     }
 
-    public function testRead()
+    public function testRead(): void
     {
         $sql = 'SELECT * FROM test_select';
         $statement = $this->db->select($sql);
@@ -414,7 +414,7 @@ class DatabasePgsqlExceptionTest extends TestCase
         static::assertSame(6, count($rows));
     }
 
-    public function testReadAll()
+    public function testReadAll(): void
     {
         $sql = 'SELECT * FROM test_select';
         $statement = $this->db->select($sql);
@@ -434,7 +434,7 @@ class DatabasePgsqlExceptionTest extends TestCase
         static::assertSame(0, count($rows));
     }
 
-    public function testTransaction()
+    public function testTransaction(): void
     {
         $this->db->startTransaction();
 
@@ -449,7 +449,7 @@ class DatabasePgsqlExceptionTest extends TestCase
         static::assertSame('my name', $this->db->selectVar($sql, $params));
     }
 
-    public function testTransactionError()
+    public function testTransactionError(): void
     {
         try {
             $this->db->startTransaction();
@@ -474,7 +474,7 @@ class DatabasePgsqlExceptionTest extends TestCase
         }
     }
 
-    public function testTransactionException()
+    public function testTransactionException(): void
     {
         try {
             $this->db->startTransaction();
@@ -497,7 +497,7 @@ class DatabasePgsqlExceptionTest extends TestCase
 
     // errors
 
-    public function testErrors()
+    public function testErrors(): void
     {
         static::assertFalse($this->db->hasErrors());
         static::assertSame([], $this->db->getErrors());
@@ -519,7 +519,7 @@ class DatabasePgsqlExceptionTest extends TestCase
 
     // save queries
 
-    public function testSaveQueries()
+    public function testSaveQueries(): void
     {
         static::assertFalse($this->db->hasSaveQueries());
 
@@ -552,29 +552,29 @@ class DatabasePgsqlExceptionTest extends TestCase
 
     // specific command
 
-    public function testTruncateTable()
+    public function testTruncateTable(): void
     {
         static::assertTrue($this->db->truncateTable('test'));
     }
 
-    public function testTruncateTables()
+    public function testTruncateTables(): void
     {
         static::assertTrue($this->db->truncateTables(['test', 'test_select']));
     }
 
-    public function testDropTable()
+    public function testDropTable(): void
     {
         static::assertTrue($this->db->dropTable('test'));
     }
 
-    public function testDropTables()
+    public function testDropTables(): void
     {
         static::assertTrue($this->db->dropTables(['test', 'toto']));
     }
 
     // low level
 
-    public function testConnect()
+    public function testConnect(): void
     {
         static::assertNull($this->db->getPdo());
 
@@ -583,7 +583,7 @@ class DatabasePgsqlExceptionTest extends TestCase
         static::assertSame('PDO', get_class($this->db->getPdo()));
     }
 
-    public function testGetPdo()
+    public function testGetPdo(): void
     {
         static::assertNull($this->db->getPdo());
 
@@ -592,7 +592,7 @@ class DatabasePgsqlExceptionTest extends TestCase
         static::assertSame('PDO', get_class($this->db->getPdo()));
     }
 
-    public function testDisconnect()
+    public function testDisconnect(): void
     {
         $this->db->connect();
 

@@ -3,10 +3,15 @@
         <var name="db_dsn" value="mysql:dbname=test_database;host=localhost"/>
         <var name="db_username" value="root"/>
         <var name="db_password" value=""/>
+        <env name="DB_CONNECTION" value="mysql"/>
+        <env name="DB_USERNAME" value="root"/>
+        <env name="DB_DATABASE" value="test_database"/>
+        <env name="DB_HOST" value="127.0.0.1" />
+        <env name="DB_PORT" value="3306" />
     </php>
 
     <testsuites>
-        <testsuite>
+        <testsuite name="unit">
             <directory>tests</directory>
         </testsuite>
     </testsuites>
