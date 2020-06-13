@@ -14,17 +14,6 @@ jobs:
           - ubuntu-latest
 
     services:
-      mysql:
-        image: mysql:5.7
-        env:
-          MYSQL_ALLOW_EMPTY_PASSWORD: yes
-          MYSQL_USER: root
-          MYSQL_PASSWORD: ''
-          MYSQL_DATABASE: test_database
-        ports:
-          - 3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
-
       postgres:
         image: postgres:10.8
         env:
@@ -38,6 +27,21 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+
+      - name: Shutdown Ubuntu MySQL (SUDO)
+        run: sudo service mysql stop
+      - name: Setup MySQL
+        uses: mirromutth/mysql-action@v1.1
+        with:
+          host port: 3306
+          container port: 3306
+          character set server: utf8mb4
+          collation server: utf8mb4_general_ci
+          mysql version: latest
+          mysql root password: ''
+          mysql database: test_database
+          mysql user: root
+          mysql password: ''
 
       - uses: shivammathur/setup-php@v2
         with:
