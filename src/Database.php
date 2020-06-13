@@ -215,6 +215,7 @@ class Database
     {
         \ob_start();
         $statement->debugDumpParams();
+
         return \ob_get_clean();
     }
 
