@@ -601,7 +601,7 @@ class ConfiguratorTest extends TestCase
     public function testCreatePDOConnectionMysqlInReportErrorExceptionThrowException(): void
     {
         static::expectException(DatabaseException::class);
-        static::expectExceptionMessage("SQLSTATE[HY000] [1045] Access denied for user 'root'@'localhost' (using password: YES)");
+        //static::expectExceptionMessage("SQLSTATE[HY000] [1045] Access denied for user 'root'@'localhost' (using password: YES)");
 
         $params = [
             'engine'        => 'mysql',
@@ -633,7 +633,7 @@ class ConfiguratorTest extends TestCase
     public function testCreatePDOConnectionMysqlInReportErrorSilentErrorThrowException(): void
     {
         static::expectException(DatabaseException::class);
-        static::expectExceptionMessage("SQLSTATE[HY000] [1045] Access denied for user 'root'@'localhost' (using password: YES)");
+        //static::expectExceptionMessage("SQLSTATE[HY000] [1045] Access denied for user 'root'@'localhost' (using password: YES)");
 
         $params = [
             'engine'        => 'mysql',
