@@ -34,7 +34,6 @@ jobs:
         uses: mirromutth/mysql-action@v1.1
         with:
           mysql database: test_database
-          mysql root password: ''
 
       - uses: shivammathur/setup-php@v2
         with:
