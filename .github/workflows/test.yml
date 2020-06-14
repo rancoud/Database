@@ -14,8 +14,19 @@ jobs:
           - ubuntu-latest
 
     services:
+      mysql:
+        image: mysql:latest
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_USER: root
+          MYSQL_PASSWORD: ''
+          MYSQL_DATABASE: test_database
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
       postgres:
-        image: postgres:10.8
+        image: postgres:latest
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: ''
@@ -27,13 +38,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-
-      - name: Shutdown Ubuntu MySQL (SUDO)
-        run: sudo service mysql stop
-      - name: Setup MySQL
-        uses: mirromutth/mysql-action@v1.1
-        with:
-          mysql database: test_database
 
       - uses: shivammathur/setup-php@v2
         with:
@@ -65,6 +69,11 @@ jobs:
       - name: PHPUnit
         run: |
           vendor/bin/phpunit --colors --coverage-text --coverage-clover coverage/clover.xml
+        env:
+          MYSQL_HOST: 127.0.0.1
+          MYSQL_PORT: ${{ job.services.mysql.ports[3306] }}
+          MYSQL_USER: root
+          MYSQL_PASSWORD:
 
       - name: Upload coverage
         uses: codecov/codecov-action@v1.0.7
