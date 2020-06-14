@@ -15,12 +15,12 @@ use PDOStatement;
 class Database
 {
     /**
-     * @var Configurator
+     * @var Configurator|null
      */
     protected ?Configurator $configurator = null;
 
     /**
-     * @var PDO
+     * @var PDO|null
      */
     protected ?PDO $pdo = null;
 
@@ -35,9 +35,9 @@ class Database
     protected array $savedQueries = [];
 
     /**
-     * @var Database
+     * @var Database|null
      */
-    protected static Database $instance;
+    protected static ?Database $instance = null;
 
     /**
      * Database constructor.
@@ -58,16 +58,16 @@ class Database
      */
     public static function getInstance(Configurator $configurator = null): self
     {
-        if (self::$instance === null) {
+        if (static::$instance === null) {
             if ($configurator === null) {
                 throw new DatabaseException('Configurator Missing');
             }
-            self::$instance = new self($configurator);
+            static::$instance = new static($configurator);
         } elseif ($configurator !== null) {
             throw new DatabaseException('Configurator Already Setup');
         }
 
-        return self::$instance;
+        return static::$instance;
     }
 
     /**
