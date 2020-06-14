@@ -15,7 +15,7 @@ jobs:
 
     services:
       mysql:
-        image: mysql:latest
+        image: mysql:5.7
         env:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
           MYSQL_USER: root
@@ -26,7 +26,7 @@ jobs:
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
       postgres:
-        image: postgres:latest
+        image: postgres:10.8
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: ''
@@ -37,6 +37,11 @@ jobs:
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
+      - name: Verify MySQL connection from host
+        run: |
+          sudo apt-get install -y mysql-client
+          mysql --host 127.0.0.1 --port 3306 -uroot --password="" -e "SHOW DATABASES"
+
       - uses: actions/checkout@v2
 
       - uses: shivammathur/setup-php@v2
