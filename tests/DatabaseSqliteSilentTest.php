@@ -33,12 +33,12 @@ class DatabaseSqliteSilentTest extends TestCase
 
     public function testDropOneTable(): void
     {
-        static::assertNull(null, $this->db->dropTable('test'));
+        static::assertTrue($this->db->dropTable('test'));
     }
 
     public function testDropMultiTable(): void
     {
-        static::assertNull(null, $this->db->dropTables(['test', 'toto']));
+        static::assertTrue($this->db->dropTables(['test', 'toto']));
     }
 
     public function testExec(): void
