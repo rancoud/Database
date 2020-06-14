@@ -33,15 +33,8 @@ jobs:
       - name: Setup MySQL
         uses: mirromutth/mysql-action@v1.1
         with:
-          host port: 3306
-          container port: 3306
-          character set server: utf8mb4
-          collation server: utf8mb4_general_ci
-          mysql version: latest
-          mysql root password: ''
           mysql database: test_database
-          mysql user: root
-          mysql password: ''
+          mysql root password: ''
 
       - uses: shivammathur/setup-php@v2
         with:
