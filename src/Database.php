@@ -155,15 +155,25 @@ class Database
     {
         if (\is_int($value)) {
             return PDO::PARAM_INT;
-        } elseif (\is_bool($value)) {
+        }
+
+        if (\is_bool($value)) {
             return PDO::PARAM_BOOL;
-        } elseif (null === $value) {
+        }
+
+        if (null === $value) {
             return PDO::PARAM_NULL;
-        } elseif (\is_string($value)) {
+        }
+
+        if (\is_string($value)) {
             return PDO::PARAM_STR;
-        } elseif (\is_float($value)) {
+        }
+
+        if (\is_float($value)) {
             return PDO::PARAM_STR;
-        } elseif (\is_resource($value)) {
+        }
+
+        if (\is_resource($value)) {
             return PDO::PARAM_LOB;
         }
 
