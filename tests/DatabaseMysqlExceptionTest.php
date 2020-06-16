@@ -1,4 +1,6 @@
 <?php
+/** @noinspection PhpIllegalPsrClassPathInspection */
+/** @noinspection SqlDialectInspection */
 
 declare(strict_types=1);
 
@@ -66,6 +68,9 @@ class DatabaseMysqlExceptionTest extends TestCase
         ]
     ];
 
+    /**
+     * @throws DatabaseException
+     */
     public function setUp(): void
     {
         $databaseConf = new Configurator($this->params);
@@ -97,8 +102,8 @@ class DatabaseMysqlExceptionTest extends TestCase
 
     public function testExecException(): void
     {
-        static::expectException(DatabaseException::class);
-        static::expectExceptionMessage('Error Execute');
+        $this->expectException(DatabaseException::class);
+        $this->expectExceptionMessage('Error Execute');
 
         $this->db->exec('aaa');
     }
@@ -107,7 +112,7 @@ class DatabaseMysqlExceptionTest extends TestCase
     {
         $sql = 'INSERT INTO test (name) VALUES ("A")';
         $id = $this->db->insert($sql);
-        static::assertSame(true, $id);
+        static::assertTrue($id);
 
         $count = $this->db->count('SELECT COUNT(*) FROM test WHERE name="A" AND id=1');
         static::assertSame(1, $count);
@@ -115,7 +120,7 @@ class DatabaseMysqlExceptionTest extends TestCase
         $sql = 'INSERT INTO test (name) VALUES (:name)';
         $params = ['name' => 'B'];
         $id = $this->db->insert($sql, $params);
-        static::assertSame(true, $id);
+        static::assertTrue($id);
 
         $count = $this->db->count('SELECT COUNT(*) FROM test WHERE name="B" AND id=2');
         static::assertSame(1, $count);
@@ -131,8 +136,8 @@ class DatabaseMysqlExceptionTest extends TestCase
 
     public function testInsertException(): void
     {
-        static::expectException(DatabaseException::class);
-        static::expectExceptionMessage('Error Execute');
+        $this->expectException(DatabaseException::class);
+        $this->expectExceptionMessage('Error Execute');
 
         $sql = 'INSERT INTO test (name) VALUES (:name)';
 
@@ -143,7 +148,7 @@ class DatabaseMysqlExceptionTest extends TestCase
     {
         $sql = 'UPDATE test SET name = "AA" WHERE id = 1';
         $rowsAffected = $this->db->update($sql);
-        static::assertSame(true, $rowsAffected);
+        static::assertTrue($rowsAffected);
 
         $count = $this->db->count('SELECT COUNT(*) FROM test WHERE name="AA" AND id=1');
         static::assertSame(1, $count);
@@ -151,7 +156,7 @@ class DatabaseMysqlExceptionTest extends TestCase
         $sql = 'UPDATE test SET name = :name WHERE id = :id';
         $params = ['id' => 2, 'name' => 'BB'];
         $rowsAffected = $this->db->update($sql, $params);
-        static::assertSame(true, $rowsAffected);
+        static::assertTrue($rowsAffected);
 
         $count = $this->db->count('SELECT COUNT(*) FROM test WHERE name="BB" AND id=2');
         static::assertSame(1, $count);
@@ -167,8 +172,8 @@ class DatabaseMysqlExceptionTest extends TestCase
 
     public function testUpdateException(): void
     {
-        static::expectException(DatabaseException::class);
-        static::expectExceptionMessage('Error Execute');
+        $this->expectException(DatabaseException::class);
+        $this->expectExceptionMessage('Error Execute');
 
         $sql = 'UPDATE test SET name = :name WHERE id = :id';
 
@@ -179,7 +184,7 @@ class DatabaseMysqlExceptionTest extends TestCase
     {
         $sql = 'DELETE FROM test WHERE id = 1';
         $rowsAffected = $this->db->delete($sql);
-        static::assertSame(true, $rowsAffected);
+        static::assertTrue($rowsAffected);
 
         $count = $this->db->count('SELECT COUNT(*) FROM test WHERE id=1');
         static::assertSame(0, $count);
@@ -187,7 +192,7 @@ class DatabaseMysqlExceptionTest extends TestCase
         $sql = 'DELETE FROM test WHERE id = :id';
         $params = ['id' => 2];
         $rowsAffected = $this->db->delete($sql, $params);
-        static::assertSame(true, $rowsAffected);
+        static::assertTrue($rowsAffected);
 
         $count = $this->db->count('SELECT COUNT(*) FROM test WHERE id=2');
         static::assertSame(0, $count);
@@ -203,8 +208,8 @@ class DatabaseMysqlExceptionTest extends TestCase
 
     public function testDeleteException(): void
     {
-        static::expectException(DatabaseException::class);
-        static::expectExceptionMessage('Error Execute');
+        $this->expectException(DatabaseException::class);
+        $this->expectExceptionMessage('Error Execute');
 
         $sql = 'DELETE FROM test WHERE id = :id';
 
@@ -220,8 +225,8 @@ class DatabaseMysqlExceptionTest extends TestCase
 
     public function testUseSqlFileException(): void
     {
-        static::expectException(DatabaseException::class);
-        static::expectExceptionMessage('File missing for useSqlFile method: ./missing-dump.sql');
+        $this->expectException(DatabaseException::class);
+        $this->expectExceptionMessage('File missing for useSqlFile method: ./missing-dump.sql');
 
         $this->db->useSqlFile('./missing-dump.sql');
     }
@@ -248,8 +253,8 @@ class DatabaseMysqlExceptionTest extends TestCase
 
     public function testSelectAllException(): void
     {
-        static::expectException(DatabaseException::class);
-        static::expectExceptionMessage('Error Execute');
+        $this->expectException(DatabaseException::class);
+        $this->expectExceptionMessage('Error Execute');
 
         $sql = 'SELECT * FROM test_select WHERE rank >= :rank';
 
@@ -275,8 +280,8 @@ class DatabaseMysqlExceptionTest extends TestCase
 
     public function testSelectRowException(): void
     {
-        static::expectException(DatabaseException::class);
-        static::expectExceptionMessage('Error Execute');
+        $this->expectException(DatabaseException::class);
+        $this->expectExceptionMessage('Error Execute');
 
         $sql = 'SELECT * FROM test_select WHERE rank >= :rank';
 
@@ -302,8 +307,8 @@ class DatabaseMysqlExceptionTest extends TestCase
 
     public function testSelectColException(): void
     {
-        static::expectException(DatabaseException::class);
-        static::expectExceptionMessage('Error Execute');
+        $this->expectException(DatabaseException::class);
+        $this->expectExceptionMessage('Error Execute');
 
         $sql = 'SELECT * FROM test_select WHERE rank >= :rank';
 
@@ -329,8 +334,8 @@ class DatabaseMysqlExceptionTest extends TestCase
 
     public function testSelectVarException(): void
     {
-        static::expectException(DatabaseException::class);
-        static::expectExceptionMessage('Error Execute');
+        $this->expectException(DatabaseException::class);
+        $this->expectExceptionMessage('Error Execute');
 
         $sql = 'SELECT * FROM test_select WHERE rank >= :rank';
 
@@ -354,7 +359,7 @@ class DatabaseMysqlExceptionTest extends TestCase
 
         static::assertSame('1', $row['true']);
         static::assertSame('0', $row['false']);
-        static::assertSame(null, $row['null']);
+        static::assertNull($row['null']);
         static::assertSame('1.2', $row['float']);
         static::assertSame('800', $row['int']);
         static::assertSame('string', $row['string']);
@@ -363,8 +368,8 @@ class DatabaseMysqlExceptionTest extends TestCase
 
     public function testPdoParamTypeException(): void
     {
-        static::expectException(DatabaseException::class);
-        static::expectExceptionMessage('Error Bind Value');
+        $this->expectException(DatabaseException::class);
+        $this->expectExceptionMessage('Error Bind Value');
 
         $sql = 'SELECT :array AS array';
         $params = ['array' => []];
@@ -373,14 +378,18 @@ class DatabaseMysqlExceptionTest extends TestCase
 
     public function testPrepareBindException(): void
     {
-        static::expectException(DatabaseException::class);
-        static::expectExceptionMessage('Error Execute');
+        $this->expectException(DatabaseException::class);
+        $this->expectExceptionMessage('Error Execute');
 
         $sql = 'SELECT :a';
         $params = [':a' => 'a'];
         $this->db->selectRow($sql, $params);
     }
 
+    /**
+     * @throws DatabaseException
+     * @noinspection GetClassUsageInspection
+     */
     public function testSelect(): void
     {
         $sql = 'SELECT * FROM test_select';
@@ -400,26 +409,30 @@ class DatabaseMysqlExceptionTest extends TestCase
 
     public function testSelectException(): void
     {
-        static::expectException(DatabaseException::class);
-        static::expectExceptionMessage('Error Execute');
+        $this->expectException(DatabaseException::class);
+        $this->expectExceptionMessage('Error Execute');
 
         $sql = 'SELECT * FROM test_select WHERE rank >= :rank';
 
         $this->db->select($sql);
     }
 
+    /**
+     * @throws DatabaseException
+     * @noinspection PhpAssignmentInConditionInspection
+     */
     public function testRead(): void
     {
         $sql = 'SELECT * FROM test_select';
         $statement = $this->db->select($sql);
         $row = $this->db->read($statement);
-        static::assertSame(4, count($row));
+        static::assertCount(4, $row);
 
         $sql = 'SELECT * FROM test_select WHERE rank >= :rank';
         $params = ['rank' => 20];
         $statement = $this->db->select($sql, $params);
         $row = $this->db->read($statement);
-        static::assertSame(4, count($row));
+        static::assertCount(4, $row);
 
         $sql = 'SELECT * FROM test_select WHERE rank >= :rank';
         $params = ['rank' => 100];
@@ -433,7 +446,7 @@ class DatabaseMysqlExceptionTest extends TestCase
             $rows[] = $row;
         }
 
-        static::assertSame(6, count($rows));
+        static::assertCount(6, $rows);
     }
 
     public function testReadAll(): void
@@ -441,19 +454,19 @@ class DatabaseMysqlExceptionTest extends TestCase
         $sql = 'SELECT * FROM test_select';
         $statement = $this->db->select($sql);
         $rows = $this->db->readAll($statement);
-        static::assertSame(6, count($rows));
+        static::assertCount(6, $rows);
 
         $sql = 'SELECT * FROM test_select WHERE rank >= :rank';
         $params = ['rank' => 20];
         $statement = $this->db->select($sql, $params);
         $rows = $this->db->readAll($statement);
-        static::assertSame(3, count($rows));
+        static::assertCount(3, $rows);
 
         $sql = 'SELECT * FROM test_select WHERE rank >= :rank';
         $params = ['rank' => 100];
         $statement = $this->db->select($sql, $params);
         $rows = $this->db->readAll($statement);
-        static::assertSame(0, count($rows));
+        static::assertCount(0, $rows);
     }
 
     public function testTransaction(): void
@@ -526,19 +539,19 @@ class DatabaseMysqlExceptionTest extends TestCase
     {
         static::assertFalse($this->db->hasErrors());
         static::assertSame([], $this->db->getErrors());
-        static::assertSame(null, $this->db->getLastError());
+        static::assertNull($this->db->getLastError());
 
         try {
             $this->db->selectVar('SELECT name FROM test WHERE id = :id');
         } catch (DatabaseException $e) {
             static::assertTrue($this->db->hasErrors());
-            static::assertSame(4, count($this->db->getLastError()));
+            static::assertCount(4, $this->db->getLastError());
 
             $this->db->cleanErrors();
 
             static::assertFalse($this->db->hasErrors());
             static::assertSame([], $this->db->getErrors());
-            static::assertSame(null, $this->db->getLastError());
+            static::assertNull($this->db->getLastError());
         }
     }
 
@@ -599,6 +612,10 @@ class DatabaseMysqlExceptionTest extends TestCase
 
     // low level
 
+    /**
+     * @throws DatabaseException
+     * @noinspection GetClassUsageInspection
+     */
     public function testConnect(): void
     {
         static::assertNull($this->db->getPdo());
@@ -610,8 +627,8 @@ class DatabaseMysqlExceptionTest extends TestCase
 
     public function testConnectException(): void
     {
-        static::expectException(DatabaseException::class);
-        static::expectExceptionMessage('Error Connecting Database');
+        $this->expectException(DatabaseException::class);
+        $this->expectExceptionMessage('Error Connecting Database');
 
         $params = $this->params;
         $params['password'] = 'password';
@@ -620,6 +637,10 @@ class DatabaseMysqlExceptionTest extends TestCase
         $db->connect();
     }
 
+    /**
+     * @throws DatabaseException
+     * @noinspection GetClassUsageInspection
+     */
     public function testGetPdo(): void
     {
         static::assertNull($this->db->getPdo());

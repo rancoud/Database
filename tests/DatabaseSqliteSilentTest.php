@@ -1,4 +1,6 @@
-<?php /** @noinspection SqlDialectInspection */
+<?php
+/** @noinspection PhpIllegalPsrClassPathInspection */
+/** @noinspection SqlDialectInspection */
 
 declare(strict_types=1);
 
@@ -118,6 +120,7 @@ class DatabaseSqliteSilentTest extends TestCase
 
     /**
      * @throws DatabaseException
+     * @noinspection PhpAssignmentInConditionInspection
      */
     public function testRead(): void
     {

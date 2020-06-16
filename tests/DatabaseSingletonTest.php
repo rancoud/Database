@@ -1,4 +1,6 @@
 <?php
+/** @noinspection PhpIllegalPsrClassPathInspection */
+/** @noinspection SqlDialectInspection */
 
 declare(strict_types=1);
 
@@ -44,12 +46,18 @@ class DatabaseSingletonTest extends TestCase
         Database::getInstance();
     }
     
-    /** @runInSeparateProcess  */
+    /**
+     * @runInSeparateProcess
+     * @throws DatabaseException
+     */
     public function testSingleton(): void
     {
-        $db = Database::getInstance(new Configurator($this->params));
-
-        static::assertSame(get_class($db), 'Rancoud\Database\Database');
+        try {
+            Database::getInstance(new Configurator($this->params));
+            $this->expectNotToPerformAssertions();
+        } catch (DatabaseException $e) {
+            throw $e;
+        }
     }
 
     /** @runInSeparateProcess  */

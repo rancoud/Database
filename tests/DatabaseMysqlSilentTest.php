@@ -1,4 +1,6 @@
 <?php
+/** @noinspection PhpIllegalPsrClassPathInspection */
+/** @noinspection SqlDialectInspection */
 
 declare(strict_types=1);
 
@@ -212,8 +214,8 @@ class DatabaseMysqlSilentTest extends TestCase
 
     public function testUseSqlFileException(): void
     {
-        static::expectException(DatabaseException::class);
-        static::expectExceptionMessage('File missing for useSqlFile method: ./missing-dump.sql');
+        $this->expectException(DatabaseException::class);
+        $this->expectExceptionMessage('File missing for useSqlFile method: ./missing-dump.sql');
 
         $this->db->useSqlFile('./missing-dump.sql');
     }
@@ -355,8 +357,8 @@ class DatabaseMysqlSilentTest extends TestCase
 
     public function testPdoParamTypeException(): void
     {
-        static::expectException(DatabaseException::class);
-        static::expectExceptionMessage('Error Bind Value');
+        $this->expectException(DatabaseException::class);
+        $this->expectExceptionMessage('Error Bind Value');
 
         $sql = 'SELECT :array AS array';
         $params = ['array' => []];

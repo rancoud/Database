@@ -1,4 +1,5 @@
 <?php
+/** @noinspection PhpIllegalPsrClassPathInspection */
 
 declare(strict_types=1);
 
@@ -97,6 +98,7 @@ class ConfiguratorTest extends TestCase
 
     /**
      * @throws DatabaseException
+     * @noinspection PhpUndefinedClassInspection
      */
     public function testConstructInvalidSettingsParametersException(): void
     {
