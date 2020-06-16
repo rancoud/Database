@@ -15,10 +15,10 @@ use Rancoud\Database\DatabaseException;
  */
 class DatabaseMysqlExceptionTest extends TestCase
 {
-    /** @var Database */
-    protected $db;
+    /** @var Database|null */
+    protected ?Database $db;
 
-    protected $params = [
+    protected array $params = [
         'engine'       => 'mysql',
         'host'         => '127.0.0.1',
         'user'         => 'root',
@@ -27,7 +27,7 @@ class DatabaseMysqlExceptionTest extends TestCase
         'report_error' => 'exception'
     ];
 
-    protected $data = [
+    protected array $data = [
         [
             'id'      => '1',
             'name'    => 'A',

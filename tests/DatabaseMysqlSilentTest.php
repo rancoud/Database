@@ -15,10 +15,10 @@ use Rancoud\Database\DatabaseException;
  */
 class DatabaseMysqlSilentTest extends TestCase
 {
-    /** @var Database */
-    protected $db;
+    /** @var Database|null */
+    protected ?Database $db;
 
-    protected $params = [
+    protected array $params = [
         'engine'       => 'mysql',
         'host'         => '127.0.0.1',
         'user'         => 'root',
@@ -27,7 +27,7 @@ class DatabaseMysqlSilentTest extends TestCase
         'report_error' => 'silent'
     ];
 
-    protected $data = [
+    protected array $data = [
         [
             'id'      => '1',
             'name'    => 'A',
@@ -66,6 +66,9 @@ class DatabaseMysqlSilentTest extends TestCase
         ]
     ];
 
+    /**
+     * @throws DatabaseException
+     */
     public function setUp(): void
     {
         $databaseConf = new Configurator($this->params);

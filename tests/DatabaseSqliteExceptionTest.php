@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection SqlDialectInspection */
 
 declare(strict_types=1);
 
@@ -15,10 +15,10 @@ use Rancoud\Database\DatabaseException;
  */
 class DatabaseSqliteExceptionTest extends TestCase
 {
-    /** @var Database */
-    protected $db;
+    /** @var Database|null */
+    protected ?Database $db;
 
-    protected $params = [
+    protected array $params = [
         'engine'       => 'sqlite',
         'host'         => '127.0.0.1',
         'user'         => '',
@@ -27,7 +27,7 @@ class DatabaseSqliteExceptionTest extends TestCase
         'report_error' => 'exception'
     ];
 
-    protected $data = [
+    protected array $data = [
         [
             'id'      => '1',
             'name'    => 'A',
@@ -66,6 +66,9 @@ class DatabaseSqliteExceptionTest extends TestCase
         ]
     ];
 
+    /**
+     * @throws DatabaseException
+     */
     public function setUp(): void
     {
         $databaseConf = new Configurator($this->params);
@@ -77,27 +80,40 @@ class DatabaseSqliteExceptionTest extends TestCase
         $this->db = null;
     }
 
+    /**
+     * @throws DatabaseException
+     */
     public function testFirstLaunch(): void
     {
-        $success = $this->db->dropTables(['test', 'test_select']);
-
-        static::assertTrue($success);
+        try {
+            $success = $this->db->dropTables(['test', 'test_select']);
+            static::assertTrue($success);
+        } catch (DatabaseException $e) {
+            throw $e;
+        }
     }
 
+    /**
+     * @throws DatabaseException
+     */
     public function testExec(): void
     {
-        $success = $this->db->exec('CREATE TABLE test (
-            id   INTEGER       PRIMARY KEY AUTOINCREMENT,
-            name VARCHAR (255) NOT NULL
-        );');
+        try {
+            $success = $this->db->exec('CREATE TABLE test (
+                id   INTEGER       PRIMARY KEY AUTOINCREMENT,
+                name VARCHAR (255) NOT NULL
+            );');
 
-        static::assertTrue($success);
+            static::assertTrue($success);
+        } catch (DatabaseException $e) {
+            throw $e;
+        }
     }
 
     public function testExecException(): void
     {
-        static::expectException(DatabaseException::class);
-        static::expectExceptionMessage('Error Prepare Statement');
+        $this->expectException(DatabaseException::class);
+        $this->expectExceptionMessage('Error Prepare Statement');
 
         $this->db->exec('aaa');
     }
@@ -121,8 +137,8 @@ class DatabaseSqliteExceptionTest extends TestCase
 
     public function testInsertException(): void
     {
-        static::expectException(DatabaseException::class);
-        static::expectExceptionMessage('Error Execute');
+        $this->expectException(DatabaseException::class);
+        $this->expectExceptionMessage('Error Execute');
 
         $sql = 'INSERT INTO test (name) VALUES (:name)';
 
@@ -183,8 +199,8 @@ class DatabaseSqliteExceptionTest extends TestCase
 
     public function testUseSqlFileException(): void
     {
-        static::expectException(DatabaseException::class);
-        static::expectExceptionMessage('File missing for useSqlFile method: ./missing-dump.sql');
+        $this->expectException(DatabaseException::class);
+        $this->expectExceptionMessage('File missing for useSqlFile method: ./missing-dump.sql');
 
         $this->db->useSqlFile('./missing-dump.sql');
     }
@@ -314,8 +330,8 @@ class DatabaseSqliteExceptionTest extends TestCase
 
     public function testPdoParamTypeException(): void
     {
-        static::expectException(DatabaseException::class);
-        static::expectExceptionMessage('Error Bind Value');
+        $this->expectException(DatabaseException::class);
+        $this->expectExceptionMessage('Error Bind Value');
 
         $sql = 'SELECT :array AS array';
         $params = ['array' => []];
@@ -324,8 +340,8 @@ class DatabaseSqliteExceptionTest extends TestCase
 
     public function testPrepareBindException(): void
     {
-        static::expectException(DatabaseException::class);
-        static::expectExceptionMessage('Error Execute');
+        $this->expectException(DatabaseException::class);
+        $this->expectExceptionMessage('Error Execute');
 
         $sql = 'SELECT :a';
         $params = [':a' => 'a'];

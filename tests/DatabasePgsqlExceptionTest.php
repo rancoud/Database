@@ -15,10 +15,10 @@ use Rancoud\Database\DatabaseException;
  */
 class DatabasePgsqlExceptionTest extends TestCase
 {
-    /** @var Database */
-    protected $db;
+    /** @var Database|null */
+    protected ?Database $db;
 
-    protected $params = [
+    protected array $params = [
         'engine'       => 'pgsql',
         'host'         => '127.0.0.1',
         'user'         => 'postgres',
@@ -27,7 +27,7 @@ class DatabasePgsqlExceptionTest extends TestCase
         'report_error' => 'exception'
     ];
 
-    protected $data = [
+    protected array $data = [
         [
             'id'      => 1,
             'name'    => 'A',
@@ -66,6 +66,9 @@ class DatabasePgsqlExceptionTest extends TestCase
         ]
     ];
 
+    /**
+     * @throws DatabaseException
+     */
     public function setUp(): void
     {
         $databaseConf = new Configurator($this->params);
@@ -97,8 +100,8 @@ class DatabasePgsqlExceptionTest extends TestCase
 
     public function testExecException(): void
     {
-        static::expectException(DatabaseException::class);
-        static::expectExceptionMessage('Error Execute');
+        $this->expectException(DatabaseException::class);
+        $this->expectExceptionMessage('Error Execute');
 
         $this->db->exec('aaa');
     }
@@ -131,8 +134,8 @@ class DatabasePgsqlExceptionTest extends TestCase
 
     public function testInsertException(): void
     {
-        static::expectException(DatabaseException::class);
-        static::expectExceptionMessage('Error Execute');
+        $this->expectException(DatabaseException::class);
+        $this->expectExceptionMessage('Error Execute');
 
         $sql = 'INSERT INTO test (name) VALUES (:name)';
 
@@ -167,8 +170,8 @@ class DatabasePgsqlExceptionTest extends TestCase
 
     public function testUpdateException(): void
     {
-        static::expectException(DatabaseException::class);
-        static::expectExceptionMessage('Error Execute');
+        $this->expectException(DatabaseException::class);
+        $this->expectExceptionMessage('Error Execute');
 
         $sql = 'UPDATE test SET name = :name WHERE id = :id';
 
@@ -203,8 +206,8 @@ class DatabasePgsqlExceptionTest extends TestCase
 
     public function testDeleteException(): void
     {
-        static::expectException(DatabaseException::class);
-        static::expectExceptionMessage('Error Execute');
+        $this->expectException(DatabaseException::class);
+        $this->expectExceptionMessage('Error Execute');
 
         $sql = 'DELETE FROM test WHERE id = :id';
 
@@ -222,8 +225,8 @@ class DatabasePgsqlExceptionTest extends TestCase
 
     public function testUseSqlFileException(): void
     {
-        static::expectException(DatabaseException::class);
-        static::expectExceptionMessage('File missing for useSqlFile method: ./missing-dump.sql');
+        $this->expectException(DatabaseException::class);
+        $this->expectExceptionMessage('File missing for useSqlFile method: ./missing-dump.sql');
 
         $this->db->useSqlFile('./missing-dump.sql');
     }
@@ -250,8 +253,8 @@ class DatabasePgsqlExceptionTest extends TestCase
 
     public function testSelectAllException(): void
     {
-        static::expectException(DatabaseException::class);
-        static::expectExceptionMessage('Error Execute');
+        $this->expectException(DatabaseException::class);
+        $this->expectExceptionMessage('Error Execute');
 
         $sql = 'SELECT * FROM test_select WHERE rank >= :rank';
 
@@ -277,8 +280,8 @@ class DatabasePgsqlExceptionTest extends TestCase
 
     public function testSelectRowException(): void
     {
-        static::expectException(DatabaseException::class);
-        static::expectExceptionMessage('Error Execute');
+        $this->expectException(DatabaseException::class);
+        $this->expectExceptionMessage('Error Execute');
 
         $sql = 'SELECT * FROM test_select WHERE rank >= :rank';
 
@@ -304,8 +307,8 @@ class DatabasePgsqlExceptionTest extends TestCase
 
     public function testSelectColException(): void
     {
-        static::expectException(DatabaseException::class);
-        static::expectExceptionMessage('Error Execute');
+        $this->expectException(DatabaseException::class);
+        $this->expectExceptionMessage('Error Execute');
 
         $sql = 'SELECT * FROM test_select WHERE rank >= :rank';
 
@@ -331,8 +334,8 @@ class DatabasePgsqlExceptionTest extends TestCase
 
     public function testSelectVarException(): void
     {
-        static::expectException(DatabaseException::class);
-        static::expectExceptionMessage('Error Execute');
+        $this->expectException(DatabaseException::class);
+        $this->expectExceptionMessage('Error Execute');
 
         $sql = 'SELECT * FROM test_select WHERE rank >= :rank';
 
@@ -341,8 +344,8 @@ class DatabasePgsqlExceptionTest extends TestCase
 
     public function testPdoParamTypeException(): void
     {
-        static::expectException(DatabaseException::class);
-        static::expectExceptionMessage('Error Bind Value');
+        $this->expectException(DatabaseException::class);
+        $this->expectExceptionMessage('Error Bind Value');
 
         $sql = 'SELECT :array AS array';
         $params = ['array' => []];
@@ -351,8 +354,8 @@ class DatabasePgsqlExceptionTest extends TestCase
 
     public function testPrepareBindException(): void
     {
-        static::expectException(DatabaseException::class);
-        static::expectExceptionMessage('SQLSTATE[HY093]: Invalid parameter number: ::a');
+        $this->expectException(DatabaseException::class);
+        $this->expectExceptionMessage('SQLSTATE[HY093]: Invalid parameter number: ::a');
 
         $sql = 'SELECT :a';
         $params = [':a' => 'a'];
@@ -378,8 +381,8 @@ class DatabasePgsqlExceptionTest extends TestCase
 
     public function testSelectException(): void
     {
-        static::expectException(DatabaseException::class);
-        static::expectExceptionMessage('Error Execute');
+        $this->expectException(DatabaseException::class);
+        $this->expectExceptionMessage('Error Execute');
 
         $sql = 'SELECT * FROM test_select WHERE rank >= :rank';
 
