@@ -1,4 +1,5 @@
 <?php
+/** @noinspection ForgottenDebugOutputInspection */
 /** @noinspection PhpIllegalPsrClassPathInspection */
 /** @noinspection SqlDialectInspection */
 
@@ -92,6 +93,7 @@ class DatabasePgsqlExceptionTest extends TestCase
             $success = $this->db->dropTables(['test', 'test_select']);
             static::assertTrue($success);
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -109,6 +111,7 @@ class DatabasePgsqlExceptionTest extends TestCase
 
             static::assertTrue($success);
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -150,6 +153,7 @@ class DatabasePgsqlExceptionTest extends TestCase
             $count = $this->db->count("SELECT COUNT(*) FROM test WHERE name='C' AND id=3");
             static::assertSame(1, $count);
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -193,6 +197,7 @@ class DatabasePgsqlExceptionTest extends TestCase
             $count = $this->db->count("SELECT COUNT(*) FROM test WHERE name='CC' AND id=3");
             static::assertSame(1, $count);
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -236,6 +241,7 @@ class DatabasePgsqlExceptionTest extends TestCase
             $count = $this->db->count('SELECT COUNT(*) FROM test WHERE id=3');
             static::assertSame(0, $count);
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -262,6 +268,7 @@ class DatabasePgsqlExceptionTest extends TestCase
             $success = $this->db->useSqlFile(__DIR__ . '/test-dump-pgsql-insert-table.sql');
             static::assertTrue($success);
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -297,6 +304,7 @@ class DatabasePgsqlExceptionTest extends TestCase
             $rows = $this->db->selectAll($sql, $params);
             static::assertSame([], $rows);
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -331,6 +339,7 @@ class DatabasePgsqlExceptionTest extends TestCase
             $row = $this->db->selectRow($sql, $params);
             static::assertSame([], $row);
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -365,6 +374,7 @@ class DatabasePgsqlExceptionTest extends TestCase
             $col = $this->db->selectCol($sql, $params);
             static::assertSame([], $col);
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -399,6 +409,7 @@ class DatabasePgsqlExceptionTest extends TestCase
             $var = $this->db->selectVar($sql, $params);
             static::assertFalse($var);
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -454,6 +465,7 @@ class DatabasePgsqlExceptionTest extends TestCase
             $statement = $this->db->select($sql, $params);
             static::assertSame(PDOStatement::class, get_class($statement));
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -500,6 +512,7 @@ class DatabasePgsqlExceptionTest extends TestCase
 
             static::assertCount(6, $rows);
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -527,6 +540,7 @@ class DatabasePgsqlExceptionTest extends TestCase
             $rows = $this->db->readAll($statement);
             static::assertCount(0, $rows);
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -549,6 +563,7 @@ class DatabasePgsqlExceptionTest extends TestCase
             $params = ['id' => 1];
             static::assertSame('my name', $this->db->selectVar($sql, $params));
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -663,6 +678,7 @@ class DatabasePgsqlExceptionTest extends TestCase
 
             static::assertCount(0, $queries);
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -677,6 +693,7 @@ class DatabasePgsqlExceptionTest extends TestCase
         try {
             static::assertTrue($this->db->truncateTable('test'));
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -689,6 +706,7 @@ class DatabasePgsqlExceptionTest extends TestCase
         try {
             static::assertTrue($this->db->truncateTables(['test', 'test_select']));
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -701,6 +719,7 @@ class DatabasePgsqlExceptionTest extends TestCase
         try {
             static::assertTrue($this->db->dropTable('test'));
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -713,6 +732,7 @@ class DatabasePgsqlExceptionTest extends TestCase
         try {
             static::assertTrue($this->db->dropTables(['test', 'toto']));
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -732,6 +752,7 @@ class DatabasePgsqlExceptionTest extends TestCase
 
             static::assertSame('PDO', get_class($this->db->getPdo()));
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -749,6 +770,7 @@ class DatabasePgsqlExceptionTest extends TestCase
 
             static::assertSame('PDO', get_class($this->db->getPdo()));
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -768,6 +790,7 @@ class DatabasePgsqlExceptionTest extends TestCase
 
             static::assertNull($this->db->getPdo());
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }

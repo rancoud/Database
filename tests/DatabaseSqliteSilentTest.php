@@ -1,4 +1,5 @@
 <?php
+/** @noinspection ForgottenDebugOutputInspection */
 /** @noinspection PhpIllegalPsrClassPathInspection */
 /** @noinspection SqlDialectInspection */
 
@@ -45,6 +46,7 @@ class DatabaseSqliteSilentTest extends TestCase
         try {
             static::assertTrue($this->db->dropTable('test'));
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -57,6 +59,7 @@ class DatabaseSqliteSilentTest extends TestCase
         try {
             static::assertTrue($this->db->dropTables(['test', 'toto']));
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -73,6 +76,7 @@ class DatabaseSqliteSilentTest extends TestCase
                                 );');
             static::assertFalse($this->db->hasErrors());
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -86,6 +90,7 @@ class DatabaseSqliteSilentTest extends TestCase
             $id = $this->db->insert('INSERT INTO test (name) VALUES (:name)', ['name' => 'A'], true);
             static::assertSame(1, $id);
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -101,6 +106,7 @@ class DatabaseSqliteSilentTest extends TestCase
             $rowsAffected = $this->db->update($sql, $params, true);
             static::assertSame(1, $rowsAffected);
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -114,6 +120,7 @@ class DatabaseSqliteSilentTest extends TestCase
             $rowsAffected = $this->db->delete('DELETE FROM test WHERE name = :name1', ['name1' => 'google'], true);
             static::assertSame(1, $rowsAffected);
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -138,6 +145,7 @@ class DatabaseSqliteSilentTest extends TestCase
 
             static::assertCount(3, $res);
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -151,6 +159,7 @@ class DatabaseSqliteSilentTest extends TestCase
             $count = $this->db->count('SELECT COUNT(*) FROM test');
             static::assertSame(3, $count);
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -164,6 +173,7 @@ class DatabaseSqliteSilentTest extends TestCase
             $rows = $this->db->selectAll('SELECT * FROM test');
             static::assertCount(3, $rows);
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -177,6 +187,7 @@ class DatabaseSqliteSilentTest extends TestCase
             $row = $this->db->selectRow('SELECT * FROM test WHERE id = :id', ['id' => 3]);
             static::assertSame('B', $row['name']);
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -190,6 +201,7 @@ class DatabaseSqliteSilentTest extends TestCase
             $col = $this->db->selectCol('SELECT id FROM test');
             static::assertCount(3, $col);
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -203,6 +215,7 @@ class DatabaseSqliteSilentTest extends TestCase
             $var = $this->db->selectVar('SELECT name FROM test WHERE id = :id', ['id' => 3]);
             static::assertSame('B', $var);
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -216,6 +229,7 @@ class DatabaseSqliteSilentTest extends TestCase
             $this->db->selectVar('SELECT namebbb FROM test WHERE id = :id', ['id' => 3]);
             static::assertTrue($this->db->hasErrors());
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -229,6 +243,7 @@ class DatabaseSqliteSilentTest extends TestCase
             $this->db->truncateTable('test');
             static::assertFalse($this->db->hasErrors());
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -243,6 +258,7 @@ class DatabaseSqliteSilentTest extends TestCase
 
             static::assertFalse($this->db->hasErrors());
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -264,6 +280,7 @@ class DatabaseSqliteSilentTest extends TestCase
             $success = $this->db->exec($sql);
             static::assertFalse($success);
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -278,6 +295,7 @@ class DatabaseSqliteSilentTest extends TestCase
             $success = $this->db->insert($sql);
             static::assertFalse($success);
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -292,6 +310,7 @@ class DatabaseSqliteSilentTest extends TestCase
             $success = $this->db->update($sql);
             static::assertFalse($success);
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -306,6 +325,7 @@ class DatabaseSqliteSilentTest extends TestCase
             $success = $this->db->delete($sql);
             static::assertFalse($success);
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -320,6 +340,7 @@ class DatabaseSqliteSilentTest extends TestCase
             $success = $this->db->count($sql);
             static::assertFalse($success);
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -334,6 +355,7 @@ class DatabaseSqliteSilentTest extends TestCase
             $success = $this->db->selectAll($sql);
             static::assertFalse($success);
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -348,6 +370,7 @@ class DatabaseSqliteSilentTest extends TestCase
             $success = $this->db->selectRow($sql);
             static::assertFalse($success);
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -362,6 +385,7 @@ class DatabaseSqliteSilentTest extends TestCase
             $success = $this->db->selectCol($sql);
             static::assertFalse($success);
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }

@@ -1,4 +1,5 @@
 <?php
+/** @noinspection ForgottenDebugOutputInspection */
 /** @noinspection PhpIllegalPsrClassPathInspection */
 /** @noinspection SqlDialectInspection */
 
@@ -91,6 +92,7 @@ class DatabaseSqliteExceptionTest extends TestCase
             $success = $this->db->dropTables(['test', 'test_select']);
             static::assertTrue($success);
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -108,6 +110,7 @@ class DatabaseSqliteExceptionTest extends TestCase
 
             static::assertTrue($success);
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -140,6 +143,7 @@ class DatabaseSqliteExceptionTest extends TestCase
             $id = $this->db->insert($sql, $params, $getLastInsertId);
             static::assertSame(3, $id);
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -174,6 +178,7 @@ class DatabaseSqliteExceptionTest extends TestCase
             $rowsAffected = $this->db->update($sql, $params, $getCountRowsAffected);
             static::assertSame(1, $rowsAffected);
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -198,6 +203,7 @@ class DatabaseSqliteExceptionTest extends TestCase
             $rowsAffected = $this->db->delete($sql, $params, $getCountRowsAffected);
             static::assertSame(1, $rowsAffected);
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -223,6 +229,7 @@ class DatabaseSqliteExceptionTest extends TestCase
             $this->db->exec("INSERT INTO test_select (id, name, rank, comment) VALUES (6, 'F', 5, NULL);");
             static::assertSame(6, $this->db->count('SELECT COUNT(*) FROM test_select'));
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -258,6 +265,7 @@ class DatabaseSqliteExceptionTest extends TestCase
             $rows = $this->db->selectAll($sql, $params);
             static::assertSame([], $rows);
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -272,6 +280,7 @@ class DatabaseSqliteExceptionTest extends TestCase
             $data = $this->db->selectAll($sql);
             static::assertSame([], $data);
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -296,6 +305,7 @@ class DatabaseSqliteExceptionTest extends TestCase
             $row = $this->db->selectRow($sql, $params);
             static::assertSame([], $row);
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -310,6 +320,7 @@ class DatabaseSqliteExceptionTest extends TestCase
             $row = $this->db->selectRow($sql);
             static::assertSame([], $row);
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -334,6 +345,7 @@ class DatabaseSqliteExceptionTest extends TestCase
             $col = $this->db->selectCol($sql, $params);
             static::assertSame([], $col);
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -348,6 +360,7 @@ class DatabaseSqliteExceptionTest extends TestCase
             $row = $this->db->selectCol($sql);
             static::assertSame([], $row);
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -372,6 +385,7 @@ class DatabaseSqliteExceptionTest extends TestCase
             $var = $this->db->selectVar($sql, $params);
             static::assertFalse($var);
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -386,6 +400,7 @@ class DatabaseSqliteExceptionTest extends TestCase
             $variable = $this->db->selectVar($sql);
             static::assertFalse($variable);
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -418,6 +433,7 @@ class DatabaseSqliteExceptionTest extends TestCase
             static::assertSame('string', $row['string']);
             static::assertSame('-- MySQL dump', mb_substr($row['resource'], 0, 13));
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -463,6 +479,7 @@ class DatabaseSqliteExceptionTest extends TestCase
             $statement = $this->db->select($sql, $params);
             static::assertSame(PDOStatement::class, get_class($statement));
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -499,6 +516,7 @@ class DatabaseSqliteExceptionTest extends TestCase
 
             static::assertCount(6, $rows);
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -526,6 +544,7 @@ class DatabaseSqliteExceptionTest extends TestCase
             $rows = $this->db->readAll($statement);
             static::assertCount(0, $rows);
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -550,6 +569,7 @@ class DatabaseSqliteExceptionTest extends TestCase
             $params = ['id' => 1];
             static::assertSame('my name', $this->db->selectVar($sql, $params));
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -640,6 +660,7 @@ class DatabaseSqliteExceptionTest extends TestCase
 
             static::assertCount(0, $queries);
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -654,6 +675,7 @@ class DatabaseSqliteExceptionTest extends TestCase
         try {
             static::assertTrue($this->db->truncateTable('test'));
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -666,6 +688,7 @@ class DatabaseSqliteExceptionTest extends TestCase
         try {
             static::assertTrue($this->db->truncateTables(['test', 'test_select']));
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -678,6 +701,7 @@ class DatabaseSqliteExceptionTest extends TestCase
         try {
             static::assertTrue($this->db->dropTable('test'));
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -690,6 +714,7 @@ class DatabaseSqliteExceptionTest extends TestCase
         try {
             static::assertTrue($this->db->dropTables(['test', 'toto']));
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -709,6 +734,7 @@ class DatabaseSqliteExceptionTest extends TestCase
 
             static::assertSame('PDO', get_class($this->db->getPdo()));
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -726,6 +752,7 @@ class DatabaseSqliteExceptionTest extends TestCase
 
             static::assertSame('PDO', get_class($this->db->getPdo()));
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
@@ -745,6 +772,7 @@ class DatabaseSqliteExceptionTest extends TestCase
 
             static::assertNull($this->db->getPdo());
         } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
             throw $e;
         }
     }
