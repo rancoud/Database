@@ -80,21 +80,8 @@ class DatabaseSqliteExceptionTest extends TestCase
 
     public function tearDown(): void
     {
+        $this->db->disconnect();
         $this->db = null;
-    }
-
-    /**
-     * @throws DatabaseException
-     */
-    public function testFirstLaunch(): void
-    {
-        try {
-            $success = $this->db->dropTables(['test', 'test_select']);
-            static::assertTrue($success);
-        } catch (DatabaseException $e) {
-            var_dump($this->db->getErrors());
-            throw $e;
-        }
     }
 
     /**
@@ -102,12 +89,13 @@ class DatabaseSqliteExceptionTest extends TestCase
      */
     public function testExec(): void
     {
-        try {
-            $success = $this->db->exec('CREATE TABLE test (
+        $sql = 'CREATE TABLE IF NOT EXISTS test (
                 id   INTEGER       PRIMARY KEY AUTOINCREMENT,
                 name VARCHAR (255) NOT NULL
-            );');
+            );';
 
+        try {
+            $success = $this->db->exec($sql);
             static::assertTrue($success);
         } catch (DatabaseException $e) {
             var_dump($this->db->getErrors());
@@ -126,22 +114,45 @@ class DatabaseSqliteExceptionTest extends TestCase
     /**
      * @throws DatabaseException
      */
+    protected function setTestTable(): void
+    {
+        $this->db->exec('DROP TABLE test');
+        $this->db->exec('CREATE TABLE test (
+                id   INTEGER       PRIMARY KEY AUTOINCREMENT,
+                name VARCHAR (255) NOT NULL
+            );');
+    }
+
+    /**
+     * @throws DatabaseException
+     */
     public function testInsert(): void
     {
         try {
+            $this->setTestTable();
+
             $sql = 'INSERT INTO test (name) VALUES ("A")';
             $id = $this->db->insert($sql);
             static::assertTrue($id);
+
+            $count = $this->db->count('SELECT COUNT(*) FROM `test` WHERE name="A" AND id=1');
+            static::assertSame(1, $count);
 
             $sql = 'INSERT INTO test (name) VALUES (:name)';
             $params = ['name' => 'B'];
             $id = $this->db->insert($sql, $params);
             static::assertTrue($id);
 
+            $count = $this->db->count('SELECT COUNT(*) FROM `test` WHERE name="B" AND id=2');
+            static::assertSame(1, $count);
+
             $params = ['name' => 'C'];
             $getLastInsertId = true;
             $id = $this->db->insert($sql, $params, $getLastInsertId);
             static::assertSame(3, $id);
+
+            $count = $this->db->count('SELECT COUNT(*) FROM `test` WHERE name="C" AND id=3');
+            static::assertSame(1, $count);
         } catch (DatabaseException $e) {
             var_dump($this->db->getErrors());
             throw $e;

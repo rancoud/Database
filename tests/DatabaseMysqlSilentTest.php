@@ -87,29 +87,16 @@ class DatabaseMysqlSilentTest extends TestCase
     /**
      * @throws DatabaseException
      */
-    public function testFirstLaunch(): void
-    {
-        try {
-            $success = $this->db->dropTables(['test', 'test_select']);
-
-            static::assertTrue($success);
-        } catch (DatabaseException $e) {
-            var_dump($this->db->getErrors());
-            throw $e;
-        }
-    }
-
-    /**
-     * @throws DatabaseException
-     */
     public function testExec(): void
     {
-        try {
-            $success = $this->db->exec('CREATE TABLE test (
+        $sql = 'CREATE TABLE IF NOT EXISTS test (
                 id INT UNSIGNED NOT NULL AUTO_INCREMENT,
                 name VARCHAR(255) NOT NULL,
-                PRIMARY KEY (id) );');
+                PRIMARY KEY (id)
+            );';
 
+        try {
+            $success = $this->db->exec($sql);
             static::assertTrue($success);
         } catch (DatabaseException $e) {
             var_dump($this->db->getErrors());
@@ -134,9 +121,24 @@ class DatabaseMysqlSilentTest extends TestCase
     /**
      * @throws DatabaseException
      */
+    protected function setTestTable(): void
+    {
+        $this->db->exec('DROP TABLE test');
+        $this->db->exec('CREATE TABLE test (
+                id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+                name VARCHAR(255) NOT NULL,
+                PRIMARY KEY (id)
+            );');
+    }
+
+    /**
+     * @throws DatabaseException
+     */
     public function testInsert(): void
     {
         try {
+            $this->setTestTable();
+
             $sql = 'INSERT INTO test (name) VALUES ("A")';
             $id = $this->db->insert($sql);
             static::assertTrue($id);

@@ -113,6 +113,7 @@ class Database
         try {
             $statement = $this->pdo->prepare($sql);
             if ($statement === false) {
+                /* @noinspection ThrowRawExceptionInspection */
                 throw new Exception('Error Prepare Statement');
             }
         } catch (Exception $e) {
@@ -270,6 +271,7 @@ class Database
         try {
             $success = $statement->execute();
             if ($success === false) {
+                /* @noinspection ThrowRawExceptionInspection */
                 throw new Exception('Error Execute');
             }
         } catch (Exception $e) {
