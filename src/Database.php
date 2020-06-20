@@ -805,6 +805,22 @@ class Database
 
         $sqlFile = \file_get_contents($filepath);
 
+        if ($this->configurator->getEngine() === 'sqlite') {
+            // sqlite support only one statement by exec
+            $sqlFileQueries = \explode(";\n", $sqlFile);
+            foreach ($sqlFileQueries as $sqlFileQuery) {
+                if ($sqlFileQuery === '') {
+                    continue;
+                }
+
+                if (!$this->exec($sqlFileQuery)) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         return $this->exec($sqlFile);
     }
 

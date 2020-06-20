@@ -114,9 +114,9 @@ class DatabaseSqliteExceptionTest extends TestCase
     /**
      * @throws DatabaseException
      */
-    protected function setTestTable(): void
+    protected function setTestTableForInsert(): void
     {
-        $this->db->exec('DROP TABLE test');
+        $this->db->exec('DROP TABLE IF EXISTS test');
         $this->db->exec('CREATE TABLE test (
                 id   INTEGER       PRIMARY KEY AUTOINCREMENT,
                 name VARCHAR (255) NOT NULL
@@ -129,7 +129,7 @@ class DatabaseSqliteExceptionTest extends TestCase
     public function testInsert(): void
     {
         try {
-            $this->setTestTable();
+            $this->setTestTableForInsert();
 
             $sql = 'INSERT INTO test (name) VALUES ("A")';
             $id = $this->db->insert($sql);
@@ -172,26 +172,77 @@ class DatabaseSqliteExceptionTest extends TestCase
     /**
      * @throws DatabaseException
      */
+    protected function setTestTableForUpdate(): void
+    {
+        $this->db->exec('DROP TABLE IF EXISTS test');
+        $this->db->exec('CREATE TABLE test (
+                id   INTEGER       PRIMARY KEY AUTOINCREMENT,
+                name VARCHAR (255) NOT NULL
+            );');
+        $this->db->exec('INSERT INTO test (name) VALUES ("A");');
+        $this->db->exec('INSERT INTO test (name) VALUES ("B");');
+        $this->db->exec('INSERT INTO test (name) VALUES ("C");');
+    }
+
+    /**
+     * @throws DatabaseException
+     */
     public function testUpdate(): void
     {
         try {
+            $this->setTestTableForUpdate();
+
             $sql = 'UPDATE test SET name = "AA" WHERE id = 1';
             $rowsAffected = $this->db->update($sql);
             static::assertTrue($rowsAffected);
+
+            $count = $this->db->count('SELECT COUNT(*) FROM test WHERE name="AA" AND id=1');
+            static::assertSame(1, $count);
 
             $sql = 'UPDATE test SET name = :name WHERE id = :id';
             $params = ['id' => 2, 'name' => 'BB'];
             $rowsAffected = $this->db->update($sql, $params);
             static::assertTrue($rowsAffected);
 
+            $count = $this->db->count('SELECT COUNT(*) FROM test WHERE name="BB" AND id=2');
+            static::assertSame(1, $count);
+
             $params = ['id' => 3, 'name' => 'CC'];
             $getCountRowsAffected = true;
             $rowsAffected = $this->db->update($sql, $params, $getCountRowsAffected);
             static::assertSame(1, $rowsAffected);
+
+            $count = $this->db->count('SELECT COUNT(*) FROM test WHERE name="CC" AND id=3');
+            static::assertSame(1, $count);
         } catch (DatabaseException $e) {
             var_dump($this->db->getErrors());
             throw $e;
         }
+    }
+
+    public function testUpdateException(): void
+    {
+        $this->expectException(DatabaseException::class);
+        $this->expectExceptionMessage('Error Prepare Statement');
+
+        $sql = 'a :a';
+
+        $this->db->update($sql);
+    }
+
+    /**
+     * @throws DatabaseException
+     */
+    protected function setTestTableForDelete(): void
+    {
+        $this->db->exec('DROP TABLE IF EXISTS test');
+        $this->db->exec('CREATE TABLE test (
+                id   INTEGER       PRIMARY KEY AUTOINCREMENT,
+                name VARCHAR (255) NOT NULL
+            );');
+        $this->db->exec('INSERT INTO test (name) VALUES ("A");');
+        $this->db->exec('INSERT INTO test (name) VALUES ("B");');
+        $this->db->exec('INSERT INTO test (name) VALUES ("C");');
     }
 
     /**
@@ -200,23 +251,44 @@ class DatabaseSqliteExceptionTest extends TestCase
     public function testDelete(): void
     {
         try {
-            $sql = 'DELETE FROM test WHERE id = 1';
+            $this->setTestTableForDelete();
+
+            $sql = 'DELETE FROM `test` WHERE id = 1';
             $rowsAffected = $this->db->delete($sql);
             static::assertTrue($rowsAffected);
 
-            $sql = 'DELETE FROM test WHERE id = :id';
+            $count = $this->db->count('SELECT COUNT(*) FROM `test` WHERE id=1');
+            static::assertSame(0, $count);
+
+            $sql = 'DELETE FROM `test` WHERE id = :id';
             $params = ['id' => 2];
             $rowsAffected = $this->db->delete($sql, $params);
             static::assertTrue($rowsAffected);
+
+            $count = $this->db->count('SELECT COUNT(*) FROM `test` WHERE id=2');
+            static::assertSame(0, $count);
 
             $params = ['id' => 3];
             $getCountRowsAffected = true;
             $rowsAffected = $this->db->delete($sql, $params, $getCountRowsAffected);
             static::assertSame(1, $rowsAffected);
+
+            $count = $this->db->count('SELECT COUNT(*) FROM `test` WHERE id=3');
+            static::assertSame(0, $count);
         } catch (DatabaseException $e) {
             var_dump($this->db->getErrors());
             throw $e;
         }
+    }
+
+    public function testDeleteException(): void
+    {
+        $this->expectException(DatabaseException::class);
+        $this->expectExceptionMessage('Error Prepare Statement');
+
+        $sql = 'a :a';
+
+        $this->db->update($sql);
     }
 
     /**
@@ -225,19 +297,11 @@ class DatabaseSqliteExceptionTest extends TestCase
     public function testUseSqlFile(): void
     {
         try {
-            $this->db->exec('CREATE TABLE test_select (
-            id      INT          PRIMARY KEY
-            NOT NULL,
-            name    VARCHAR (45) NOT NULL,
-            rank    INT (1)      NOT NULL,
-            comment TEXT
-            );');
-            $this->db->exec("INSERT INTO test_select (id, name, rank, comment) VALUES (1, 'A', 0, NULL);");
-            $this->db->exec("INSERT INTO test_select (id, name, rank, comment) VALUES (2, 'B', 10, 'yes');");
-            $this->db->exec("INSERT INTO test_select (id, name, rank, comment) VALUES (3, 'C', 20, 'maybe');");
-            $this->db->exec("INSERT INTO test_select (id, name, rank, comment) VALUES (4, 'D', 30, 'no');");
-            $this->db->exec("INSERT INTO test_select (id, name, rank, comment) VALUES (5, 'E', 25, NULL);");
-            $this->db->exec("INSERT INTO test_select (id, name, rank, comment) VALUES (6, 'F', 5, NULL);");
+            $this->db->exec('DROP TABLE IF EXISTS test_select');
+
+            $success = $this->db->useSqlFile(__DIR__ . '/test-dump-sqlite.sql');
+            static::assertTrue($success);
+
             static::assertSame(6, $this->db->count('SELECT COUNT(*) FROM test_select'));
         } catch (DatabaseException $e) {
             var_dump($this->db->getErrors());

@@ -115,9 +115,9 @@ class DatabaseMysqlExceptionTest extends TestCase
     /**
      * @throws DatabaseException
      */
-    protected function setTestTable(): void
+    protected function setTestTableForInsert(): void
     {
-        $this->db->exec('DROP TABLE test');
+        $this->db->exec('DROP TABLE IF EXISTS test');
         $this->db->exec('CREATE TABLE test (
                 id INT UNSIGNED NOT NULL AUTO_INCREMENT,
                 name VARCHAR(255) NOT NULL,
@@ -131,7 +131,7 @@ class DatabaseMysqlExceptionTest extends TestCase
     public function testInsert(): void
     {
         try {
-            $this->setTestTable();
+            $this->setTestTableForInsert();
 
             $sql = 'INSERT INTO test (name) VALUES ("A")';
             $id = $this->db->insert($sql);
@@ -174,9 +174,27 @@ class DatabaseMysqlExceptionTest extends TestCase
     /**
      * @throws DatabaseException
      */
+    protected function setTestTableForUpdate(): void
+    {
+        $this->db->exec('DROP TABLE IF EXISTS test');
+        $this->db->exec('CREATE TABLE test (
+                id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+                name VARCHAR(255) NOT NULL,
+                PRIMARY KEY (id)
+            );');
+        $this->db->exec('INSERT INTO test (name) VALUES ("A");');
+        $this->db->exec('INSERT INTO test (name) VALUES ("B");');
+        $this->db->exec('INSERT INTO test (name) VALUES ("C");');
+    }
+
+    /**
+     * @throws DatabaseException
+     */
     public function testUpdate(): void
     {
         try {
+            $this->setTestTableForUpdate();
+
             $sql = 'UPDATE test SET name = "AA" WHERE id = 1';
             $rowsAffected = $this->db->update($sql);
             static::assertTrue($rowsAffected);
@@ -218,9 +236,27 @@ class DatabaseMysqlExceptionTest extends TestCase
     /**
      * @throws DatabaseException
      */
+    protected function setTestTableForDelete(): void
+    {
+        $this->db->exec('DROP TABLE IF EXISTS test');
+        $this->db->exec('CREATE TABLE test (
+                id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+                name VARCHAR(255) NOT NULL,
+                PRIMARY KEY (id)
+            );');
+        $this->db->exec('INSERT INTO test (name) VALUES ("A");');
+        $this->db->exec('INSERT INTO test (name) VALUES ("B");');
+        $this->db->exec('INSERT INTO test (name) VALUES ("C");');
+    }
+
+    /**
+     * @throws DatabaseException
+     */
     public function testDelete(): void
     {
         try {
+            $this->setTestTableForDelete();
+
             $sql = 'DELETE FROM `test` WHERE id = 1';
             $rowsAffected = $this->db->delete($sql);
             static::assertTrue($rowsAffected);
@@ -266,8 +302,9 @@ class DatabaseMysqlExceptionTest extends TestCase
     {
         try {
             $success = $this->db->useSqlFile(__DIR__ . '/test-dump-mysql.sql');
-
             static::assertTrue($success);
+
+            static::assertSame(6, $this->db->count('SELECT COUNT(*) FROM test_select'));
         } catch (DatabaseException $e) {
             var_dump($this->db->getErrors());
             throw $e;

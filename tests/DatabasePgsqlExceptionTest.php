@@ -114,9 +114,9 @@ class DatabasePgsqlExceptionTest extends TestCase
     /**
      * @throws DatabaseException
      */
-    protected function setTestTable(): void
+    protected function setTestTableForInsert(): void
     {
-        $this->db->exec('DROP TABLE test');
+        $this->db->exec('DROP TABLE IF EXISTS test');
         $this->db->exec('CREATE TABLE test (
                 id SERIAL PRIMARY KEY,
                 name character varying(255) NOT NULL
@@ -129,7 +129,7 @@ class DatabasePgsqlExceptionTest extends TestCase
     public function testInsert(): void
     {
         try {
-            $this->setTestTable();
+            $this->setTestTableForInsert();
 
             $sql = "INSERT INTO test (name) VALUES ('A')";
             $id = $this->db->insert($sql);
@@ -172,9 +172,26 @@ class DatabasePgsqlExceptionTest extends TestCase
     /**
      * @throws DatabaseException
      */
+    protected function setTestTableForUpdate(): void
+    {
+        $this->db->exec('DROP TABLE IF EXISTS test');
+        $this->db->exec('CREATE TABLE test (
+                id SERIAL PRIMARY KEY,
+                name character varying(255) NOT NULL
+            );');
+        $this->db->exec("INSERT INTO test (name) VALUES ('A');");
+        $this->db->exec("INSERT INTO test (name) VALUES ('B');");
+        $this->db->exec("INSERT INTO test (name) VALUES ('C');");
+    }
+
+    /**
+     * @throws DatabaseException
+     */
     public function testUpdate(): void
     {
         try {
+            $this->setTestTableForUpdate();
+
             $sql = "UPDATE test SET name = 'AA' WHERE id = 1";
             $rowsAffected = $this->db->update($sql);
             static::assertTrue($rowsAffected);
@@ -216,9 +233,26 @@ class DatabasePgsqlExceptionTest extends TestCase
     /**
      * @throws DatabaseException
      */
+    protected function setTestTableForDelete(): void
+    {
+        $this->db->exec('DROP TABLE IF EXISTS test');
+        $this->db->exec('CREATE TABLE test (
+                id SERIAL PRIMARY KEY,
+                name character varying(255) NOT NULL
+            );');
+        $this->db->exec("INSERT INTO test (name) VALUES ('A');");
+        $this->db->exec("INSERT INTO test (name) VALUES ('B');");
+        $this->db->exec("INSERT INTO test (name) VALUES ('C');");
+    }
+
+    /**
+     * @throws DatabaseException
+     */
     public function testDelete(): void
     {
         try {
+            $this->setTestTableForDelete();
+
             $sql = 'DELETE FROM test WHERE id = 1';
             $rowsAffected = $this->db->delete($sql);
             static::assertTrue($rowsAffected);
@@ -263,11 +297,15 @@ class DatabasePgsqlExceptionTest extends TestCase
     public function testUseSqlFile(): void
     {
         try {
+            $this->db->exec('DROP TABLE IF EXISTS test_select');
+
             $success = $this->db->useSqlFile(__DIR__ . '/test-dump-pgsql-create-table.sql');
             static::assertTrue($success);
 
             $success = $this->db->useSqlFile(__DIR__ . '/test-dump-pgsql-insert-table.sql');
             static::assertTrue($success);
+
+            static::assertSame(6, $this->db->count('SELECT COUNT(*) FROM test_select'));
         } catch (DatabaseException $e) {
             var_dump($this->db->getErrors());
             throw $e;
