@@ -89,7 +89,7 @@ class DatabaseMysqlExceptionTest extends TestCase
      */
     public function testExec(): void
     {
-        $sql = 'CREATE TABLE IF NOT EXISTS test (
+        $sql = 'CREATE TABLE IF NOT EXISTS test_exec (
                 id INT UNSIGNED NOT NULL AUTO_INCREMENT,
                 name VARCHAR(255) NOT NULL,
                 PRIMARY KEY (id)
@@ -117,8 +117,8 @@ class DatabaseMysqlExceptionTest extends TestCase
      */
     protected function setTestTableForInsert(): void
     {
-        $this->db->exec('DROP TABLE IF EXISTS test');
-        $this->db->exec('CREATE TABLE test (
+        $this->db->exec('DROP TABLE IF EXISTS test_insert');
+        $this->db->exec('CREATE TABLE test_insert (
                 id INT UNSIGNED NOT NULL AUTO_INCREMENT,
                 name VARCHAR(255) NOT NULL,
                 PRIMARY KEY (id)
@@ -133,19 +133,19 @@ class DatabaseMysqlExceptionTest extends TestCase
         try {
             $this->setTestTableForInsert();
 
-            $sql = 'INSERT INTO test (name) VALUES ("A")';
+            $sql = 'INSERT INTO test_insert (name) VALUES ("A")';
             $id = $this->db->insert($sql);
             static::assertTrue($id);
 
-            $count = $this->db->count('SELECT COUNT(*) FROM `test` WHERE name="A" AND id=1');
+            $count = $this->db->count('SELECT COUNT(*) FROM test_insert WHERE name="A" AND id=1');
             static::assertSame(1, $count);
 
-            $sql = 'INSERT INTO test (name) VALUES (:name)';
+            $sql = 'INSERT INTO test_insert (name) VALUES (:name)';
             $params = ['name' => 'B'];
             $id = $this->db->insert($sql, $params);
             static::assertTrue($id);
 
-            $count = $this->db->count('SELECT COUNT(*) FROM `test` WHERE name="B" AND id=2');
+            $count = $this->db->count('SELECT COUNT(*) FROM test_insert WHERE name="B" AND id=2');
             static::assertSame(1, $count);
 
             $params = ['name' => 'C'];
@@ -153,7 +153,7 @@ class DatabaseMysqlExceptionTest extends TestCase
             $id = $this->db->insert($sql, $params, $getLastInsertId);
             static::assertSame(3, $id);
 
-            $count = $this->db->count('SELECT COUNT(*) FROM `test` WHERE name="C" AND id=3');
+            $count = $this->db->count('SELECT COUNT(*) FROM test_insert WHERE name="C" AND id=3');
             static::assertSame(1, $count);
         } catch (DatabaseException $e) {
             var_dump($this->db->getErrors());
@@ -176,15 +176,15 @@ class DatabaseMysqlExceptionTest extends TestCase
      */
     protected function setTestTableForUpdate(): void
     {
-        $this->db->exec('DROP TABLE IF EXISTS test');
-        $this->db->exec('CREATE TABLE test (
+        $this->db->exec('DROP TABLE IF EXISTS test_update');
+        $this->db->exec('CREATE TABLE test_update (
                 id INT UNSIGNED NOT NULL AUTO_INCREMENT,
                 name VARCHAR(255) NOT NULL,
                 PRIMARY KEY (id)
             );');
-        $this->db->exec('INSERT INTO test (name) VALUES ("A");');
-        $this->db->exec('INSERT INTO test (name) VALUES ("B");');
-        $this->db->exec('INSERT INTO test (name) VALUES ("C");');
+        $this->db->exec('INSERT INTO test_update (name) VALUES ("A");');
+        $this->db->exec('INSERT INTO test_update (name) VALUES ("B");');
+        $this->db->exec('INSERT INTO test_update (name) VALUES ("C");');
     }
 
     /**
@@ -195,19 +195,19 @@ class DatabaseMysqlExceptionTest extends TestCase
         try {
             $this->setTestTableForUpdate();
 
-            $sql = 'UPDATE test SET name = "AA" WHERE id = 1';
+            $sql = 'UPDATE test_update SET name = "AA" WHERE id = 1';
             $rowsAffected = $this->db->update($sql);
             static::assertTrue($rowsAffected);
 
-            $count = $this->db->count('SELECT COUNT(*) FROM `test` WHERE name="AA" AND id=1');
+            $count = $this->db->count('SELECT COUNT(*) FROM test_update WHERE name="AA" AND id=1');
             static::assertSame(1, $count);
 
-            $sql = 'UPDATE test SET name = :name WHERE id = :id';
+            $sql = 'UPDATE test_update SET name = :name WHERE id = :id';
             $params = ['id' => 2, 'name' => 'BB'];
             $rowsAffected = $this->db->update($sql, $params);
             static::assertTrue($rowsAffected);
 
-            $count = $this->db->count('SELECT COUNT(*) FROM `test` WHERE name="BB" AND id=2');
+            $count = $this->db->count('SELECT COUNT(*) FROM test_update WHERE name="BB" AND id=2');
             static::assertSame(1, $count);
 
             $params = ['id' => 3, 'name' => 'CC'];
@@ -215,7 +215,7 @@ class DatabaseMysqlExceptionTest extends TestCase
             $rowsAffected = $this->db->update($sql, $params, $getCountRowsAffected);
             static::assertSame(1, $rowsAffected);
 
-            $count = $this->db->count('SELECT COUNT(*) FROM `test` WHERE name="CC" AND id=3');
+            $count = $this->db->count('SELECT COUNT(*) FROM test_update WHERE name="CC" AND id=3');
             static::assertSame(1, $count);
         } catch (DatabaseException $e) {
             var_dump($this->db->getErrors());
@@ -238,15 +238,15 @@ class DatabaseMysqlExceptionTest extends TestCase
      */
     protected function setTestTableForDelete(): void
     {
-        $this->db->exec('DROP TABLE IF EXISTS test');
-        $this->db->exec('CREATE TABLE test (
+        $this->db->exec('DROP TABLE IF EXISTS test_delete');
+        $this->db->exec('CREATE TABLE test_delete (
                 id INT UNSIGNED NOT NULL AUTO_INCREMENT,
                 name VARCHAR(255) NOT NULL,
                 PRIMARY KEY (id)
             );');
-        $this->db->exec('INSERT INTO test (name) VALUES ("A");');
-        $this->db->exec('INSERT INTO test (name) VALUES ("B");');
-        $this->db->exec('INSERT INTO test (name) VALUES ("C");');
+        $this->db->exec('INSERT INTO test_delete (name) VALUES ("A");');
+        $this->db->exec('INSERT INTO test_delete (name) VALUES ("B");');
+        $this->db->exec('INSERT INTO test_delete (name) VALUES ("C");');
     }
 
     /**
@@ -257,19 +257,19 @@ class DatabaseMysqlExceptionTest extends TestCase
         try {
             $this->setTestTableForDelete();
 
-            $sql = 'DELETE FROM `test` WHERE id = 1';
+            $sql = 'DELETE FROM test_delete WHERE id = 1';
             $rowsAffected = $this->db->delete($sql);
             static::assertTrue($rowsAffected);
 
-            $count = $this->db->count('SELECT COUNT(*) FROM `test` WHERE id=1');
+            $count = $this->db->count('SELECT COUNT(*) FROM test_delete WHERE id=1');
             static::assertSame(0, $count);
 
-            $sql = 'DELETE FROM `test` WHERE id = :id';
+            $sql = 'DELETE FROM test_delete WHERE id = :id';
             $params = ['id' => 2];
             $rowsAffected = $this->db->delete($sql, $params);
             static::assertTrue($rowsAffected);
 
-            $count = $this->db->count('SELECT COUNT(*) FROM `test` WHERE id=2');
+            $count = $this->db->count('SELECT COUNT(*) FROM test_delete WHERE id=2');
             static::assertSame(0, $count);
 
             $params = ['id' => 3];
@@ -277,7 +277,7 @@ class DatabaseMysqlExceptionTest extends TestCase
             $rowsAffected = $this->db->delete($sql, $params, $getCountRowsAffected);
             static::assertSame(1, $rowsAffected);
 
-            $count = $this->db->count('SELECT COUNT(*) FROM `test` WHERE id=3');
+            $count = $this->db->count('SELECT COUNT(*) FROM test_delete WHERE id=3');
             static::assertSame(0, $count);
         } catch (DatabaseException $e) {
             var_dump($this->db->getErrors());
@@ -322,9 +322,32 @@ class DatabaseMysqlExceptionTest extends TestCase
     /**
      * @throws DatabaseException
      */
+    protected function setTestTableForSelects(): void
+    {
+        $this->db->exec('DROP TABLE IF EXISTS test_select');
+        $this->db->exec('CREATE TABLE `test_select` (
+              `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+              `name` varchar(45) NOT NULL,
+              `rank` tinyint(1) unsigned NOT NULL,
+              `comment` text,
+              PRIMARY KEY (`id`)
+            ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;');
+        $this->db->exec('INSERT INTO test_select (id, name, `rank`, comment) VALUES (1, "A", 0, NULL);');
+        $this->db->exec('INSERT INTO test_select (id, name, `rank`, comment) VALUES (2, "B", 10, "yes");');
+        $this->db->exec('INSERT INTO test_select (id, name, `rank`, comment) VALUES (3, "C", 20, "maybe");');
+        $this->db->exec('INSERT INTO test_select (id, name, `rank`, comment) VALUES (4, "D", 30, "no");');
+        $this->db->exec('INSERT INTO test_select (id, name, `rank`, comment) VALUES (5, "E", 25, NULL);');
+        $this->db->exec('INSERT INTO test_select (id, name, `rank`, comment) VALUES (6, "F", 5, NULL);');
+    }
+
+    /**
+     * @throws DatabaseException
+     */
     public function testSelectAll(): void
     {
         try {
+            $this->setTestTableForSelects();
+
             $sql = 'SELECT * FROM `test_select`';
             $rows = $this->db->selectAll($sql);
             static::assertSame($this->data, $rows);
@@ -363,6 +386,8 @@ class DatabaseMysqlExceptionTest extends TestCase
     public function testSelectRow(): void
     {
         try {
+            $this->setTestTableForSelects();
+
             $sql = 'SELECT * FROM `test_select`';
             $row = $this->db->selectRow($sql);
             static::assertSame($this->data[0], $row);
@@ -398,6 +423,8 @@ class DatabaseMysqlExceptionTest extends TestCase
     public function testSelectCol(): void
     {
         try {
+            $this->setTestTableForSelects();
+
             $sql = 'SELECT * FROM `test_select`';
             $col = $this->db->selectCol($sql);
             static::assertSame(['1', '2', '3', '4', '5', '6'], $col);
@@ -433,6 +460,8 @@ class DatabaseMysqlExceptionTest extends TestCase
     public function testSelectVar(): void
     {
         try {
+            $this->setTestTableForSelects();
+
             $sql = 'SELECT `id` FROM `test_select`';
             $var = $this->db->selectVar($sql);
             static::assertSame('1', $var);
@@ -494,7 +523,7 @@ class DatabaseMysqlExceptionTest extends TestCase
             throw $e;
         }
     }
-
+/*
     public function testPdoParamTypeException(): void
     {
         $this->expectException(DatabaseException::class);
@@ -514,7 +543,7 @@ class DatabaseMysqlExceptionTest extends TestCase
         $params = [':a' => 'a'];
         $this->db->selectRow($sql, $params);
     }
-
+*/
     /**
      * @throws DatabaseException
      * @noinspection GetClassUsageInspection
@@ -522,6 +551,8 @@ class DatabaseMysqlExceptionTest extends TestCase
     public function testSelect(): void
     {
         try {
+            $this->setTestTableForSelects();
+
             $sql = 'SELECT * FROM `test_select`';
             $statement = $this->db->select($sql);
             static::assertSame(PDOStatement::class, get_class($statement));
@@ -558,6 +589,8 @@ class DatabaseMysqlExceptionTest extends TestCase
     public function testRead(): void
     {
         try {
+            $this->setTestTableForSelects();
+
             $sql = 'SELECT * FROM `test_select`';
             $statement = $this->db->select($sql);
             $row = $this->db->read($statement);
@@ -594,6 +627,8 @@ class DatabaseMysqlExceptionTest extends TestCase
     public function testReadAll(): void
     {
         try {
+            $this->setTestTableForSelects();
+
             $sql = 'SELECT * FROM `test_select`';
             $statement = $this->db->select($sql);
             $rows = $this->db->readAll($statement);
@@ -619,9 +654,11 @@ class DatabaseMysqlExceptionTest extends TestCase
     /**
      * @throws DatabaseException
      */
-    public function testTransaction(): void
+    public function testCompleteTransaction(): void
     {
         try {
+            $this->setTestTableForSelects();
+
             $this->db->startTransaction();
 
             $sql = 'UPDATE test_select SET name = :name WHERE id =:id';
@@ -642,30 +679,53 @@ class DatabaseMysqlExceptionTest extends TestCase
     /**
      * @throws DatabaseException
      */
-    public function testTransactionError(): void
+    public function testRollbackTransaction(): void
     {
         try {
+            $this->setTestTableForSelects();
+
             $this->db->startTransaction();
 
             $sql = 'UPDATE test_select SET name = :name WHERE id =:id';
-            $params = ['name' => 'A', 'id' => 1];
+            $params = ['name' => 'my name', 'id' => 1];
             $this->db->update($sql, $params);
 
             $sql = 'SELECT `name` FROM `test_select` WHERE id = :id';
             $params = ['id' => 1];
-            static::assertSame('A', $this->db->selectVar($sql, $params));
+            static::assertSame('my name', $this->db->selectVar($sql, $params));
 
-            $this->db->selectVar($sql);
-
-            $this->db->commitTransaction();
-        } catch (DatabaseException $e) {
-            $this->db->rollbackTransaction();
+             $this->db->rollbackTransaction();
 
             $sql = 'SELECT `name` FROM `test_select` WHERE id = :id';
             $params = ['id' => 1];
-            static::assertSame('my name', $this->db->selectVar($sql, $params));
+            static::assertSame('A', $this->db->selectVar($sql, $params));
+        } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
+            throw $e;
         }
     }
+
+    /**
+     * @throws DatabaseException
+     */
+    /*public function testCompleteTransactionException(): void
+    {
+        try {
+            $this->setTestTableForSelects();
+
+            $this->db->startTransaction();
+
+            $sql = 'UPDATE test_select SET name = :name WHERE id =:id';
+            $params = [];
+            $this->db->update($sql, $params);
+
+            $success = $this->db->completeTransaction();
+            static::assertFalse($success);
+        } catch (DatabaseException $e) {
+            var_dump($this->db->getErrors());
+            throw $e;
+        }
+    }*/
 
     /**
      * @throws DatabaseException
@@ -729,6 +789,8 @@ class DatabaseMysqlExceptionTest extends TestCase
     public function testSaveQueries(): void
     {
         try {
+            $this->setTestTableForSelects();
+
             static::assertFalse($this->db->hasSaveQueries());
 
             $this->db->enableSaveQueries();
@@ -749,7 +811,7 @@ class DatabaseMysqlExceptionTest extends TestCase
 
             $queries = $this->db->getSavedQueries();
 
-            static::assertCount(2, $queries);
+            static::assertCount(1, $queries);
 
             $this->db->cleanSavedQueries();
 
@@ -767,10 +829,42 @@ class DatabaseMysqlExceptionTest extends TestCase
     /**
      * @throws DatabaseException
      */
+    protected function setTestTableForTruncateAndDrop(): void
+    {
+        $this->db->exec('DROP TABLE IF EXISTS test_truncate1');
+        $this->db->exec('CREATE TABLE test_truncate1 (
+                id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+                name VARCHAR(255) NOT NULL,
+                PRIMARY KEY (id)
+            );');
+        $this->db->exec('INSERT INTO test_truncate1 (name) VALUES ("A");');
+        $this->db->exec('INSERT INTO test_truncate1 (name) VALUES ("B");');
+        $this->db->exec('INSERT INTO test_truncate1 (name) VALUES ("C");');
+
+        $this->db->exec('DROP TABLE IF EXISTS test_truncate2');
+        $this->db->exec('CREATE TABLE test_truncate2 (
+                id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+                name VARCHAR(255) NOT NULL,
+                PRIMARY KEY (id)
+            );');
+        $this->db->exec('INSERT INTO test_truncate2 (name) VALUES ("A");');
+        $this->db->exec('INSERT INTO test_truncate2 (name) VALUES ("B");');
+        $this->db->exec('INSERT INTO test_truncate2 (name) VALUES ("C");');
+    }
+
+    /**
+     * @throws DatabaseException
+     */
     public function testTruncateTable(): void
     {
         try {
-            static::assertTrue($this->db->truncateTable('test'));
+            $this->setTestTableForTruncateAndDrop();
+
+            static::assertSame(3, $this->db->count('SELECT COUNT(*) FROM test_truncate1'));
+            static::assertSame(3, $this->db->count('SELECT COUNT(*) FROM test_truncate2'));
+            static::assertTrue($this->db->truncateTable('test_truncate1'));
+            static::assertSame(0, $this->db->count('SELECT COUNT(*) FROM test_truncate1'));
+            static::assertSame(3, $this->db->count('SELECT COUNT(*) FROM test_truncate2'));
         } catch (DatabaseException $e) {
             var_dump($this->db->getErrors());
             throw $e;
@@ -783,7 +877,13 @@ class DatabaseMysqlExceptionTest extends TestCase
     public function testTruncateTables(): void
     {
         try {
-            static::assertTrue($this->db->truncateTables(['test', 'test_select']));
+            $this->setTestTableForTruncateAndDrop();
+
+            static::assertSame(3, $this->db->count('SELECT COUNT(*) FROM test_truncate1'));
+            static::assertSame(3, $this->db->count('SELECT COUNT(*) FROM test_truncate2'));
+            static::assertTrue($this->db->truncateTables(['test_truncate1', 'test_truncate2']));
+            static::assertSame(0, $this->db->count('SELECT COUNT(*) FROM test_truncate1'));
+            static::assertSame(0, $this->db->count('SELECT COUNT(*) FROM test_truncate2'));
         } catch (DatabaseException $e) {
             var_dump($this->db->getErrors());
             throw $e;
@@ -796,7 +896,16 @@ class DatabaseMysqlExceptionTest extends TestCase
     public function testDropTable(): void
     {
         try {
-            static::assertTrue($this->db->dropTable('test'));
+            $this->setTestTableForTruncateAndDrop();
+
+            $sql1 = "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'test_database' AND table_name = 'test_truncate1';";
+            $sql2 = "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'test_database' AND table_name = 'test_truncate2';";
+
+            static::assertSame(1, $this->db->count($sql1));
+            static::assertSame(1, $this->db->count($sql2));
+            static::assertTrue($this->db->dropTable('test_truncate1'));
+            static::assertSame(0, $this->db->count($sql1));
+            static::assertSame(1, $this->db->count($sql2));
         } catch (DatabaseException $e) {
             var_dump($this->db->getErrors());
             throw $e;
@@ -809,7 +918,16 @@ class DatabaseMysqlExceptionTest extends TestCase
     public function testDropTables(): void
     {
         try {
-            static::assertTrue($this->db->dropTables(['test', 'toto']));
+            $this->setTestTableForTruncateAndDrop();
+
+            $sql1 = "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'test_database' AND table_name = 'test_truncate1';";
+            $sql2 = "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'test_database' AND table_name = 'test_truncate2';";
+
+            static::assertSame(1, $this->db->count($sql1));
+            static::assertSame(1, $this->db->count($sql2));
+            static::assertTrue($this->db->dropTables(['test_truncate1', 'test_truncate2']));
+            static::assertSame(0, $this->db->count($sql1));
+            static::assertSame(0, $this->db->count($sql2));
         } catch (DatabaseException $e) {
             var_dump($this->db->getErrors());
             throw $e;
