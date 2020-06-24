@@ -689,7 +689,7 @@ class DatabaseTest extends TestCase
         $this->expectExceptionMessage('Error Connecting Database');
 
         $params = $this->sgbds[$sgbd]['parameters'];
-        $params['database'] = ':';
+        $params['database'] = '/';
         $databaseConf = new Configurator($params);
         $db = new Database($databaseConf);
         $db->connect();
@@ -704,7 +704,7 @@ class DatabaseTest extends TestCase
     {
         try {
             $params = $this->sgbds[$sgbd]['parameters'];
-            $params['database'] = ':';
+            $params['database'] = '/';
             $databaseConf = new Configurator($params);
             $db = new Database($databaseConf);
             $success = $db->connect();
