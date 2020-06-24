@@ -43,6 +43,18 @@ class DatabaseTest extends TestCase
                 'report_error' => 'silent'
             ],
         ],
+        'postgresql_exception' => [
+            /** @var ?Database $db; */
+            'db' => null,
+            'parameters' => [
+                'engine'        => 'pgsql',
+                'host'          => '127.0.0.1',
+                'user'          => 'postgres',
+                'password'      => '',
+                'database'      => 'test_database',
+                'report_error'  => 'exception'
+            ],
+        ],
         'sqlite_exception' => [
             /** @var ?Database $db; */
             'db' => null,
@@ -66,19 +78,7 @@ class DatabaseTest extends TestCase
                 'database'      => __DIR__ . '/test_database.db',
                 'report_error'  => 'silent'
             ],
-        ],
-        'postgresql_exception' => [
-            /** @var ?Database $db; */
-            'db' => null,
-            'parameters' => [
-                'engine'        => 'pgsql',
-                'host'          => '127.0.0.1',
-                'user'          => 'postgres',
-                'password'      => '',
-                'database'      => 'test_database',
-                'report_error'  => 'exception'
-            ],
-        ],
+        ]
     ];
 
     protected array $sqlQueries = [
@@ -103,7 +103,16 @@ class DatabaseTest extends TestCase
                 "INSERT INTO test_update (name) VALUES ('B');",
                 "INSERT INTO test_update (name) VALUES ('C');",
             ],
-            'delete' => [],
+            'delete' => [
+                'CREATE TABLE test_delete (
+                    id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+                    name VARCHAR(255) NOT NULL,
+                    PRIMARY KEY (id)
+                );',
+                "INSERT INTO test_delete (name) VALUES ('A');",
+                "INSERT INTO test_delete (name) VALUES ('B');",
+                "INSERT INTO test_delete (name) VALUES ('C');",
+            ],
         ],
         'pgsql' => [
             'exec' => 'CREATE TABLE test_exec (
@@ -123,7 +132,15 @@ class DatabaseTest extends TestCase
                 "INSERT INTO test_update (name) VALUES ('B');",
                 "INSERT INTO test_update (name) VALUES ('C');",
             ],
-            'delete' => [],
+            'delete' => [
+                'CREATE TABLE test_delete (
+                    id SERIAL PRIMARY KEY,
+                    name character varying(255) NOT NULL
+                );',
+                "INSERT INTO test_delete (name) VALUES ('A');",
+                "INSERT INTO test_delete (name) VALUES ('B');",
+                "INSERT INTO test_delete (name) VALUES ('C');",
+            ],
         ],
         'sqlite' => [
             'exec' => 'CREATE TABLE test_exec (
@@ -143,8 +160,22 @@ class DatabaseTest extends TestCase
                 "INSERT INTO test_update (name) VALUES ('B');",
                 "INSERT INTO test_update (name) VALUES ('C');",
             ],
-            'delete' => [],
+            'delete' => [
+                'CREATE TABLE test_delete (
+                    id   INTEGER       PRIMARY KEY AUTOINCREMENT,
+                    name VARCHAR (255) NOT NULL
+                );',
+                "INSERT INTO test_delete (name) VALUES ('A');",
+                "INSERT INTO test_delete (name) VALUES ('B');",
+                "INSERT INTO test_delete (name) VALUES ('C');",
+            ],
         ],
+    ];
+
+    protected array $sqlFiles = [
+        'mysql' => [__DIR__ . '/test-dump-mysql.sql'],
+        'pgsql' => [__DIR__ . '/test-dump-pgsql-create-table.sql', __DIR__ . '/test-dump-pgsql-insert-table.sql'],
+        'sqlite' => [__DIR__ . '/test-dump-sqlite.sql'],
     ];
 
     // region Data Provider
@@ -154,9 +185,9 @@ class DatabaseTest extends TestCase
         return [
             'mysql_exception' => ['mysql_exception'],
             'mysql_silent' => ['mysql_silent'],
-            'sqlite_exception' => ['sqlite_exception'],
-            'sqlite_silent' => ['sqlite_silent'],
             'postgresql_exception' => ['postgresql_exception'],
+            'sqlite_exception' => ['sqlite_exception'],
+            'sqlite_silent' => ['sqlite_silent']
         ];
     }
 
@@ -164,8 +195,8 @@ class DatabaseTest extends TestCase
     {
         return [
             'mysql_exception' => ['mysql_exception'],
-            'sqlite_exception' => ['sqlite_exception'],
-            'postgresql_exception' => ['postgresql_exception']
+            'postgresql_exception' => ['postgresql_exception'],
+            'sqlite_exception' => ['sqlite_exception']
         ];
     }
 
@@ -173,6 +204,41 @@ class DatabaseTest extends TestCase
     {
         return [
             'mysql_silent' => ['mysql_silent'],
+            'sqlite_silent' => ['sqlite_silent']
+        ];
+    }
+
+    public function sgbdsMysqlException(): array
+    {
+        return [
+            'mysql_exception' => ['mysql_exception']
+        ];
+    }
+
+    public function sgbdsMysqlSilent(): array
+    {
+        return [
+            'mysql_silent' => ['mysql_silent']
+        ];
+    }
+
+    public function sgbdsPostgresqlException(): array
+    {
+        return [
+            'postgresql_exception' => ['postgresql_exception']
+        ];
+    }
+
+    public function sgbdsSqliteException(): array
+    {
+        return [
+            'sqlite_exception' => ['sqlite_exception']
+        ];
+    }
+
+    public function sgbdsSqliteSilent(): array
+    {
+        return [
             'sqlite_silent' => ['sqlite_silent']
         ];
     }
@@ -195,6 +261,7 @@ class DatabaseTest extends TestCase
             $pdo->exec('DROP TABLE IF EXISTS test_insert');
             $pdo->exec('DROP TABLE IF EXISTS test_update');
             $pdo->exec('DROP TABLE IF EXISTS test_delete');
+            $pdo->exec('DROP TABLE IF EXISTS test_select');
         }
     }
 
@@ -421,6 +488,284 @@ class DatabaseTest extends TestCase
             $success = $db->update('aaa');
             static::assertFalse($success);
             static::assertTrue($db->hasErrors());
+        } catch (DatabaseException $e) {
+            var_dump($db->getErrors());
+            throw $e;
+        }
+    }
+
+    // endregion
+
+    // region Database->Delete
+
+    /**
+     * @dataProvider sgbds
+     * @param string $sgbd
+     * @throws DatabaseException
+     */
+    public function testDelete(string $sgbd): void
+    {
+        /** @var Database $db */
+        $db = $this->sgbds[$sgbd]['db'];
+        $sqls = $this->sqlQueries[$this->sgbds[$sgbd]['parameters']['engine']]['delete'];
+        foreach ($sqls as $sql) {
+            $db->exec($sql);
+        }
+
+        try {
+            $sql = 'DELETE FROM test_delete WHERE id = 1';
+            $rowsAffected = $db->delete($sql);
+            static::assertTrue($rowsAffected);
+
+            $count = $db->count('SELECT COUNT(*) FROM test_delete WHERE id = 1');
+            static::assertSame(0, $count);
+
+            $sql = 'DELETE FROM test_delete WHERE id = :id';
+            $params = ['id' => 2];
+            $rowsAffected = $db->delete($sql, $params);
+            static::assertTrue($rowsAffected);
+
+            $count = $db->count('SELECT COUNT(*) FROM test_delete WHERE id = 2');
+            static::assertSame(0, $count);
+
+            $params = ['id' => 3];
+            $getCountRowsAffected = true;
+            $rowsAffected = $db->delete($sql, $params, $getCountRowsAffected);
+            static::assertSame(1, $rowsAffected);
+
+            $count = $db->count('SELECT COUNT(*) FROM test_delete WHERE id = 3');
+            static::assertSame(0, $count);
+        } catch (DatabaseException $e) {
+            var_dump($db->getErrors());
+            throw $e;
+        }
+    }
+
+    /**
+     * @dataProvider sgbdsException
+     * @param string $sgbd
+     * @throws DatabaseException
+     */
+    public function testDeleteException(string $sgbd): void
+    {
+        /** @var Database $db */
+        $db = $this->sgbds[$sgbd]['db'];
+
+        $this->expectException(DatabaseException::class);
+
+        $db->delete('aaa');
+    }
+
+    /**
+     * @dataProvider sgbdsSilent
+     * @param string $sgbd
+     * @throws DatabaseException
+     */
+    public function testDeleteError(string $sgbd): void
+    {
+        /** @var Database $db */
+        $db = $this->sgbds[$sgbd]['db'];
+
+        try {
+            $success = $db->delete('aaa');
+            static::assertFalse($success);
+            static::assertTrue($db->hasErrors());
+        } catch (DatabaseException $e) {
+            var_dump($db->getErrors());
+            throw $e;
+        }
+    }
+
+    // endregion
+
+    // region Database->useSqlFile
+
+    /**
+     * @dataProvider sgbds
+     * @param string $sgbd
+     * @throws DatabaseException
+     */
+    public function testUseSqlFile(string $sgbd): void
+    {
+        /** @var Database $db */
+        $db = $this->sgbds[$sgbd]['db'];
+        $sqlFiles = $this->sqlFiles[$this->sgbds[$sgbd]['parameters']['engine']];
+
+        try {
+            foreach ($sqlFiles as $sqlFile) {
+                $success = $db->useSqlFile($sqlFile);
+                static::assertTrue($success);
+            }
+
+            static::assertSame(6, $db->count('SELECT COUNT(*) FROM test_select'));
+        } catch (DatabaseException $e) {
+            var_dump($db->getErrors());
+            throw $e;
+        }
+    }
+
+    /**
+     * @dataProvider sgbds
+     * @param string $sgbd
+     */
+    public function testUseSqlFileExceptionMissingFile(string $sgbd): void
+    {
+        /** @var Database $db */
+        $db = $this->sgbds[$sgbd]['db'];
+
+        $this->expectException(DatabaseException::class);
+
+        $db->useSqlFile('./missing-dump.sql');
+    }
+
+    /**
+     * @dataProvider sgbdsException
+     * @param string $sgbd
+     */
+    public function testUseSqlFileException(string $sgbd): void
+    {
+        /** @var Database $db */
+        $db = $this->sgbds[$sgbd]['db'];
+
+        $this->expectException(DatabaseException::class);
+
+        $db->useSqlFile(__DIR__ . '/DatabaseTest.php');
+    }
+
+    /**
+     * @dataProvider sgbdsSilent
+     * @param string $sgbd
+     * @throws DatabaseException
+     */
+    public function testUseSqlFileError(string $sgbd): void
+    {
+        /** @var Database $db */
+        $db = $this->sgbds[$sgbd]['db'];
+
+        try {
+            $success = $db->useSqlFile(__DIR__ . '/DatabaseTest.php');
+            static::assertFalse($success);
+        } catch (DatabaseException $e) {
+            var_dump($db->getErrors());
+            throw $e;
+        }
+    }
+
+    // endregion
+
+    // region Database->Connect
+
+    /**
+     * @dataProvider sgbds
+     * @param string $sgbd
+     * @throws DatabaseException
+     * @noinspection GetClassUsageInspection
+     */
+    public function testConnect(string $sgbd): void
+    {
+        /** @var Database $db */
+        $db = $this->sgbds[$sgbd]['db'];
+
+        try {
+            static::assertNull($db->getPdo());
+
+            $success = $db->connect();
+
+            static::assertTrue($success);
+            static::assertSame('PDO', get_class($db->getPdo()));
+        } catch (DatabaseException $e) {
+            var_dump($db->getErrors());
+            throw $e;
+        }
+    }
+
+    /**
+     * @dataProvider sgbdsException
+     * @param string $sgbd
+     */
+    public function testConnectException(string $sgbd): void
+    {
+        $this->expectException(DatabaseException::class);
+        $this->expectExceptionMessage('Error Connecting Database');
+
+        $params = $this->sgbds[$sgbd]['parameters'];
+        $params['database'] = ':';
+        $databaseConf = new Configurator($params);
+        $db = new Database($databaseConf);
+        $db->connect();
+    }
+
+    /**
+     * @dataProvider sgbdsSilent
+     * @param string $sgbd
+     * @throws DatabaseException
+     */
+    public function testConnectError(string $sgbd): void
+    {
+        try {
+            $params = $this->sgbds[$sgbd]['parameters'];
+            $params['database'] = ':';
+            $databaseConf = new Configurator($params);
+            $db = new Database($databaseConf);
+            $success = $db->connect();
+
+            static::assertFalse($success);
+            static::assertTrue($db->hasErrors());
+        } catch (DatabaseException $e) {
+            throw $e;
+        }
+    }
+
+    // endregion
+
+    // region Database->GetPdo
+
+    /**
+     * @dataProvider sgbds
+     * @param string $sgbd
+     * @throws DatabaseException
+     * @noinspection GetClassUsageInspection
+     */
+    public function testGetPdo(string $sgbd): void
+    {
+        /** @var Database $db */
+        $db = $this->sgbds[$sgbd]['db'];
+
+        try {
+            static::assertNull($db->getPdo());
+
+            $db->connect();
+
+            static::assertSame('PDO', get_class($db->getPdo()));
+        } catch (DatabaseException $e) {
+            var_dump($db->getErrors());
+            throw $e;
+        }
+    }
+
+    // endregion
+
+    // region Database->Disconnect
+
+    /**
+     * @dataProvider sgbds
+     * @param string $sgbd
+     * @throws DatabaseException
+     * @noinspection GetClassUsageInspection
+     */
+    public function testDisconnect(string $sgbd): void
+    {
+        /** @var Database $db */
+        $db = $this->sgbds[$sgbd]['db'];
+
+        try {
+            $db->connect();
+
+            static::assertSame('PDO', get_class($db->getPdo()));
+
+            $db->disconnect();
+
+            static::assertNull($db->getPdo());
         } catch (DatabaseException $e) {
             var_dump($db->getErrors());
             throw $e;

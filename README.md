@@ -133,7 +133,7 @@ Here it's the description of the array passed to the construct
 * useSqlFile(filepath: string): bool  
 
 ### Low Level
-* connect(): void  
+* connect(): bool  
 * disconnect(): void  
 * getPdo(): ?PDO  
 

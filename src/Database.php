@@ -73,7 +73,7 @@ class Database
     /**
      * @throws DatabaseException
      */
-    public function connect(): void
+    public function connect(): bool
     {
         try {
             $startTime = \microtime(true);
@@ -91,7 +91,11 @@ class Database
             if ($this->configurator->hasThrowException()) {
                 throw new DatabaseException('Error Connecting Database');
             }
+
+            return false;
         }
+
+        return true;
     }
 
     /**
