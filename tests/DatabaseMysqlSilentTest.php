@@ -399,7 +399,7 @@ class DatabaseMysqlSilentTest extends TestCase
         try {
             $sql = 'a :a';
             $success = $this->db->selectAll($sql);
-            static::assertSame([], $success);
+            static::assertFalse($success);
         } catch (DatabaseException $e) {
             var_dump($this->db->getErrors());
             throw $e;
@@ -441,7 +441,7 @@ class DatabaseMysqlSilentTest extends TestCase
         try {
             $sql = 'a';
             $success = $this->db->selectRow($sql);
-            static::assertSame([], $success);
+            static::assertFalse($success);
         } catch (DatabaseException $e) {
             var_dump($this->db->getErrors());
             throw $e;
@@ -483,7 +483,7 @@ class DatabaseMysqlSilentTest extends TestCase
         try {
             $sql = 'a :a';
             $success = $this->db->selectCol($sql);
-            static::assertSame([], $success);
+            static::assertFalse($success);
         } catch (DatabaseException $e) {
             var_dump($this->db->getErrors());
             throw $e;
@@ -605,14 +605,13 @@ class DatabaseMysqlSilentTest extends TestCase
 
     /**
      * @throws DatabaseException
-     * @noinspection GetClassUsageInspection
      */
     public function testSelectError(): void
     {
         try {
             $sql = 'a :a';
             $statement = $this->db->select($sql);
-            static::assertSame(PDOStatement::class, get_class($statement));
+            static::assertNull($statement);
         } catch (DatabaseException $e) {
             var_dump($this->db->getErrors());
             throw $e;
