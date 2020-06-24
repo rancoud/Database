@@ -126,10 +126,8 @@ Here it's the description of the array passed to the construct
 * getSavedQueries(): array  
 
 ### Specific Commands
-* truncateTable(table: string): bool  
-* truncateTables(tables: array): bool  
-* dropTable(table: string): bool  
-* dropTables(tables: array): bool  
+* truncateTables(...tables: string): bool  
+* dropTables(...tables: string): bool  
 * useSqlFile(filepath: string): bool  
 
 ### Low Level

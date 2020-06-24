@@ -855,25 +855,6 @@ class DatabaseMysqlExceptionTest extends TestCase
     /**
      * @throws DatabaseException
      */
-    public function testTruncateTable(): void
-    {
-        try {
-            $this->setTestTableForTruncateAndDrop();
-
-            static::assertSame(3, $this->db->count('SELECT COUNT(*) FROM test_truncate1'));
-            static::assertSame(3, $this->db->count('SELECT COUNT(*) FROM test_truncate2'));
-            static::assertTrue($this->db->truncateTable('test_truncate1'));
-            static::assertSame(0, $this->db->count('SELECT COUNT(*) FROM test_truncate1'));
-            static::assertSame(3, $this->db->count('SELECT COUNT(*) FROM test_truncate2'));
-        } catch (DatabaseException $e) {
-            var_dump($this->db->getErrors());
-            throw $e;
-        }
-    }
-
-    /**
-     * @throws DatabaseException
-     */
     public function testTruncateTables(): void
     {
         try {
@@ -881,31 +862,9 @@ class DatabaseMysqlExceptionTest extends TestCase
 
             static::assertSame(3, $this->db->count('SELECT COUNT(*) FROM test_truncate1'));
             static::assertSame(3, $this->db->count('SELECT COUNT(*) FROM test_truncate2'));
-            static::assertTrue($this->db->truncateTables(['test_truncate1', 'test_truncate2']));
+            static::assertTrue($this->db->truncateTables('test_truncate1', 'test_truncate2'));
             static::assertSame(0, $this->db->count('SELECT COUNT(*) FROM test_truncate1'));
             static::assertSame(0, $this->db->count('SELECT COUNT(*) FROM test_truncate2'));
-        } catch (DatabaseException $e) {
-            var_dump($this->db->getErrors());
-            throw $e;
-        }
-    }
-
-    /**
-     * @throws DatabaseException
-     */
-    public function testDropTable(): void
-    {
-        try {
-            $this->setTestTableForTruncateAndDrop();
-
-            $sql1 = "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'test_database' AND table_name = 'test_truncate1';";
-            $sql2 = "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'test_database' AND table_name = 'test_truncate2';";
-
-            static::assertSame(1, $this->db->count($sql1));
-            static::assertSame(1, $this->db->count($sql2));
-            static::assertTrue($this->db->dropTable('test_truncate1'));
-            static::assertSame(0, $this->db->count($sql1));
-            static::assertSame(1, $this->db->count($sql2));
         } catch (DatabaseException $e) {
             var_dump($this->db->getErrors());
             throw $e;
@@ -925,7 +884,7 @@ class DatabaseMysqlExceptionTest extends TestCase
 
             static::assertSame(1, $this->db->count($sql1));
             static::assertSame(1, $this->db->count($sql2));
-            static::assertTrue($this->db->dropTables(['test_truncate1', 'test_truncate2']));
+            static::assertTrue($this->db->dropTables('test_truncate1', 'test_truncate2'));
             static::assertSame(0, $this->db->count($sql1));
             static::assertSame(0, $this->db->count($sql2));
         } catch (DatabaseException $e) {

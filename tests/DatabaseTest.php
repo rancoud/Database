@@ -113,6 +113,39 @@ class DatabaseTest extends TestCase
                 "INSERT INTO test_delete (name) VALUES ('B');",
                 "INSERT INTO test_delete (name) VALUES ('C');",
             ],
+            'select' => [
+                'CREATE TABLE `test_select` (
+                  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+                  `name` varchar(45) NOT NULL,
+                  `ranking` tinyint(1) unsigned NOT NULL,
+                  `comment` text,
+                  PRIMARY KEY (`id`)
+                ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;',
+                "INSERT INTO test_select (id, name, ranking, comment) VALUES (1, 'A', 0, NULL);",
+                "INSERT INTO test_select (id, name, ranking, comment) VALUES (2, 'B', 10, 'yes');",
+                "INSERT INTO test_select (id, name, ranking, comment) VALUES (3, 'C', 20, 'maybe');",
+                "INSERT INTO test_select (id, name, ranking, comment) VALUES (4, 'D', 30, 'no');",
+                "INSERT INTO test_select (id, name, ranking, comment) VALUES (5, 'E', 25, NULL);",
+                "INSERT INTO test_select (id, name, ranking, comment) VALUES (6, 'F', 5, NULL);",
+            ],
+            'truncate' => [
+                'CREATE TABLE test_truncate1 (
+                    id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+                    name VARCHAR(255) NOT NULL,
+                    PRIMARY KEY (id)
+                );',
+                "INSERT INTO test_truncate1 (name) VALUES ('A');",
+                "INSERT INTO test_truncate1 (name) VALUES ('B');",
+                "INSERT INTO test_truncate1 (name) VALUES ('C');",
+                'CREATE TABLE test_truncate2 (
+                    id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+                    name VARCHAR(255) NOT NULL,
+                    PRIMARY KEY (id)
+                );',
+                "INSERT INTO test_truncate2 (name) VALUES ('A');",
+                "INSERT INTO test_truncate2 (name) VALUES ('B');",
+                "INSERT INTO test_truncate2 (name) VALUES ('C');",
+            ]
         ],
         'pgsql' => [
             'exec' => 'CREATE TABLE test_exec (
@@ -141,6 +174,36 @@ class DatabaseTest extends TestCase
                 "INSERT INTO test_delete (name) VALUES ('B');",
                 "INSERT INTO test_delete (name) VALUES ('C');",
             ],
+            'select' => [
+                'CREATE TABLE test_select(
+                  id  SERIAL PRIMARY KEY,
+                  name           character varying(255)      NOT NULL,
+                  ranking        INT       NOT NULL,
+                  comment        TEXT
+                );',
+                "INSERT INTO test_select (id, name, ranking, comment) VALUES (1, 'A', 0, NULL);",
+                "INSERT INTO test_select (id, name, ranking, comment) VALUES (2, 'B', 10, 'yes');",
+                "INSERT INTO test_select (id, name, ranking, comment) VALUES (3, 'C', 20, 'maybe');",
+                "INSERT INTO test_select (id, name, ranking, comment) VALUES (4, 'D', 30, 'no');",
+                "INSERT INTO test_select (id, name, ranking, comment) VALUES (5, 'E', 25, NULL);",
+                "INSERT INTO test_select (id, name, ranking, comment) VALUES (6, 'F', 5, NULL);",
+            ],
+            'truncate' => [
+                'CREATE TABLE test_truncate1 (
+                    id SERIAL PRIMARY KEY,
+                    name character varying(255) NOT NULL
+                );',
+                "INSERT INTO test_truncate1 (name) VALUES ('A');",
+                "INSERT INTO test_truncate1 (name) VALUES ('B');",
+                "INSERT INTO test_truncate1 (name) VALUES ('C');",
+                'CREATE TABLE test_truncate2 (
+                    id SERIAL PRIMARY KEY,
+                    name character varying(255) NOT NULL
+                );',
+                "INSERT INTO test_truncate2 (name) VALUES ('A');",
+                "INSERT INTO test_truncate2 (name) VALUES ('B');",
+                "INSERT INTO test_truncate2 (name) VALUES ('C');",
+            ]
         ],
         'sqlite' => [
             'exec' => 'CREATE TABLE test_exec (
@@ -169,7 +232,154 @@ class DatabaseTest extends TestCase
                 "INSERT INTO test_delete (name) VALUES ('B');",
                 "INSERT INTO test_delete (name) VALUES ('C');",
             ],
+            'select' => [
+                'CREATE TABLE test_select (
+                    id      INT          PRIMARY KEY  NOT NULL,
+                    name    VARCHAR (45) NOT NULL,
+                    ranking INT (1)      NOT NULL,
+                    comment TEXT
+                );',
+                "INSERT INTO test_select (id, name, ranking, comment) VALUES (1, 'A', 0, NULL);",
+                "INSERT INTO test_select (id, name, ranking, comment) VALUES (2, 'B', 10, 'yes');",
+                "INSERT INTO test_select (id, name, ranking, comment) VALUES (3, 'C', 20, 'maybe');",
+                "INSERT INTO test_select (id, name, ranking, comment) VALUES (4, 'D', 30, 'no');",
+                "INSERT INTO test_select (id, name, ranking, comment) VALUES (5, 'E', 25, NULL);",
+                "INSERT INTO test_select (id, name, ranking, comment) VALUES (6, 'F', 5, NULL);",
+            ],
+            'truncate' => [
+                'CREATE TABLE test_truncate1 (
+                    id   INTEGER       PRIMARY KEY AUTOINCREMENT,
+                    name VARCHAR (255) NOT NULL
+                );',
+                "INSERT INTO test_truncate1 (name) VALUES ('A');",
+                "INSERT INTO test_truncate1 (name) VALUES ('B');",
+                "INSERT INTO test_truncate1 (name) VALUES ('C');",
+                'CREATE TABLE test_truncate2 (
+                    id   INTEGER       PRIMARY KEY AUTOINCREMENT,
+                    name VARCHAR (255) NOT NULL
+                );',
+                "INSERT INTO test_truncate2 (name) VALUES ('A');",
+                "INSERT INTO test_truncate2 (name) VALUES ('B');",
+                "INSERT INTO test_truncate2 (name) VALUES ('C');",
+            ]
         ],
+    ];
+
+    protected array $selectData = [
+        'mysql' => [
+            [
+                'id'      => '1',
+                'name'    => 'A',
+                'ranking' => '0',
+                'comment' => null,
+            ],
+            [
+                'id'      => '2',
+                'name'    => 'B',
+                'ranking' => '10',
+                'comment' => 'yes',
+            ],
+            [
+                'id'      => '3',
+                'name'    => 'C',
+                'ranking' => '20',
+                'comment' => 'maybe',
+            ],
+            [
+                'id'      => '4',
+                'name'    => 'D',
+                'ranking' => '30',
+                'comment' => 'no',
+            ],
+            [
+                'id'      => '5',
+                'name'    => 'E',
+                'ranking' => '25',
+                'comment' => null,
+            ],
+            [
+                'id'      => '6',
+                'name'    => 'F',
+                'ranking' => '5',
+                'comment' => null,
+            ]
+        ],
+        'pgsql' => [
+            [
+                'id'      => 1,
+                'name'    => 'A',
+                'ranking' => 0,
+                'comment' => null,
+            ],
+            [
+                'id'      => 2,
+                'name'    => 'B',
+                'ranking' => 10,
+                'comment' => 'yes',
+            ],
+            [
+                'id'      => 3,
+                'name'    => 'C',
+                'ranking' => 20,
+                'comment' => 'maybe',
+            ],
+            [
+                'id'      => 4,
+                'name'    => 'D',
+                'ranking' => 30,
+                'comment' => 'no',
+            ],
+            [
+                'id'      => 5,
+                'name'    => 'E',
+                'ranking' => 25,
+                'comment' => null,
+            ],
+            [
+                'id'      => 6,
+                'name'    => 'F',
+                'ranking' => 5,
+                'comment' => null,
+            ]
+        ],
+        'sqlite' => [
+            [
+                'id'      => '1',
+                'name'    => 'A',
+                'ranking' => '0',
+                'comment' => null,
+            ],
+            [
+                'id'      => '2',
+                'name'    => 'B',
+                'ranking' => '10',
+                'comment' => 'yes',
+            ],
+            [
+                'id'      => '3',
+                'name'    => 'C',
+                'ranking' => '20',
+                'comment' => 'maybe',
+            ],
+            [
+                'id'      => '4',
+                'name'    => 'D',
+                'ranking' => '30',
+                'comment' => 'no',
+            ],
+            [
+                'id'      => '5',
+                'name'    => 'E',
+                'ranking' => '25',
+                'comment' => null,
+            ],
+            [
+                'id'      => '6',
+                'name'    => 'F',
+                'ranking' => '5',
+                'comment' => null,
+            ]
+        ]
     ];
 
     protected array $sqlFiles = [
@@ -262,6 +472,8 @@ class DatabaseTest extends TestCase
             $pdo->exec('DROP TABLE IF EXISTS test_update');
             $pdo->exec('DROP TABLE IF EXISTS test_delete');
             $pdo->exec('DROP TABLE IF EXISTS test_select');
+            $pdo->exec('DROP TABLE IF EXISTS test_truncate1');
+            $pdo->exec('DROP TABLE IF EXISTS test_truncate2');
         }
     }
 
@@ -578,6 +790,474 @@ class DatabaseTest extends TestCase
 
     // endregion
 
+    // region Database->SelectAll
+
+    /**
+     * @dataProvider sgbds
+     * @param string $sgbd
+     * @throws DatabaseException
+     */
+    public function testSelectAll(string $sgbd): void
+    {
+        /** @var Database $db */
+        $db = $this->sgbds[$sgbd]['db'];
+
+        $sqls = $this->sqlQueries[$this->sgbds[$sgbd]['parameters']['engine']]['select'];
+        foreach ($sqls as $sql) {
+            $db->exec($sql);
+        }
+
+        try {
+            $sql = 'SELECT * FROM test_select';
+            $rows = $db->selectAll($sql);
+            static::assertSame($this->selectData[$this->sgbds[$sgbd]['parameters']['engine']], $rows);
+
+            $sql = 'SELECT * FROM test_select WHERE ranking >= :ranking';
+            $params = ['ranking' => 20];
+            $rows = $db->selectAll($sql, $params);
+            $data[] = $this->selectData[$this->sgbds[$sgbd]['parameters']['engine']][2];
+            $data[] = $this->selectData[$this->sgbds[$sgbd]['parameters']['engine']][3];
+            $data[] = $this->selectData[$this->sgbds[$sgbd]['parameters']['engine']][4];
+            static::assertSame($data, $rows);
+
+            $sql = 'SELECT * FROM test_select WHERE ranking >= :ranking';
+            $params = ['ranking' => 100];
+            $rows = $db->selectAll($sql, $params);
+            static::assertSame([], $rows);
+        } catch (DatabaseException $e) {
+            var_dump($db->getErrors());
+            throw $e;
+        }
+    }
+
+    /**
+     * @dataProvider sgbdsException
+     * @param string $sgbd
+     * @throws DatabaseException
+     */
+    public function testSelectAllException(string $sgbd): void
+    {
+        /** @var Database $db */
+        $db = $this->sgbds[$sgbd]['db'];
+
+        $this->expectException(DatabaseException::class);
+
+        $db->selectAll('aaa');
+    }
+
+    /**
+     * @dataProvider sgbdsSilent
+     * @param string $sgbd
+     * @throws DatabaseException
+     */
+    public function testSelectAllError(string $sgbd): void
+    {
+        /** @var Database $db */
+        $db = $this->sgbds[$sgbd]['db'];
+
+        try {
+            static::assertFalse($db->selectAll('aaa'));
+        } catch (DatabaseException $e) {
+            var_dump($db->getErrors());
+            throw $e;
+        }
+    }
+
+    // endregion
+
+    // region Database->SelectRow
+
+    /**
+     * @dataProvider sgbds
+     * @param string $sgbd
+     * @throws DatabaseException
+     */
+    public function testSelectRow(string $sgbd): void
+    {
+        /** @var Database $db */
+        $db = $this->sgbds[$sgbd]['db'];
+
+        $sqls = $this->sqlQueries[$this->sgbds[$sgbd]['parameters']['engine']]['select'];
+        foreach ($sqls as $sql) {
+            $db->exec($sql);
+        }
+
+        try {
+            $sql = 'SELECT * FROM test_select';
+            $row = $db->selectRow($sql);
+            static::assertSame($this->selectData[$this->sgbds[$sgbd]['parameters']['engine']][0], $row);
+
+            $sql = 'SELECT * FROM test_select WHERE ranking >= :ranking';
+            $params = ['ranking' => 20];
+            $row = $db->selectRow($sql, $params);
+            static::assertSame($this->selectData[$this->sgbds[$sgbd]['parameters']['engine']][2], $row);
+
+            $sql = 'SELECT * FROM test_select WHERE ranking >= :ranking';
+            $params = ['ranking' => 100];
+            $rows = $db->selectRow($sql, $params);
+            static::assertSame([], $rows);
+        } catch (DatabaseException $e) {
+            var_dump($db->getErrors());
+            throw $e;
+        }
+    }
+
+    /**
+     * @dataProvider sgbdsException
+     * @param string $sgbd
+     * @throws DatabaseException
+     */
+    public function testSelectRowException(string $sgbd): void
+    {
+        /** @var Database $db */
+        $db = $this->sgbds[$sgbd]['db'];
+
+        $this->expectException(DatabaseException::class);
+
+        $db->selectRow('aaa');
+    }
+
+    /**
+     * @dataProvider sgbdsSilent
+     * @param string $sgbd
+     * @throws DatabaseException
+     */
+    public function testSelectRowError(string $sgbd): void
+    {
+        /** @var Database $db */
+        $db = $this->sgbds[$sgbd]['db'];
+
+        try {
+            static::assertFalse($db->selectRow('aaa'));
+        } catch (DatabaseException $e) {
+            var_dump($db->getErrors());
+            throw $e;
+        }
+    }
+
+    // endregion
+
+    // region Database->SelectCol
+
+    /**
+     * @dataProvider sgbds
+     * @param string $sgbd
+     * @throws DatabaseException
+     */
+    public function testSelectCol(string $sgbd): void
+    {
+        /** @var Database $db */
+        $db = $this->sgbds[$sgbd]['db'];
+
+        $sqls = $this->sqlQueries[$this->sgbds[$sgbd]['parameters']['engine']]['select'];
+        foreach ($sqls as $sql) {
+            $db->exec($sql);
+        }
+
+        try {
+            $sql = 'SELECT * FROM test_select';
+            $col = $db->selectCol($sql);
+            static::assertSame([
+                $this->selectData[$this->sgbds[$sgbd]['parameters']['engine']][0]['id'],
+                $this->selectData[$this->sgbds[$sgbd]['parameters']['engine']][1]['id'],
+                $this->selectData[$this->sgbds[$sgbd]['parameters']['engine']][2]['id'],
+                $this->selectData[$this->sgbds[$sgbd]['parameters']['engine']][3]['id'],
+                $this->selectData[$this->sgbds[$sgbd]['parameters']['engine']][4]['id'],
+                $this->selectData[$this->sgbds[$sgbd]['parameters']['engine']][5]['id']
+            ], $col);
+
+            $sql = 'SELECT name FROM test_select WHERE ranking >= :ranking';
+            $params = ['ranking' => 20];
+            $col = $db->selectCol($sql, $params);
+            static::assertSame([
+                $this->selectData[$this->sgbds[$sgbd]['parameters']['engine']][2]['name'],
+                $this->selectData[$this->sgbds[$sgbd]['parameters']['engine']][3]['name'],
+                $this->selectData[$this->sgbds[$sgbd]['parameters']['engine']][4]['name']
+            ], $col);
+
+            $sql = 'SELECT ranking FROM test_select WHERE ranking >= :ranking';
+            $params = ['ranking' => 100];
+            $col = $db->selectCol($sql, $params);
+            static::assertSame([], $col);
+        } catch (DatabaseException $e) {
+            var_dump($db->getErrors());
+            throw $e;
+        }
+    }
+
+    /**
+     * @dataProvider sgbdsException
+     * @param string $sgbd
+     * @throws DatabaseException
+     */
+    public function testSelectColException(string $sgbd): void
+    {
+        /** @var Database $db */
+        $db = $this->sgbds[$sgbd]['db'];
+
+        $this->expectException(DatabaseException::class);
+
+        $db->selectCol('aaa');
+    }
+
+    /**
+     * @dataProvider sgbdsSilent
+     * @param string $sgbd
+     * @throws DatabaseException
+     */
+    public function testSelectColError(string $sgbd): void
+    {
+        /** @var Database $db */
+        $db = $this->sgbds[$sgbd]['db'];
+
+        try {
+            static::assertFalse($db->selectCol('aaa'));
+        } catch (DatabaseException $e) {
+            var_dump($db->getErrors());
+            throw $e;
+        }
+    }
+
+    // endregion
+
+    // region Database->SelectVar
+
+    /**
+     * @dataProvider sgbds
+     * @param string $sgbd
+     * @throws DatabaseException
+     */
+    public function testSelectVar(string $sgbd): void
+    {
+        /** @var Database $db */
+        $db = $this->sgbds[$sgbd]['db'];
+
+        $sqls = $this->sqlQueries[$this->sgbds[$sgbd]['parameters']['engine']]['select'];
+        foreach ($sqls as $sql) {
+            $db->exec($sql);
+        }
+
+        try {
+            $sql = 'SELECT * FROM test_select';
+            $var = $db->selectVar($sql);
+            static::assertSame($this->selectData[$this->sgbds[$sgbd]['parameters']['engine']][0]['id'], $var);
+
+            $sql = 'SELECT name FROM test_select WHERE ranking >= :ranking';
+            $params = ['ranking' => 20];
+            $var = $db->selectVar($sql, $params);
+            static::assertSame($this->selectData[$this->sgbds[$sgbd]['parameters']['engine']][2]['name'], $var);
+
+            $sql = 'SELECT ranking FROM test_select WHERE ranking >= :ranking';
+            $params = ['ranking' => 100];
+            $var = $db->selectVar($sql, $params);
+            static::assertFalse($var);
+        } catch (DatabaseException $e) {
+            var_dump($db->getErrors());
+            throw $e;
+        }
+    }
+
+    /**
+     * @dataProvider sgbdsException
+     * @param string $sgbd
+     * @throws DatabaseException
+     */
+    public function testSelectVarException(string $sgbd): void
+    {
+        /** @var Database $db */
+        $db = $this->sgbds[$sgbd]['db'];
+
+        $this->expectException(DatabaseException::class);
+
+        $db->selectVar('aaa');
+    }
+
+    /**
+     * @dataProvider sgbdsSilent
+     * @param string $sgbd
+     * @throws DatabaseException
+     */
+    public function testSelectVarError(string $sgbd): void
+    {
+        /** @var Database $db */
+        $db = $this->sgbds[$sgbd]['db'];
+
+        try {
+            static::assertFalse($db->selectVar('aaa'));
+        } catch (DatabaseException $e) {
+            var_dump($db->getErrors());
+            throw $e;
+        }
+    }
+
+    // endregion
+
+    // region Database->Select
+
+    /**
+     * @dataProvider sgbds
+     * @param string $sgbd
+     * @throws DatabaseException
+     * @noinspection GetClassUsageInspection
+     */
+    public function testSelect(string $sgbd): void
+    {
+        /** @var Database $db */
+        $db = $this->sgbds[$sgbd]['db'];
+
+        $sqls = $this->sqlQueries[$this->sgbds[$sgbd]['parameters']['engine']]['select'];
+        foreach ($sqls as $sql) {
+            $db->exec($sql);
+        }
+
+        try {
+            $sql = 'SELECT * FROM test_select';
+            $statement = $db->select($sql);
+            static::assertSame(PDOStatement::class, get_class($statement));
+
+            $sql = 'SELECT * FROM test_select WHERE ranking >= :ranking';
+            $params = ['ranking' => 20];
+            $statement = $db->select($sql, $params);
+            static::assertSame(PDOStatement::class, get_class($statement));
+
+            $sql = 'SELECT * FROM test_select WHERE ranking >= :ranking';
+            $params = ['ranking' => 100];
+            $statement = $db->select($sql, $params);
+            static::assertSame(PDOStatement::class, get_class($statement));
+        } catch (DatabaseException $e) {
+            var_dump($db->getErrors());
+            throw $e;
+        }
+    }
+
+    /**
+     * @dataProvider sgbdsException
+     * @param string $sgbd
+     * @throws DatabaseException
+     */
+    public function testSelectException(string $sgbd): void
+    {
+        /** @var Database $db */
+        $db = $this->sgbds[$sgbd]['db'];
+
+        $this->expectException(DatabaseException::class);
+
+        $db->select('aaa');
+    }
+
+    /**
+     * @dataProvider sgbdsSilent
+     * @param string $sgbd
+     * @throws DatabaseException
+     */
+    public function testSelectError(string $sgbd): void
+    {
+        /** @var Database $db */
+        $db = $this->sgbds[$sgbd]['db'];
+
+        try {
+            static::assertNull($db->select('aaa'));
+        } catch (DatabaseException $e) {
+            var_dump($db->getErrors());
+            throw $e;
+        }
+    }
+
+    // endregion
+
+    // region Database->Read
+
+    /**
+     * @dataProvider sgbds
+     * @param string $sgbd
+     * @throws DatabaseException
+     * @noinspection PhpAssignmentInConditionInspection
+     */
+    public function testRead(string $sgbd): void
+    {
+        /** @var Database $db */
+        $db = $this->sgbds[$sgbd]['db'];
+
+        $sqls = $this->sqlQueries[$this->sgbds[$sgbd]['parameters']['engine']]['select'];
+        foreach ($sqls as $sql) {
+            $db->exec($sql);
+        }
+
+        try {
+            $sql = 'SELECT * FROM test_select';
+            $statement = $db->select($sql);
+            $rows = $db->read($statement);
+            static::assertCount(4, $rows);
+
+            $sql = 'SELECT * FROM test_select WHERE ranking >= :ranking';
+            $params = ['ranking' => 20];
+            $statement = $db->select($sql, $params);
+            $rows = $db->read($statement);
+            static::assertCount(4, $rows);
+
+            $sql = 'SELECT * FROM test_select WHERE ranking >= :ranking';
+            $params = ['ranking' => 100];
+            $statement = $db->select($sql, $params);
+            $row = $db->read($statement);
+            static::assertFalse($row);
+
+            $rows = [];
+            $statement = $db->select('SELECT * FROM test_select');
+            while ($row = $db->read($statement)) {
+                $rows[] = $row;
+            }
+
+            static::assertCount(6, $rows);
+        } catch (DatabaseException $e) {
+            var_dump($db->getErrors());
+            throw $e;
+        }
+    }
+
+    // endregion
+
+    // region Database->ReadAll
+
+    /**
+     * @dataProvider sgbds
+     * @param string $sgbd
+     * @throws DatabaseException
+     */
+    public function testReadAll(string $sgbd): void
+    {
+        /** @var Database $db */
+        $db = $this->sgbds[$sgbd]['db'];
+
+        $sqls = $this->sqlQueries[$this->sgbds[$sgbd]['parameters']['engine']]['select'];
+        foreach ($sqls as $sql) {
+            $db->exec($sql);
+        }
+
+        try {
+            $sql = 'SELECT * FROM test_select';
+            $statement = $db->select($sql);
+            $rows = $db->readAll($statement);
+            static::assertCount(6, $rows);
+
+            $sql = 'SELECT * FROM test_select WHERE ranking >= :ranking';
+            $params = ['ranking' => 20];
+            $statement = $db->select($sql, $params);
+            $rows = $db->readAll($statement);
+            static::assertCount(3, $rows);
+
+            $sql = 'SELECT * FROM test_select WHERE ranking >= :ranking';
+            $params = ['ranking' => 100];
+            $statement = $db->select($sql, $params);
+            $rows = $db->readAll($statement);
+            static::assertCount(0, $rows);
+        } catch (DatabaseException $e) {
+            var_dump($db->getErrors());
+            throw $e;
+        }
+    }
+
+    // endregion
+
     // region Database->useSqlFile
 
     /**
@@ -645,6 +1325,161 @@ class DatabaseTest extends TestCase
         try {
             $success = $db->useSqlFile(__DIR__ . '/DatabaseTest.php');
             static::assertFalse($success);
+        } catch (DatabaseException $e) {
+            var_dump($db->getErrors());
+            throw $e;
+        }
+    }
+
+    // endregion
+
+    // region Database->TruncateTables
+
+    /**
+     * @dataProvider sgbds
+     * @param string $sgbd
+     * @throws DatabaseException
+     */
+    public function testTruncateTables(string $sgbd): void
+    {
+        /** @var Database $db */
+        $db = $this->sgbds[$sgbd]['db'];
+
+        $sqls = $this->sqlQueries[$this->sgbds[$sgbd]['parameters']['engine']]['truncate'];
+        foreach ($sqls as $sql) {
+            $db->exec($sql);
+        }
+
+        try {
+            static::assertSame(3, $db->count('SELECT COUNT(*) FROM test_truncate1'));
+            static::assertSame(3, $db->count('SELECT COUNT(*) FROM test_truncate2'));
+            static::assertTrue($db->truncateTables('test_truncate1', 'test_truncate2'));
+            static::assertSame(0, $db->count('SELECT COUNT(*) FROM test_truncate1'));
+            static::assertSame(0, $db->count('SELECT COUNT(*) FROM test_truncate2'));
+        } catch (DatabaseException $e) {
+            var_dump($db->getErrors());
+            throw $e;
+        }
+    }
+
+    /**
+     * @dataProvider sgbdsException
+     * @param string $sgbd
+     * @throws DatabaseException
+     */
+    public function testTruncateTablesException(string $sgbd): void
+    {
+        /** @var Database $db */
+        $db = $this->sgbds[$sgbd]['db'];
+
+        $this->expectException(DatabaseException::class);
+
+        $db->truncateTables('');
+    }
+
+    /**
+     * @dataProvider sgbdsSilent
+     * @param string $sgbd
+     * @throws DatabaseException
+     */
+    public function testTruncateTablesError(string $sgbd): void
+    {
+        /** @var Database $db */
+        $db = $this->sgbds[$sgbd]['db'];
+
+        try {
+            $success = $db->truncateTables('');
+            static::assertFalse($success);
+            static::assertTrue($db->hasErrors());
+        } catch (DatabaseException $e) {
+            var_dump($db->getErrors());
+            throw $e;
+        }
+    }
+
+    // endregion
+
+    // region Database->DropTables
+
+    /**
+     * @dataProvider sgbds
+     * @param string $sgbd
+     * @throws DatabaseException
+     */
+    public function testDropTables(string $sgbd): void
+    {
+        /** @var Database $db */
+        $db = $this->sgbds[$sgbd]['db'];
+
+        $sqls = $this->sqlQueries[$this->sgbds[$sgbd]['parameters']['engine']]['truncate'];
+        foreach ($sqls as $sql) {
+            $db->exec($sql);
+        }
+
+        try {
+            if ($this->sgbds[$sgbd]['parameters']['engine'] === 'mysql') {
+                $sql1 = "SELECT COUNT(*) FROM information_schema.tables
+                         WHERE table_schema = 'test_database' AND table_name = 'test_truncate1';";
+                $sql2 = "SELECT COUNT(*) FROM information_schema.tables
+                         WHERE table_schema = 'test_database' AND table_name = 'test_truncate2';";
+
+                static::assertSame(1, $db->count($sql1));
+                static::assertSame(1, $db->count($sql2));
+                static::assertTrue($db->dropTables('test_truncate1', 'test_truncate2'));
+                static::assertSame(0, $db->count($sql1));
+                static::assertSame(0, $db->count($sql2));
+            } elseif ($this->sgbds[$sgbd]['parameters']['engine'] === 'pgsql') {
+                static::assertSame('test_truncate1', $db->selectVar("SELECT to_regclass('test_truncate1');"));
+                static::assertSame('test_truncate2', $db->selectVar("SELECT to_regclass('test_truncate2');"));
+                static::assertTrue($db->dropTables('test_truncate1', 'test_truncate2'));
+                static::assertNull($db->selectVar("SELECT to_regclass('test_truncate2');"));
+                static::assertNull($db->selectVar("SELECT to_regclass('test_truncate2');"));
+            } elseif ($this->sgbds[$sgbd]['parameters']['engine'] === 'sqlite') {
+                $sql1 = "SELECT count(*) FROM sqlite_master WHERE type='table' AND name='test_truncate1';";
+                $sql2 = "SELECT count(*) FROM sqlite_master WHERE type='table' AND name='test_truncate2';";
+                static::assertSame(1, $db->count($sql1));
+                static::assertSame(1, $db->count($sql2));
+                static::assertTrue($db->dropTables('test_truncate1', 'test_truncate2'));
+                static::assertSame(0, $db->count($sql1));
+                static::assertSame(0, $db->count($sql2));
+            } else {
+                throw new DatabaseException('sgbd ' . $sgbd . ' not supported!');
+            }
+        } catch (DatabaseException $e) {
+            var_dump($db->getErrors());
+            throw $e;
+        }
+    }
+
+    /**
+     * @dataProvider sgbdsException
+     * @param string $sgbd
+     * @throws DatabaseException
+     */
+    public function testDropTablesException(string $sgbd): void
+    {
+        /** @var Database $db */
+        $db = $this->sgbds[$sgbd]['db'];
+
+        $this->expectException(DatabaseException::class);
+
+        $db->dropTables('');
+    }
+
+    /**
+     * @dataProvider sgbdsSilent
+     * @param string $sgbd
+     * @throws DatabaseException
+     */
+    public function testDropTablesError(string $sgbd): void
+    {
+        /** @var Database $db */
+        $db = $this->sgbds[$sgbd]['db'];
+
+        try {
+            $success = $db->dropTables('');
+            static::assertFalse($success);
+            static::assertTrue($db->hasErrors());
         } catch (DatabaseException $e) {
             var_dump($db->getErrors());
             throw $e;

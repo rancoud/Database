@@ -716,36 +716,25 @@ class Database
     }
 
     /**
-     * @param string $table
-     *
-     * @throws DatabaseException
-     *
-     * @return bool
-     */
-    public function truncateTable(string $table): bool
-    {
-        $sql = 'TRUNCATE TABLE ' . $table;
-        if ($this->configurator->getEngine() === 'sqlite') {
-            $sql = 'DELETE FROM ' . $table;
-        }
-
-        return $this->exec($sql);
-    }
-
-    /**
      * @param array $tables
      *
      * @throws DatabaseException
      *
      * @return bool
      */
-    public function truncateTables(array $tables): bool
+    public function truncateTables(string ...$tables): bool
     {
         $success = true;
 
         foreach ($tables as $table) {
-            if ($this->truncateTable($table) === false) {
-                $success = false;
+            $sql = 'TRUNCATE TABLE ' . $table;
+            if ($this->configurator->getEngine() === 'sqlite') {
+                $sql = 'DELETE FROM ' . $table;
+            }
+
+            $success = $this->exec($sql);
+            if ($success === false) {
+                break;
             }
         }
 
@@ -753,33 +742,22 @@ class Database
     }
 
     /**
-     * @param string $table
-     *
-     * @throws DatabaseException
-     *
-     * @return bool
-     */
-    public function dropTable(string $table): bool
-    {
-        return $this->dropTables([$table]);
-    }
-
-    /**
      * @param array $tables
      *
      * @throws DatabaseException
      *
      * @return bool
      */
-    public function dropTables(array $tables): bool
+    public function dropTables(string ...$tables): bool
     {
         $success = true;
 
         if ($this->configurator->getEngine() === 'sqlite') {
             foreach ($tables as $table) {
                 $sql = 'DROP TABLE IF EXISTS ' . $table;
-                if ($this->exec($sql) === false) {
-                    $success = false;
+                $success = $this->exec($sql);
+                if ($success === false) {
+                    break;
                 }
             }
 
