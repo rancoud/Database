@@ -1258,6 +1258,241 @@ class DatabaseTest extends TestCase
 
     // endregion
 
+    // region Database startTransaction/commitTransaction/rollbackTransaction/completeTransaction
+
+    /**
+     * @dataProvider sgbds
+     * @param string $sgbd
+     * @throws DatabaseException
+     */
+    public function testCompleteTransaction(string $sgbd): void
+    {
+        /** @var Database $db */
+        $db = $this->sgbds[$sgbd]['db'];
+
+        $sqls = $this->sqlQueries[$this->sgbds[$sgbd]['parameters']['engine']]['select'];
+        foreach ($sqls as $sql) {
+            $db->exec($sql);
+        }
+
+        try {
+            $success = $db->startTransaction();
+            static::assertTrue($success);
+
+            $sql = 'UPDATE test_select SET name = :name WHERE id =:id';
+            $params = ['name' => 'my name', 'id' => 1];
+            $db->update($sql, $params);
+
+            $success = $db->completeTransaction();
+            static::assertTrue($success);
+        } catch (DatabaseException $e) {
+            var_dump($db->getErrors());
+            throw $e;
+        }
+
+        $sql = 'SELECT name FROM test_select WHERE id = :id';
+        $params = ['id' => 1];
+        static::assertSame('my name', $db->selectVar($sql, $params));
+    }
+
+    /**
+     * @dataProvider sgbds
+     * @param string $sgbd
+     * @throws DatabaseException
+     */
+    public function testRollbackTransaction(string $sgbd): void
+    {
+        /** @var Database $db */
+        $db = $this->sgbds[$sgbd]['db'];
+
+        $sqls = $this->sqlQueries[$this->sgbds[$sgbd]['parameters']['engine']]['select'];
+        foreach ($sqls as $sql) {
+            $db->exec($sql);
+        }
+
+        try {
+            $success = $db->startTransaction();
+            static::assertTrue($success);
+
+            $sql = 'UPDATE test_select SET name = :name WHERE id =:id';
+            $params = ['name' => 'my name', 'id' => 1];
+            $db->update($sql, $params);
+
+            $sql = 'SELECT name FROM test_select WHERE id = :id';
+            $params = ['id' => 1];
+            static::assertSame('my name', $db->selectVar($sql, $params));
+
+            $success = $db->rollbackTransaction();
+            static::assertTrue($success);
+
+            $sql = 'SELECT name FROM test_select WHERE id = :id';
+            $params = ['id' => 1];
+            static::assertSame('A', $db->selectVar($sql, $params));
+        } catch (DatabaseException $e) {
+            var_dump($db->getErrors());
+            throw $e;
+        }
+
+        $sql = 'SELECT name FROM test_select WHERE id = :id';
+        $params = ['id' => 1];
+        static::assertSame('A', $db->selectVar($sql, $params));
+    }
+
+    /**
+     * @dataProvider sgbds
+     * @param string $sgbd
+     * @throws DatabaseException
+     */
+    public function testInTransactionError(string $sgbd): void
+    {
+        /** @var Database $db */
+        $db = $this->sgbds[$sgbd]['db'];
+
+        try {
+            $success = $db->completeTransaction();
+            static::assertFalse($success);
+
+            $success = $db->commitTransaction();
+            static::assertFalse($success);
+
+            $success = $db->rollbackTransaction();
+            static::assertFalse($success);
+        } catch (DatabaseException $e) {
+            var_dump($db->getErrors());
+            throw $e;
+        }
+    }
+
+    // endregion
+
+    // region Database hasErrors/getErrors/getLastError/cleanErrors
+
+    /**
+     * @dataProvider sgbdsException
+     * @param string $sgbd
+     * @throws DatabaseException
+     */
+    public function testErrorsException(string $sgbd): void
+    {
+        /** @var Database $db */
+        $db = $this->sgbds[$sgbd]['db'];
+
+        $sqls = $this->sqlQueries[$this->sgbds[$sgbd]['parameters']['engine']]['select'];
+        foreach ($sqls as $sql) {
+            $db->exec($sql);
+        }
+
+        static::assertFalse($db->hasErrors());
+        static::assertSame([], $db->getErrors());
+        static::assertNull($db->getLastError());
+
+        try {
+            $db->select('aaa');
+            // if assert is done then it's not good
+            static::assertFalse(true);
+        } catch (DatabaseException $e) {
+            static::assertTrue($db->hasErrors());
+            static::assertCount(4, $db->getLastError());
+
+            $db->cleanErrors();
+
+            static::assertFalse($db->hasErrors());
+            static::assertSame([], $db->getErrors());
+            static::assertNull($db->getLastError());
+        }
+    }
+
+    /**
+     * @dataProvider sgbdsSilent
+     * @param string $sgbd
+     * @throws DatabaseException
+     */
+    public function testErrorsError(string $sgbd): void
+    {
+        /** @var Database $db */
+        $db = $this->sgbds[$sgbd]['db'];
+
+        $sqls = $this->sqlQueries[$this->sgbds[$sgbd]['parameters']['engine']]['select'];
+        foreach ($sqls as $sql) {
+            $db->exec($sql);
+        }
+
+        static::assertFalse($db->hasErrors());
+        static::assertSame([], $db->getErrors());
+        static::assertNull($db->getLastError());
+
+        try {
+            $statement = $db->select('aaa');
+            static::assertNull($statement);
+            static::assertTrue($db->hasErrors());
+            static::assertCount(4, $db->getLastError());
+
+            $db->cleanErrors();
+
+            static::assertFalse($db->hasErrors());
+            static::assertSame([], $db->getErrors());
+            static::assertNull($db->getLastError());
+        } catch (DatabaseException $e) {
+            var_dump($db->getErrors());
+            throw $e;
+        }
+    }
+
+    // endregion
+
+    // region Database hasSaveQueries/getSavedQueries/cleanSavedQueries
+
+    /**
+     * @dataProvider sgbds
+     * @param string $sgbd
+     * @throws DatabaseException
+     */
+    public function testSaveQueries(string $sgbd): void
+    {
+        /** @var Database $db */
+        $db = $this->sgbds[$sgbd]['db'];
+
+        $sqls = $this->sqlQueries[$this->sgbds[$sgbd]['parameters']['engine']]['select'];
+        foreach ($sqls as $sql) {
+            $db->exec($sql);
+        }
+
+        try {
+            static::assertFalse($db->hasSaveQueries());
+
+            $db->enableSaveQueries();
+
+            static::assertTrue($db->hasSaveQueries());
+
+            $db->disableSaveQueries();
+
+            static::assertFalse($db->hasSaveQueries());
+
+            $db->enableSaveQueries();
+
+            static::assertTrue($db->hasSaveQueries());
+
+            static::assertSame([], $db->getSavedQueries());
+
+            $db->selectAll('SELECT * FROM test_select');
+
+            $queries = $db->getSavedQueries();
+
+            static::assertCount(1, $queries);
+
+            $db->cleanSavedQueries();
+
+            $queries = $db->getSavedQueries();
+
+            static::assertCount(0, $queries);
+        } catch (DatabaseException $e) {
+            var_dump($db->getErrors());
+            throw $e;
+        }
+    }
+
+    // endregion
+
     // region Database->useSqlFile
 
     /**
