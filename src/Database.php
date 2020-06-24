@@ -252,7 +252,10 @@ class Database
 
         $startTime = \microtime(true);
 
-        $this->executeStatement($statement);
+        $success = $this->executeStatement($statement);
+        if ($success === false) {
+            return null;
+        }
 
         $endTime = \microtime(true);
 
@@ -472,6 +475,9 @@ class Database
         $startTime = \microtime(true);
 
         $success = $this->executeStatement($statement);
+        if ($success === false) {
+            return false;
+        }
 
         $endTime = \microtime(true);
 
