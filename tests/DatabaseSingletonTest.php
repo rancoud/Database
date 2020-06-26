@@ -1,4 +1,6 @@
 <?php
+/** @noinspection PhpIllegalPsrClassPathInspection */
+/** @noinspection SqlDialectInspection */
 
 declare(strict_types=1);
 
@@ -14,10 +16,10 @@ use Rancoud\Database\DatabaseException;
  */
 class DatabaseSingletonTest extends TestCase
 {
-    /** @var Database */
-    protected $db;
+    /** @var Database|null */
+    protected ?Database $db;
 
-    protected $params = [
+    protected array $params = [
         'engine'       => 'mysql',
         'host'         => 'localhost',
         'user'         => 'root',
@@ -26,34 +28,43 @@ class DatabaseSingletonTest extends TestCase
         'report_error' => 'exception'
     ];
 
-    public function setUp()
+    /**
+     * @throws DatabaseException
+     */
+    public function setUp(): void
     {
         $databaseConf = new Configurator($this->params);
         $this->db = new Database($databaseConf);
     }
     
     /** @runInSeparateProcess  */
-    public function testSingletonEmptyConfiguratorException()
+    public function testSingletonEmptyConfiguratorException(): void
     {
-        static::expectException(DatabaseException::class);
-        static::expectExceptionMessage('Configurator Missing');
+        $this->expectException(DatabaseException::class);
+        $this->expectExceptionMessage('Configurator Missing');
 
         Database::getInstance();
     }
     
-    /** @runInSeparateProcess  */
-    public function testSingleton()
+    /**
+     * @runInSeparateProcess
+     * @throws DatabaseException
+     */
+    public function testSingleton(): void
     {
-        $db = Database::getInstance(new Configurator($this->params));
-
-        static::assertSame(get_class($db), 'Rancoud\Database\Database');
+        try {
+            Database::getInstance(new Configurator($this->params));
+            $this->expectNotToPerformAssertions();
+        } catch (DatabaseException $e) {
+            throw $e;
+        }
     }
 
     /** @runInSeparateProcess  */
-    public function testSingletonCallTwiceWithConfiguratorException()
+    public function testSingletonCallTwiceWithConfiguratorException(): void
     {
-        static::expectException(DatabaseException::class);
-        static::expectExceptionMessage('Configurator Already Setup');
+        $this->expectException(DatabaseException::class);
+        $this->expectExceptionMessage('Configurator Already Setup');
 
         Database::getInstance(new Configurator($this->params));
         Database::getInstance(new Configurator($this->params));

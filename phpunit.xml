@@ -1,12 +1,6 @@
 <phpunit bootstrap="./vendor/autoload.php">
-    <php>
-        <var name="db_dsn" value="mysql:dbname=test_database;host=localhost"/>
-        <var name="db_username" value="root"/>
-        <var name="db_password" value=""/>
-    </php>
-
     <testsuites>
-        <testsuite>
+        <testsuite name="unit">
             <directory>tests</directory>
         </testsuite>
     </testsuites>
