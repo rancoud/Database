@@ -1258,6 +1258,170 @@ class DatabaseTest extends TestCase
 
     // endregion
 
+    // region Database->Count
+
+    /**
+     * @dataProvider sgbds
+     * @param string $sgbd
+     * @throws DatabaseException
+     */
+    public function testCount(string $sgbd): void
+    {
+        /** @var Database $db */
+        $db = $this->sgbds[$sgbd]['db'];
+        $sqls = $this->sqlQueries[$this->sgbds[$sgbd]['parameters']['engine']]['select'];
+        foreach ($sqls as $sql) {
+            $db->exec($sql);
+        }
+
+        try {
+            static::assertSame(6, $db->count('SELECT COUNT(*) from test_select'));
+        } catch (DatabaseException $e) {
+            var_dump($db->getErrors());
+            throw $e;
+        }
+    }
+
+    /**
+     * @dataProvider sgbdsException
+     * @param string $sgbd
+     * @throws DatabaseException
+     */
+    public function testCountException(string $sgbd): void
+    {
+        /** @var Database $db */
+        $db = $this->sgbds[$sgbd]['db'];
+
+        $this->expectException(DatabaseException::class);
+
+        $db->count('aaa');
+    }
+
+    /**
+     * @dataProvider sgbdsSilent
+     * @param string $sgbd
+     * @throws DatabaseException
+     */
+    public function testCountError(string $sgbd): void
+    {
+        /** @var Database $db */
+        $db = $this->sgbds[$sgbd]['db'];
+
+        try {
+            $success = $db->count('aaa');
+            static::assertFalse($success);
+            static::assertTrue($db->hasErrors());
+        } catch (DatabaseException $e) {
+            var_dump($db->getErrors());
+            throw $e;
+        }
+    }
+
+    // endregion
+
+    // region Database Pdo Param
+
+    /**
+     * @dataProvider sgbds
+     * @param string $sgbd
+     * @throws DatabaseException
+     * @noinspection FopenBinaryUnsafeUsageInspection
+     */
+    public function testPdoParamType(string $sgbd): void
+    {
+        /** @var Database $db */
+        $db = $this->sgbds[$sgbd]['db'];
+
+        try {
+            if ($this->sgbds[$sgbd]['parameters']['engine'] !== 'pgsql') {
+                $sql = 'SELECT :true AS `true`, :false AS `false`, :null AS `null`, :float AS `float`,
+                :int AS `int`, :string AS `string`, :resource AS `resource`';
+                $params = [
+                    'true' => true,
+                    'false' => false,
+                    'null' => null,
+                    'float' => 1.2,
+                    'int' => 800,
+                    'string' => 'string',
+                    'resource' => fopen(__DIR__ . '/test-dump-mysql.sql', 'r')
+                ];
+
+                $row = $db->selectRow($sql, $params);
+
+                static::assertSame('1', $row['true']);
+                static::assertSame('0', $row['false']);
+                static::assertNull($row['null']);
+                static::assertSame('1.2', $row['float']);
+                static::assertSame('800', $row['int']);
+                static::assertSame('string', $row['string']);
+                static::assertSame('-- MySQL dump', mb_substr($row['resource'], 0, 13));
+            } else {
+                $sql = 'SELECT :true AS true, :false AS false, :null AS null, :float AS float,
+                :int AS int, :string AS string, :resource AS resource';
+                $params = [
+                    'true' => true,
+                    'false' => false,
+                    'null' => null,
+                    'float' => 1.2,
+                    'int' => 800,
+                    'string' => 'string',
+                    'resource' => fopen(__DIR__ . '/test-dump-mysql.sql', 'r')
+                ];
+                $row = $db->selectRow($sql, $params);
+
+                static::assertSame('t', $row['true']);
+                static::assertSame('f', $row['false']);
+                static::assertNull($row['null']);
+                static::assertSame('1.2', $row['float']);
+                static::assertSame('800', $row['int']);
+                static::assertSame('string', $row['string']);
+                static::assertSame('-- MySQL dump', mb_substr($row['resource'], 0, 13));
+            }
+        } catch (DatabaseException $e) {
+            var_dump($db->getErrors());
+            throw $e;
+        }
+    }
+
+    /**
+     * @dataProvider sgbdsException
+     * @param string $sgbd
+     * @throws DatabaseException
+     */
+    public function testPdoParamTypeException(string $sgbd): void
+    {
+        /** @var Database $db */
+        $db = $this->sgbds[$sgbd]['db'];
+
+        $this->expectException(DatabaseException::class);
+
+        $sql = 'SELECT :array AS array';
+        $params = ['array' => []];
+        $db->selectRow($sql, $params);
+    }
+
+    /**
+     * @dataProvider sgbdsSilent
+     * @param string $sgbd
+     * @throws DatabaseException
+     */
+    public function testPdoParamTypeError(string $sgbd): void
+    {
+        /** @var Database $db */
+        $db = $this->sgbds[$sgbd]['db'];
+
+        try {
+            $sql = 'SELECT :array AS array';
+            $params = ['array' => []];
+            static::assertFalse($db->selectRow($sql, $params));
+        } catch (DatabaseException $e) {
+            var_dump($db->getErrors());
+            throw $e;
+        }
+    }
+
+    // endregion
+
     // region Database startTransaction/commitTransaction/rollbackTransaction/completeTransaction
 
     /**
@@ -1265,7 +1429,7 @@ class DatabaseTest extends TestCase
      * @param string $sgbd
      * @throws DatabaseException
      */
-    public function testCompleteTransaction(string $sgbd): void
+    public function testCommitTransaction(string $sgbd): void
     {
         /** @var Database $db */
         $db = $this->sgbds[$sgbd]['db'];
@@ -1276,6 +1440,11 @@ class DatabaseTest extends TestCase
         }
 
         try {
+            static::assertFalse($db->completeTransaction());
+
+            $success = $db->commitTransaction();
+            static::assertFalse($success);
+
             $success = $db->startTransaction();
             static::assertTrue($success);
 
@@ -1283,7 +1452,7 @@ class DatabaseTest extends TestCase
             $params = ['name' => 'my name', 'id' => 1];
             $db->update($sql, $params);
 
-            $success = $db->completeTransaction();
+            $success = $db->commitTransaction();
             static::assertTrue($success);
         } catch (DatabaseException $e) {
             var_dump($db->getErrors());
@@ -1311,6 +1480,8 @@ class DatabaseTest extends TestCase
         }
 
         try {
+            static::assertFalse($db->rollbackTransaction());
+
             $success = $db->startTransaction();
             static::assertTrue($success);
 
@@ -1343,24 +1514,108 @@ class DatabaseTest extends TestCase
      * @param string $sgbd
      * @throws DatabaseException
      */
-    public function testInTransactionError(string $sgbd): void
+    public function testCompleteTransaction(string $sgbd): void
     {
         /** @var Database $db */
         $db = $this->sgbds[$sgbd]['db'];
 
+        $sqls = $this->sqlQueries[$this->sgbds[$sgbd]['parameters']['engine']]['select'];
+        foreach ($sqls as $sql) {
+            $db->exec($sql);
+        }
+
         try {
+            static::assertFalse($db->completeTransaction());
+
+            $success = $db->startTransaction();
+            static::assertTrue($success);
+
+            $sql = 'UPDATE test_select SET name = :name WHERE id =:id';
+            $params = ['name' => 'my name', 'id' => 1];
+            $db->update($sql, $params);
+
             $success = $db->completeTransaction();
+            static::assertTrue($success);
+        } catch (DatabaseException $e) {
+            var_dump($db->getErrors());
+            throw $e;
+        }
+
+        $sql = 'SELECT name FROM test_select WHERE id = :id';
+        $params = ['id' => 1];
+        static::assertSame('my name', $db->selectVar($sql, $params));
+    }
+
+    /**
+     * @dataProvider sgbdsSilent
+     * @param string $sgbd
+     * @throws DatabaseException
+     */
+    public function testCompleteTransactionAutoRollbackForSilent(string $sgbd): void
+    {
+        /** @var Database $db */
+        $db = $this->sgbds[$sgbd]['db'];
+
+        $sqls = $this->sqlQueries[$this->sgbds[$sgbd]['parameters']['engine']]['select'];
+        foreach ($sqls as $sql) {
+            $db->exec($sql);
+        }
+
+        try {
+            static::assertFalse($db->completeTransaction());
+
+            $success = $db->startTransaction();
+            static::assertTrue($success);
+
+            $sql = 'UPDATE test_select SET name = :name WHERE id =:id';
+            $params = ['name' => 'my name', 'id' => 1];
+            $db->update($sql, $params);
+
+            $success = $db->selectAll('aaa');
             static::assertFalse($success);
 
-            $success = $db->commitTransaction();
-            static::assertFalse($success);
-
-            $success = $db->rollbackTransaction();
+            $success = $db->completeTransaction();
             static::assertFalse($success);
         } catch (DatabaseException $e) {
             var_dump($db->getErrors());
             throw $e;
         }
+
+        $sql = 'SELECT name FROM test_select WHERE id = :id';
+        $params = ['id' => 1];
+        static::assertSame('A', $db->selectVar($sql, $params));
+    }
+
+    /**
+     * @dataProvider sgbds
+     * @param string $sgbd
+     */
+    public function testInTransactionError(string $sgbd): void
+    {
+        /** @var Database $db */
+        $db = $this->sgbds[$sgbd]['db'];
+
+        $success = $db->completeTransaction();
+        static::assertFalse($success);
+
+        $success = $db->commitTransaction();
+        static::assertFalse($success);
+
+        $success = $db->rollbackTransaction();
+        static::assertFalse($success);
+    }
+
+    /**
+     * @dataProvider sgbds
+     * @param string $sgbd
+     * @throws DatabaseException
+     */
+    public function testStartCommitAutoConnect(string $sgbd): void
+    {
+        $db = new Database(new Configurator($this->sgbds[$sgbd]['parameters']));
+        static::assertNull($db->getPdo());
+        static::assertTrue($db->startTransaction());
+        static::assertNotNull($db->getPdo());
     }
 
     // endregion

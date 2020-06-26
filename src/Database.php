@@ -138,14 +138,28 @@ class Database
             }
 
             if ($param === false) {
-                throw new DatabaseException('Error Bind Value');
+                $this->addErrorPrepare($sql, $parameters);
+                if ($this->configurator->hasThrowException()) {
+                    throw new DatabaseException('Error Bind Value');
+                }
+
+                return null;
             }
 
+            // @codeCoverageIgnoreStart
             try {
-                $statement->bindValue(":$key", $value, $param);
-            } catch (PDOException $e) {
-                throw new DatabaseException($e->getMessage());
+                $success = $statement->bindValue(":$key", $value, $param);
+                if ($success === false) {
+                    /* @noinspection ThrowRawExceptionInspection */
+                    throw new Exception('Error Bind Value');
+                }
+            } catch (Exception $e) {
+                $this->addErrorPrepare($sql, $parameters);
+                if ($this->configurator->hasThrowException()) {
+                    throw new DatabaseException('Error Bind Value');
+                }
             }
+            // @codeCoverageIgnoreEnd
         }
 
         return $statement;
@@ -166,7 +180,7 @@ class Database
             return PDO::PARAM_BOOL;
         }
 
-        if (null === $value) {
+        if ($value === null) {
             return PDO::PARAM_NULL;
         }
 
@@ -615,13 +629,10 @@ class Database
         return $this->pdo->beginTransaction();
     }
 
-    /**
-     * @throws DatabaseException
-     */
     public function completeTransaction(): bool
     {
         if ($this->pdo === null) {
-            $this->connect();
+            return false;
         }
 
         if ($this->pdo->inTransaction() === false) {
@@ -639,13 +650,10 @@ class Database
         return true;
     }
 
-    /**
-     * @throws DatabaseException
-     */
     public function commitTransaction(): bool
     {
         if ($this->pdo === null) {
-            $this->connect();
+            return false;
         }
 
         if ($this->pdo->inTransaction() === false) {
@@ -655,13 +663,10 @@ class Database
         return $this->pdo->commit();
     }
 
-    /**
-     * @throws DatabaseException
-     */
     public function rollbackTransaction(): bool
     {
         if ($this->pdo === null) {
-            $this->connect();
+            return false;
         }
 
         if ($this->pdo->inTransaction() === false) {
