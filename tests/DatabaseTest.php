@@ -87,18 +87,18 @@ class DatabaseTest extends TestCase
                 id INT UNSIGNED NOT NULL AUTO_INCREMENT,
                 name VARCHAR(255) NOT NULL,
                 PRIMARY KEY (id)
-            );',
+            ) DEFAULT CHARSET=utf8mb4;',
             'insert' => 'CREATE TABLE test_insert (
                 id INT UNSIGNED NOT NULL AUTO_INCREMENT,
                 name VARCHAR(255) NOT NULL,
                 PRIMARY KEY (id)
-            );',
+            ) DEFAULT CHARSET=utf8mb4;',
             'update' => [
                 'CREATE TABLE test_update (
                     id INT UNSIGNED NOT NULL AUTO_INCREMENT,
                     name VARCHAR(255) NOT NULL,
                     PRIMARY KEY (id)
-                );',
+                ) DEFAULT CHARSET=utf8mb4;',
                 "INSERT INTO test_update (name) VALUES ('A');",
                 "INSERT INTO test_update (name) VALUES ('B');",
                 "INSERT INTO test_update (name) VALUES ('C');",
@@ -108,7 +108,7 @@ class DatabaseTest extends TestCase
                     id INT UNSIGNED NOT NULL AUTO_INCREMENT,
                     name VARCHAR(255) NOT NULL,
                     PRIMARY KEY (id)
-                );',
+                ) DEFAULT CHARSET=utf8mb4;',
                 "INSERT INTO test_delete (name) VALUES ('A');",
                 "INSERT INTO test_delete (name) VALUES ('B');",
                 "INSERT INTO test_delete (name) VALUES ('C');",
@@ -133,7 +133,7 @@ class DatabaseTest extends TestCase
                     id INT UNSIGNED NOT NULL AUTO_INCREMENT,
                     name VARCHAR(255) NOT NULL,
                     PRIMARY KEY (id)
-                );',
+                ) DEFAULT CHARSET=utf8mb4;',
                 "INSERT INTO test_truncate1 (name) VALUES ('A');",
                 "INSERT INTO test_truncate1 (name) VALUES ('B');",
                 "INSERT INTO test_truncate1 (name) VALUES ('C');",
@@ -141,7 +141,7 @@ class DatabaseTest extends TestCase
                     id INT UNSIGNED NOT NULL AUTO_INCREMENT,
                     name VARCHAR(255) NOT NULL,
                     PRIMARY KEY (id)
-                );',
+                ) DEFAULT CHARSET=utf8mb4;',
                 "INSERT INTO test_truncate2 (name) VALUES ('A');",
                 "INSERT INTO test_truncate2 (name) VALUES ('B');",
                 "INSERT INTO test_truncate2 (name) VALUES ('C');",
