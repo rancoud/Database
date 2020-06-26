@@ -120,7 +120,7 @@ class DatabaseTest extends TestCase
                   `ranking` tinyint(1) unsigned NOT NULL,
                   `comment` text,
                   PRIMARY KEY (`id`)
-                ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;',
+                ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4;',
                 "INSERT INTO test_select (id, name, ranking, comment) VALUES (1, 'A', 0, NULL);",
                 "INSERT INTO test_select (id, name, ranking, comment) VALUES (2, 'B', 10, 'yes');",
                 "INSERT INTO test_select (id, name, ranking, comment) VALUES (3, 'C', 20, 'maybe');",
@@ -569,12 +569,14 @@ class DatabaseTest extends TestCase
             static::assertSame(1, $count);
 
             $sql = 'INSERT INTO test_insert (name) VALUES (:name)';
-            $params = ['name' => 'B'];
+            $params = ['name' => '💪'];
             $id = $db->insert($sql, $params);
             static::assertTrue($id);
 
-            $count = $db->count("SELECT COUNT(*) FROM test_insert WHERE name='B' AND id=2");
+            $count = $db->count("SELECT COUNT(*) FROM test_insert WHERE name='💪' AND id=2");
             static::assertSame(1, $count);
+
+            static::assertSame('💪', $db->selectVar("SELECT name FROM test_insert WHERE id=2"));
 
             $params = ['name' => 'C'];
             $getLastInsertId = true;

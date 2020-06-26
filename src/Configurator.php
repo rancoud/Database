@@ -40,7 +40,7 @@ class Configurator
     protected string $reportError = 'exception';
 
     /** @var string */
-    protected string $charset = 'utf8';
+    protected string $charset = 'utf8mb4';
 
     /** @var string[] */
     protected array $keySettings = [

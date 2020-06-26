@@ -445,7 +445,7 @@ class ConfiguratorTest extends TestCase
     /**
      * @throws DatabaseException
      */
-    public function testDefaultGetCharsetUtf8(): void
+    public function testDefaultGetCharsetUtf8mb4(): void
     {
         $params = [
             'engine'        => 'mysql',
@@ -458,7 +458,7 @@ class ConfiguratorTest extends TestCase
         try {
             $conf = new Configurator($params);
 
-            static::assertSame('utf8', $conf->getCharset());
+            static::assertSame('utf8mb4', $conf->getCharset());
         } catch (DatabaseException $e) {
             throw $e;
         }
@@ -651,7 +651,7 @@ class ConfiguratorTest extends TestCase
             $conf = new Configurator($params);
 
             $expected = [
-                PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8',
+                PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8mb4',
                 PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_PERSISTENT         => false
             ];
@@ -659,7 +659,7 @@ class ConfiguratorTest extends TestCase
 
             $conf->setReportError('silent');
             $expected = [
-                PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8',
+                PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8mb4',
                 PDO::ATTR_ERRMODE            => PDO::ERRMODE_SILENT,
                 PDO::ATTR_PERSISTENT         => false
             ];
