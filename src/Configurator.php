@@ -37,9 +37,6 @@ class Configurator
     protected bool $permanentConnection = false;
 
     /** @var string */
-    protected string $reportError = 'exception';
-
-    /** @var string */
     protected string $charset = 'utf8mb4';
 
     /** @var string[] */
@@ -51,7 +48,6 @@ class Configurator
         'database',
         'save_queries',
         'permanent_connection',
-        'report_error',
         'charset',
         'parameters'
     ];
@@ -105,8 +101,6 @@ class Configurator
 
     /**
      * @param array $settings
-     *
-     * @throws DatabaseException
      */
     protected function setOptionnalsParameters(array $settings): void
     {
@@ -116,10 +110,6 @@ class Configurator
 
         if (\array_key_exists('permanent_connection', $settings)) {
             $this->permanentConnection = (bool) $settings['permanent_connection'];
-        }
-
-        if (\array_key_exists('report_error', $settings)) {
-            $this->setReportError($settings['report_error']);
         }
 
         if (\array_key_exists('charset', $settings)) {
@@ -218,12 +208,7 @@ class Configurator
             $parameters[PDO::MYSQL_ATTR_INIT_COMMAND] = 'SET NAMES ' . $this->getCharset();
         }
 
-        if ($this->getReportError() === 'silent') {
-            $parameters[PDO::ATTR_ERRMODE] = PDO::ERRMODE_SILENT;
-        } elseif ($this->getReportError() === 'exception') {
-            $parameters[PDO::ATTR_ERRMODE] = PDO::ERRMODE_EXCEPTION;
-        }
-
+        $parameters[PDO::ATTR_ERRMODE] = PDO::ERRMODE_EXCEPTION;
         $parameters[PDO::ATTR_PERSISTENT] = $this->permanentConnection;
 
         return $parameters;
@@ -257,30 +242,6 @@ class Configurator
     public function disablePermanentConnection(): void
     {
         $this->permanentConnection = false;
-    }
-
-    public function getReportError(): string
-    {
-        return $this->reportError;
-    }
-
-    /**
-     * @param string $reportError
-     *
-     * @throws DatabaseException
-     */
-    public function setReportError(string $reportError): void
-    {
-        if (!\in_array($reportError, ['silent', 'exception'], true)) {
-            throw new DatabaseException('The report error "' . $reportError . '" is incorrect. (silent , exception)');
-        }
-
-        $this->reportError = $reportError;
-    }
-
-    public function hasThrowException(): bool
-    {
-        return $this->reportError === 'exception';
     }
 
     public function getCharset(): string

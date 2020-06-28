@@ -79,23 +79,6 @@ class ConfiguratorTest extends TestCase
         new Configurator($params);
     }
 
-    public function testConstructReportErrorException(): void
-    {
-        $this->expectException(DatabaseException::class);
-        $this->expectExceptionMessage('The report error "report_error" is incorrect. (silent , exception)');
-        
-        $params = [
-            'engine'        => 'mysql',
-            'host'          => 'localhost',
-            'user'          => 'root',
-            'password'      => '',
-            'database'      => 'test_database',
-            'report_error'  => 'report_error'
-        ];
-
-        new Configurator($params);
-    }
-
     /**
      * @throws DatabaseException
      * @noinspection PhpUndefinedClassInspection
@@ -374,77 +357,6 @@ class ConfiguratorTest extends TestCase
     /**
      * @throws DatabaseException
      */
-    public function testDefaultReportErrorException(): void
-    {
-        $params = [
-            'engine'        => 'mysql',
-            'host'          => 'localhost',
-            'user'          => 'root',
-            'password'      => '',
-            'database'      => 'test_database'
-        ];
-
-        try {
-            $conf = new Configurator($params);
-
-            static::assertSame('exception', $conf->getReportError());
-        } catch (DatabaseException $e) {
-            throw $e;
-        }
-    }
-
-    /**
-     * @throws DatabaseException
-     */
-    public function testReportError(): void
-    {
-        $params = [
-            'engine'        => 'mysql',
-            'host'          => 'localhost',
-            'user'          => 'root',
-            'password'      => '',
-            'database'      => 'test_database',
-            'report_error'  => 'silent'
-        ];
-
-        try {
-            $conf = new Configurator($params);
-
-            static::assertSame('silent', $conf->getReportError());
-
-            static::assertFalse($conf->hasThrowException());
-
-            $conf->setReportError('exception');
-
-            static::assertSame('exception', $conf->getReportError());
-
-            static::assertTrue($conf->hasThrowException());
-        } catch (DatabaseException $e) {
-            throw $e;
-        }
-    }
-
-    public function testSetReportErrorException(): void
-    {
-        $this->expectException(DatabaseException::class);
-        $this->expectExceptionMessage('The report error "report_error" is incorrect. (silent , exception)');
-
-        $params = [
-            'engine'        => 'mysql',
-            'host'          => 'localhost',
-            'user'          => 'root',
-            'password'      => '',
-            'database'      => 'test_database',
-        ];
-
-        $conf = new Configurator($params);
-
-        $conf->setReportError('report_error');
-    }
-
-    /**
-     * @throws DatabaseException
-     */
     public function testDefaultGetCharsetUtf8mb4(): void
     {
         $params = [
@@ -657,18 +569,10 @@ class ConfiguratorTest extends TestCase
             ];
             static::assertSame($expected, $conf->getParametersForPDO());
 
-            $conf->setReportError('silent');
-            $expected = [
-                PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8mb4',
-                PDO::ATTR_ERRMODE            => PDO::ERRMODE_SILENT,
-                PDO::ATTR_PERSISTENT         => false
-            ];
-            static::assertSame($expected, $conf->getParametersForPDO());
-
             $conf->setCharset('charset');
             $expected = [
                 PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES charset',
-                PDO::ATTR_ERRMODE            => PDO::ERRMODE_SILENT,
+                PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_PERSISTENT         => false
             ];
             static::assertSame($expected, $conf->getParametersForPDO());
@@ -676,7 +580,7 @@ class ConfiguratorTest extends TestCase
             $conf->enablePermanentConnection();
             $expected = [
                 PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES charset',
-                PDO::ATTR_ERRMODE            => PDO::ERRMODE_SILENT,
+                PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_PERSISTENT         => true
             ];
             static::assertSame($expected, $conf->getParametersForPDO());
@@ -707,23 +611,16 @@ class ConfiguratorTest extends TestCase
             ];
             static::assertSame($expected, $conf->getParametersForPDO());
 
-            $conf->setReportError('silent');
-            $expected = [
-                PDO::ATTR_ERRMODE    => PDO::ERRMODE_SILENT,
-                PDO::ATTR_PERSISTENT => false
-            ];
-            static::assertSame($expected, $conf->getParametersForPDO());
-
             $conf->setCharset('charset');
             $expected = [
-                PDO::ATTR_ERRMODE    => PDO::ERRMODE_SILENT,
+                PDO::ATTR_ERRMODE    => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_PERSISTENT => false
             ];
             static::assertSame($expected, $conf->getParametersForPDO());
 
             $conf->enablePermanentConnection();
             $expected = [
-                PDO::ATTR_ERRMODE    => PDO::ERRMODE_SILENT,
+                PDO::ATTR_ERRMODE    => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_PERSISTENT => true
             ];
             static::assertSame($expected, $conf->getParametersForPDO());
@@ -754,23 +651,16 @@ class ConfiguratorTest extends TestCase
             ];
             static::assertSame($expected, $conf->getParametersForPDO());
 
-            $conf->setReportError('silent');
-            $expected = [
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_SILENT,
-                PDO::ATTR_PERSISTENT => false
-            ];
-            static::assertSame($expected, $conf->getParametersForPDO());
-
             $conf->setCharset('charset');
             $expected = [
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_SILENT,
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_PERSISTENT => false
             ];
             static::assertSame($expected, $conf->getParametersForPDO());
 
             $conf->enablePermanentConnection();
             $expected = [
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_SILENT,
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_PERSISTENT => true
             ];
             static::assertSame($expected, $conf->getParametersForPDO());
@@ -828,8 +718,7 @@ class ConfiguratorTest extends TestCase
             'host'          => '127.0.0.1',
             'user'          => 'root',
             'password'      => '',
-            'database'      => 'test_database',
-            'report_error'  => 'silent'
+            'database'      => 'test_database'
         ];
 
         try {
@@ -891,8 +780,7 @@ class ConfiguratorTest extends TestCase
             'host'          => '127.0.0.1',
             'user'          => 'postgres',
             'password'      => '',
-            'database'      => 'test_database',
-            'report_error'  => 'silent'
+            'database'      => 'test_database'
         ];
 
         try {
