@@ -159,6 +159,7 @@ $countRowAffected = $database->delete("DELETE FROM users WHERE id = 4", [], true
 ```
 
 ## Transactions
+Nested transactions are supported for MySQL / PostgreSQL / SQLite.  
 ```php
 $database->startTransaction();
 
@@ -209,7 +210,6 @@ Here it's the description of the array passed to the construct
 * getUser(): string  
 * hasPermanentConnection(): bool  
 * hasSaveQueries(): bool  
-* hasThrowException(): bool  
 * setCharset(charset: string): void  
 * setDatabase(database: string): void  
 * setEngine(engine: string): void  
@@ -228,24 +228,24 @@ Here it's the description of the array passed to the construct
 | configurator | Configurator | Database configuration |
 
 ### General Commands  
-* selectAll(sql: string, [parameters: array = []]): array|bool  
-* selectRow(sql: string, [parameters: array = []]): array|bool  
-* selectCol(sql: string, [parameters: array = []]): array|bool  
-* selectVar(sql: string, [parameters: array = []]): mixed|bool  
-* insert(sql: string, [parameters: array = []], [getLastInsertId: bool = false]): int|bool  
-* update(sql: string, [parameters: array = []], [getCountRowAffected: bool = false]): int|bool  
-* delete(sql: string, [parameters: array = []], [getCountRowAffected: bool = false]): int|bool  
-* count(sql: string, [parameters: array = []]): int|bool  
-* exec(sql: string, [parameters: array = []]): bool  
-* select(sql: string, [parameters: array = []]): ?PDOStatement  
+* selectAll(sql: string, [parameters: array = []]): array  
+* selectRow(sql: string, [parameters: array = []]): array  
+* selectCol(sql: string, [parameters: array = []]): array  
+* selectVar(sql: string, [parameters: array = []]): mixed  
+* insert(sql: string, [parameters: array = []], [getLastInsertId: bool = false]): ?int  
+* update(sql: string, [parameters: array = []], [getCountRowAffected: bool = false]): ?int  
+* delete(sql: string, [parameters: array = []], [getCountRowAffected: bool = false]): ?int  
+* count(sql: string, [parameters: array = []]): ?int  
+* exec(sql: string, [parameters: array = []]): void  
+* select(sql: string, [parameters: array = []]): PDOStatement  
 * read(statement: PDOStatement, [fetchType: int = PDO::FETCH_ASSOC]): mixed  
 * readAll(statement: PDOStatement, [fetchType: int = PDO::FETCH_ASSOC]): array  
 
 ### Transactions
-* startTransaction(): bool  
-* completeTransaction(): bool  
-* commitTransaction(): bool  
-* rollbackTransaction(): bool  
+* startTransaction(): void  
+* completeTransaction(): void  
+* commitTransaction(): void  
+* rollbackTransaction(): void  
 
 ### Errors
 * hasErrors(): bool  
@@ -261,12 +261,12 @@ Here it's the description of the array passed to the construct
 * getSavedQueries(): array  
 
 ### Specific Commands
-* truncateTables(...tables: string): bool  
-* dropTables(...tables: string): bool  
-* useSqlFile(filepath: string): bool  
+* truncateTables(...tables: string): void  
+* dropTables(...tables: string): void  
+* useSqlFile(filepath: string): void  
 
 ### Low Level
-* connect(): bool  
+* connect(): void  
 * disconnect(): void  
 * getPdo(): ?PDO  
 

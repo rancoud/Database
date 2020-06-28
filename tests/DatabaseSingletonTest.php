@@ -24,8 +24,7 @@ class DatabaseSingletonTest extends TestCase
         'host'         => 'localhost',
         'user'         => 'root',
         'password'     => '',
-        'database'     => 'test_database',
-        'report_error' => 'exception'
+        'database'     => 'test_database'
     ];
 
     /**

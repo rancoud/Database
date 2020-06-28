@@ -6,7 +6,6 @@ namespace Rancoud\Database;
 
 use Exception;
 use PDO;
-use PDOException;
 use PDOStatement;
 
 /**
@@ -14,30 +13,26 @@ use PDOStatement;
  */
 class Database
 {
-    /**
-     * @var Configurator|null
-     */
+    /** @var Configurator|null */
     protected ?Configurator $configurator = null;
 
-    /**
-     * @var PDO|null
-     */
+    /** @var PDO|null */
     protected ?PDO $pdo = null;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected array $errors = [];
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected array $savedQueries = [];
 
-    /**
-     * @var Database|null
-     */
+    /** @var Database|null */
     protected static ?Database $instance = null;
+
+    /** @var string[] */
+    protected array $nestedTransactionsEngineSupported = ['mysql', 'pgsql', 'sqlite'];
+
+    /** @var int */
+    protected int $transactionDepth = 0;
 
     /**
      * Database constructor.
@@ -70,10 +65,15 @@ class Database
         return static::$instance;
     }
 
+    public function isNestedTransactionSupported(): bool
+    {
+        return \in_array($this->configurator->getEngine(), $this->nestedTransactionsEngineSupported, true);
+    }
+
     /**
      * @throws DatabaseException
      */
-    public function connect(): bool
+    public function connect(): void
     {
         try {
             $startTime = \microtime(true);
@@ -85,17 +85,15 @@ class Database
             if ($this->configurator->hasSaveQueries()) {
                 $this->savedQueries[] = ['Connection' => $this->getTime($startTime, $endTime)];
             }
+
+            if ($this->pdo === null) {
+                /* @noinspection ThrowRawExceptionInspection */
+                throw new Exception('Error Connecting Database');
+            }
         } catch (Exception $e) {
             $this->addErrorConnection($e);
-
-            if ($this->configurator->hasThrowException()) {
-                throw new DatabaseException('Error Connecting Database');
-            }
-
-            return false;
+            throw new DatabaseException('Error Connecting Database');
         }
-
-        return true;
     }
 
     /**
@@ -106,13 +104,11 @@ class Database
      *
      * @return PDOStatement
      */
-    protected function prepareBind(string $sql, array $parameters = []): ?PDOStatement
+    protected function prepareBind(string $sql, array $parameters = []): PDOStatement
     {
         if ($this->pdo === null) {
             $this->connect();
         }
-
-        $statement = null;
 
         try {
             $statement = $this->pdo->prepare($sql);
@@ -122,13 +118,7 @@ class Database
             }
         } catch (Exception $e) {
             $this->addErrorPrepare($sql, $parameters);
-            if ($this->configurator->hasThrowException()) {
-                throw new DatabaseException('Error Prepare Statement');
-            }
-        }
-
-        if ($statement === false) {
-            return null;
+            throw new DatabaseException('Error Prepare Statement');
         }
 
         foreach ($parameters as $key => $value) {
@@ -139,25 +129,19 @@ class Database
 
             if ($param === false) {
                 $this->addErrorPrepare($sql, $parameters);
-                if ($this->configurator->hasThrowException()) {
-                    throw new DatabaseException('Error Bind Value');
-                }
-
-                return null;
+                throw new DatabaseException('Error Bind Value');
             }
 
-            // @codeCoverageIgnoreStart
             try {
                 $success = $statement->bindValue(":$key", $value, $param);
                 if ($success === false) {
                     /* @noinspection ThrowRawExceptionInspection */
                     throw new Exception('Error Bind Value');
                 }
+                // @codeCoverageIgnoreStart
             } catch (Exception $e) {
                 $this->addErrorPrepare($sql, $parameters);
-                if ($this->configurator->hasThrowException()) {
-                    throw new DatabaseException('Error Bind Value');
-                }
+                throw new DatabaseException('Error Bind Value');
             }
             // @codeCoverageIgnoreEnd
         }
@@ -254,22 +238,15 @@ class Database
      *
      * @throws DatabaseException
      *
-     * @return PDOStatement|null
+     * @return PDOStatement
      */
-    public function select(string $sql, array $parameters = []): ?PDOStatement
+    public function select(string $sql, array $parameters = []): PDOStatement
     {
         $statement = $this->prepareBind($sql, $parameters);
 
-        if ($statement === null) {
-            return null;
-        }
-
         $startTime = \microtime(true);
 
-        $success = $this->executeStatement($statement);
-        if ($success === false) {
-            return null;
-        }
+        $this->executeStatement($statement);
 
         $endTime = \microtime(true);
 
@@ -282,13 +259,9 @@ class Database
      * @param PDOStatement $statement
      *
      * @throws DatabaseException
-     *
-     * @return bool
      */
-    protected function executeStatement(PDOStatement $statement): bool
+    protected function executeStatement(PDOStatement $statement): void
     {
-        $success = false;
-
         try {
             $success = $statement->execute();
             if ($success === false) {
@@ -297,12 +270,8 @@ class Database
             }
         } catch (Exception $e) {
             $this->addErrorStatement($statement);
-            if ($this->configurator->hasThrowException()) {
-                throw new DatabaseException('Error Execute');
-            }
+            throw new DatabaseException('Error Execute');
         }
-
-        return $success;
     }
 
     /**
@@ -334,28 +303,21 @@ class Database
      *
      * @throws DatabaseException
      *
-     * @return int|bool
+     * @return int|null
      */
-    public function insert(string $sql, array $parameters = [], bool $getLastInsertId = false)
+    public function insert(string $sql, array $parameters = [], bool $getLastInsertId = false): ?int
     {
         $statement = $this->prepareBind($sql, $parameters);
 
-        if ($statement === null) {
-            return false;
-        }
-
         $startTime = \microtime(true);
 
-        $success = $this->executeStatement($statement);
-        if ($success === false) {
-            return false;
-        }
+        $this->executeStatement($statement);
 
         $endTime = \microtime(true);
 
         $this->addQuery($statement, $parameters, $this->getTime($startTime, $endTime));
 
-        $lastInsertId = true;
+        $lastInsertId = null;
         if ($getLastInsertId === true) {
             $lastInsertId = (int) $this->pdo->lastInsertId();
         }
@@ -373,28 +335,21 @@ class Database
      *
      * @throws DatabaseException
      *
-     * @return int|bool
+     * @return int|null
      */
-    public function update(string $sql, array $parameters = [], bool $getCountRowsAffected = false)
+    public function update(string $sql, array $parameters = [], bool $getCountRowsAffected = false): ?int
     {
         $statement = $this->prepareBind($sql, $parameters);
 
-        if ($statement === null) {
-            return false;
-        }
-
         $startTime = \microtime(true);
 
-        $success = $this->executeStatement($statement);
-        if ($success === false) {
-            return false;
-        }
+        $this->executeStatement($statement);
 
         $endTime = \microtime(true);
 
         $this->addQuery($statement, $parameters, $this->getTime($startTime, $endTime));
 
-        $countRowAffected = true;
+        $countRowAffected = null;
         if ($getCountRowsAffected) {
             $countRowAffected = (int) $statement->rowCount();
         }
@@ -412,28 +367,21 @@ class Database
      *
      * @throws DatabaseException
      *
-     * @return int|bool
+     * @return int|null
      */
-    public function delete(string $sql, array $parameters = [], bool $getCountRowsAffected = false)
+    public function delete(string $sql, array $parameters = [], bool $getCountRowsAffected = false): ?int
     {
         $statement = $this->prepareBind($sql, $parameters);
 
-        if ($statement === null) {
-            return false;
-        }
-
         $startTime = \microtime(true);
 
-        $success = $this->executeStatement($statement);
-        if ($success === false) {
-            return false;
-        }
+        $this->executeStatement($statement);
 
         $endTime = \microtime(true);
 
         $this->addQuery($statement, $parameters, $this->getTime($startTime, $endTime));
 
-        $countRowAffected = true;
+        $countRowAffected = null;
         if ($getCountRowsAffected) {
             $countRowAffected = (int) $statement->rowCount();
         }
@@ -450,15 +398,11 @@ class Database
      *
      * @throws DatabaseException
      *
-     * @return int|bool
+     * @return int|null
      */
-    public function count(string $sql, array $parameters = [])
+    public function count(string $sql, array $parameters = []): ?int
     {
         $statement = $this->select($sql, $parameters);
-
-        if ($statement === null) {
-            return false;
-        }
 
         $cursor = $statement->fetch(PDO::FETCH_ASSOC);
 
@@ -475,23 +419,14 @@ class Database
      * @param array  $parameters
      *
      * @throws DatabaseException
-     *
-     * @return bool
      */
-    public function exec(string $sql, array $parameters = []): bool
+    public function exec(string $sql, array $parameters = []): void
     {
         $statement = $this->prepareBind($sql, $parameters);
 
-        if ($statement === null) {
-            return false;
-        }
-
         $startTime = \microtime(true);
 
-        $success = $this->executeStatement($statement);
-        if ($success === false) {
-            return false;
-        }
+        $this->executeStatement($statement);
 
         $endTime = \microtime(true);
 
@@ -499,8 +434,6 @@ class Database
 
         $statement->closeCursor();
         $statement = null;
-
-        return $success;
     }
 
     public function getPdo(): ?PDO
@@ -514,15 +447,11 @@ class Database
      *
      * @throws DatabaseException
      *
-     * @return array|bool
+     * @return array
      */
-    public function selectAll(string $sql, array $parameters = [])
+    public function selectAll(string $sql, array $parameters = []): array
     {
         $statement = $this->select($sql, $parameters);
-
-        if ($statement === null) {
-            return false;
-        }
 
         $results = $this->readAll($statement);
 
@@ -538,15 +467,11 @@ class Database
      *
      * @throws DatabaseException
      *
-     * @return array|bool
+     * @return array
      */
-    public function selectRow($sql, array $parameters = [])
+    public function selectRow($sql, array $parameters = []): array
     {
         $statement = $this->select($sql, $parameters);
-
-        if ($statement === null) {
-            return false;
-        }
 
         $row = $this->read($statement);
         if ($row === false) {
@@ -565,15 +490,11 @@ class Database
      *
      * @throws DatabaseException
      *
-     * @return array|bool
+     * @return array
      */
-    public function selectCol(string $sql, array $parameters = [])
+    public function selectCol(string $sql, array $parameters = []): array
     {
         $statement = $this->select($sql, $parameters);
-
-        if ($statement === null) {
-            return false;
-        }
 
         $datas = $this->readAll($statement);
         $col = [];
@@ -593,20 +514,16 @@ class Database
      *
      * @throws DatabaseException
      *
-     * @return mixed|bool
+     * @return mixed
      */
     public function selectVar(string $sql, array $parameters = [])
     {
-        $var = false;
-
         $statement = $this->select($sql, $parameters);
 
-        if ($statement === null) {
-            return false;
-        }
-
         $row = $this->read($statement);
-        if ($row !== false) {
+        if ($row === false) {
+            $var = false;
+        } else {
             $var = \current($row);
         }
 
@@ -618,62 +535,95 @@ class Database
 
     /**
      * @throws DatabaseException
-     * @throws PDOException
      */
-    public function startTransaction(): bool
+    public function startTransaction(): void
     {
         if ($this->pdo === null) {
             $this->connect();
         }
 
-        return $this->pdo->beginTransaction();
+        try {
+            if ($this->transactionDepth === 0 || $this->isNestedTransactionSupported() === false) {
+                if ($this->pdo->beginTransaction() === false) {
+                    /* @noinspection ThrowRawExceptionInspection */
+                    throw new Exception('Error Begin Transaction');
+                }
+            } else {
+                $this->exec('SAVEPOINT LEVEL' . $this->transactionDepth);
+            }
+
+            ++$this->transactionDepth;
+            // @codeCoverageIgnoreStart
+        } catch (Exception $e) {
+            throw new DatabaseException('Error Begin Transaction');
+        }
+        // @codeCoverageIgnoreEnd
     }
 
-    public function completeTransaction(): bool
+    /**
+     * @throws DatabaseException
+     */
+    public function completeTransaction(): void
     {
-        if ($this->pdo === null) {
-            return false;
-        }
-
-        if ($this->pdo->inTransaction() === false) {
-            return false;
-        }
-
         if ($this->hasErrors()) {
-            $this->pdo->rollBack();
-
-            return false;
+            $this->rollbackTransaction();
+        } else {
+            $this->commitTransaction();
         }
-
-        $this->pdo->commit();
-
-        return true;
     }
 
-    public function commitTransaction(): bool
+    /**
+     * @throws DatabaseException
+     */
+    public function commitTransaction(): void
     {
-        if ($this->pdo === null) {
-            return false;
+        if ($this->pdo === null || $this->transactionDepth === 0 || $this->pdo->inTransaction() === false) {
+            throw new DatabaseException('Error No Transaction started');
         }
 
-        if ($this->pdo->inTransaction() === false) {
-            return false;
-        }
+        try {
+            --$this->transactionDepth;
 
-        return $this->pdo->commit();
+            if ($this->transactionDepth === 0 || $this->isNestedTransactionSupported() === false) {
+                if ($this->pdo->commit() === false) {
+                    /* @noinspection ThrowRawExceptionInspection */
+                    throw new Exception('Error Commit Transaction');
+                }
+            } else {
+                $this->exec('RELEASE SAVEPOINT LEVEL' . $this->transactionDepth);
+            }
+            // @codeCoverageIgnoreStart
+        } catch (Exception $e) {
+            throw new DatabaseException('Error Commit Transaction');
+        }
+        // @codeCoverageIgnoreEnd
     }
 
-    public function rollbackTransaction(): bool
+    /**
+     * @throws DatabaseException
+     */
+    public function rollbackTransaction(): void
     {
-        if ($this->pdo === null) {
-            return false;
+        if ($this->pdo === null || $this->transactionDepth === 0 || $this->pdo->inTransaction() === false) {
+            throw new DatabaseException('Error No Transaction started');
         }
 
-        if ($this->pdo->inTransaction() === false) {
-            return false;
-        }
+        try {
+            --$this->transactionDepth;
 
-        return $this->pdo->rollBack();
+            if ($this->transactionDepth === 0 || $this->isNestedTransactionSupported() === false) {
+                if ($this->pdo->rollBack() === false) {
+                    /* @noinspection ThrowRawExceptionInspection */
+                    throw new Exception('Error Rollback Transaction');
+                }
+            } else {
+                $this->exec('ROLLBACK TO SAVEPOINT LEVEL' . $this->transactionDepth);
+            }
+            // @codeCoverageIgnoreStart
+        } catch (Exception $e) {
+            throw new DatabaseException('Error Rollback Transaction');
+        }
+        // @codeCoverageIgnoreEnd
     }
 
     public function hasErrors(): bool
@@ -727,15 +677,14 @@ class Database
     }
 
     /**
-     * @param array $tables
+     * @param string $tableMandatory
+     * @param array  $tables
      *
      * @throws DatabaseException
-     *
-     * @return bool
      */
-    public function truncateTables(string ...$tables): bool
+    public function truncateTables(string $tableMandatory, string ...$tables): void
     {
-        $success = true;
+        \array_unshift($tables, $tableMandatory);
 
         foreach ($tables as $table) {
             $sql = 'TRUNCATE TABLE ' . $table;
@@ -743,54 +692,42 @@ class Database
                 $sql = 'DELETE FROM ' . $table;
             }
 
-            $success = $this->exec($sql);
-            if ($success === false) {
-                break;
-            }
+            $this->exec($sql);
         }
-
-        return $success;
     }
 
     /**
-     * @param array $tables
+     * @param string $tableMandatory
+     * @param array  $tables
      *
      * @throws DatabaseException
-     *
-     * @return bool
      */
-    public function dropTables(string ...$tables): bool
+    public function dropTables(string $tableMandatory, string ...$tables): void
     {
-        $success = true;
+        \array_unshift($tables, $tableMandatory);
 
         if ($this->configurator->getEngine() === 'sqlite') {
             foreach ($tables as $table) {
                 $sql = 'DROP TABLE IF EXISTS ' . $table;
-                $success = $this->exec($sql);
-                if ($success === false) {
-                    break;
-                }
+                $this->exec($sql);
             }
 
-            return $success;
+            return;
         }
 
+        /** @noinspection CallableParameterUseCaseInTypeContextInspection */
         $tables = \implode(',', $tables);
 
         $sql = 'DROP TABLE IF EXISTS ' . $tables;
-        $success = $this->exec($sql);
-
-        return $success;
+        $this->exec($sql);
     }
 
     /**
      * @param string $filepath
      *
      * @throws DatabaseException
-     *
-     * @return bool
      */
-    public function useSqlFile(string $filepath): bool
+    public function useSqlFile(string $filepath): void
     {
         if (!\file_exists($filepath)) {
             throw new DatabaseException('File missing for useSqlFile method: ' . $filepath);
@@ -806,15 +743,13 @@ class Database
                     continue;
                 }
 
-                if (!$this->exec($sqlFileQuery)) {
-                    return false;
-                }
+                $this->exec($sqlFileQuery);
             }
 
-            return true;
+            return;
         }
 
-        return $this->exec($sqlFile);
+        $this->exec($sqlFile);
     }
 
     protected function getTime(float $startTime, float $endTime): float
