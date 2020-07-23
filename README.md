@@ -8,7 +8,7 @@
 [![Codecov](https://img.shields.io/codecov/c/github/rancoud/database?logo=codecov)](https://codecov.io/gh/rancoud/database)
 [![composer.lock](https://poser.pugx.org/rancoud/database/composerlock)](https://packagist.org/packages/rancoud/database)
 
-Request Database (use PDO), tested with MySQL / PostgreSQL / SQLite.  
+Request Database (use PDO), tested with MySQL / PostgreSQL / SQLite.
 
 ## Installation
 ```php
@@ -20,7 +20,7 @@ composer require rancoud/database
 ```php
 // Create a configurator
 $params = [
-    'engine'    => 'mysql',
+    'driver'    => 'mysql',
     'host'      => 'localhost',
     'user'      => 'root',
     'password'  => '',
@@ -36,7 +36,7 @@ $singletonDatabase = Database::getInstance($databaseConf);
 ```
 
 ## Examples
-For example we have a table `users` with this schema:  
+For example we have a table `users` with this schema:
 
 | Field | Type | Options |
 | --- | --- | --- |
@@ -44,7 +44,7 @@ For example we have a table `users` with this schema:
 | username | varchar(255) |  |
 | ranking | int(8) |  |
 
-In the table we have thoses datas:  
+In the table we have these data:
 
 | id | username | ranking |
 | --- | --- | --- |
@@ -52,11 +52,11 @@ In the table we have thoses datas:
 | 2 | alison | 30 |
 | 3 | swifts | 20 |
 
-### Selects
-The output is always an associative array.  
+### Select methods
+The output is always an array.
 
 #### SelectAll
-Return all rows  
+Return all rows
 ```php
 $results = $database->selectAll("SELECT * FROM users");
 
@@ -69,7 +69,7 @@ $results = $database->selectAll("SELECT * FROM users");
 ```
 
 #### SelectRow
-Return only the first row  
+Return only the first row
 ```php
 $results = $database->selectRow("SELECT * FROM users");
 
@@ -78,7 +78,7 @@ $results = $database->selectRow("SELECT * FROM users");
 ```
 
 #### SelectCol
-Return only the column  
+Return only the first column
 ```php
 $results = $database->selectCol("SELECT username FROM users");
 
@@ -91,7 +91,7 @@ $results = $database->selectCol("SELECT username FROM users");
 ```
 
 #### SelectVar
-Return only the field  
+Return only the first value of first line
 ```php
 $results = $database->selectVar("SELECT username FROM users WHERE id = 3");
 
@@ -100,7 +100,7 @@ $results = $database->selectVar("SELECT username FROM users WHERE id = 3");
 ```
 
 #### Select + (Read OR ReadAll)
-Having the statement and use read for getting row by row or readAll for all data.  
+Having the statement and use read to get row by row or readAll for all data.
 Useful when you want to use a specific fetch mode.
 ```php
 $statement = $database->select("SELECT * FROM users");
@@ -121,7 +121,7 @@ $rows = $database->readAll($statement);
 ```
 
 #### Count
-Return only the value when using `SELECT COUNT(*) FROM ...`.  
+Return only the value when using `SELECT COUNT(*) FROM ...`.
 ```php
 $count = $database->count("SELECT COUNT(*) FROM users");
 
@@ -131,7 +131,7 @@ $count = $database->count("SELECT COUNT(*) FROM users");
 
 ## Insert
 ```php
-// insert with parameters and getting last insert id
+// insert with parameters and get last insert id
 $params = ['username' => 'adam', 'ranking' => 100];
 $lastInsertId = $database->insert("INSERT INTO users (username, ranking) VALUES (:username, :ranking)", $params, true);
 
@@ -141,9 +141,9 @@ $lastInsertId = $database->insert("INSERT INTO users (username, ranking) VALUES 
 
 ## Update
 ```php
-// update with parameters and getting count row affected
+// update with parameters and get the number of affected rows
 $params = ['username' => 'adam', 'id' => 4];
-$countRowAffected = $database->update("UPDATE users SET username = :username WHERE id = :id", $params, true);
+$affectedRowsCount = $database->update("UPDATE users SET username = :username WHERE id = :id", $params, true);
 
 // Output be like
 1
@@ -151,15 +151,16 @@ $countRowAffected = $database->update("UPDATE users SET username = :username WHE
 
 ## Delete
 ```php
-// delete with parameters and getting count row affected
-$countRowAffected = $database->delete("DELETE FROM users WHERE id = 4", [], true);
+// delete with parameters and get the number of affected rows
+$params = ['id' => 4];
+$affectedRowsCount = $database->delete("DELETE FROM users WHERE id = :id", $params, true);
 
 // Output be like
 1
 ```
 
 ## Transactions
-Nested transactions are supported for MySQL / PostgreSQL / SQLite.  
+Nested transactions are supported for MySQL / PostgreSQL / SQLite.
 ```php
 $database->startTransaction();
 
@@ -172,53 +173,50 @@ if (isOk()) {
 
 ## Configurator
 ### Constructor Settings
-Here it's the description of the array passed to the construct  
+Here is the description of the array passed to the construct
 
-#### Mandatory
-| Parameter | Type | Description |
+#### Mandatory keys
+| Parameter | Type of the associated value | Description |
 | --- | --- | --- |
-| engine | string | engine of the database, it will be check with PDO::getAvailableDrivers |
-| host | string | hostname of the database |
+| driver | string | driver of the database, it will be check with PDO::getAvailableDrivers |
+| host | string | hostname of the database (port number may be included, e.g `example.org:5342`) |
 | user | string | user used to connect to the database |
 | password | string | password used to connect to the database |
 | database | string | name of the database |
 
-#### Optionnals
-| Parameter | Type | Default value | Description |
+#### Optional keys
+| Parameter | Type of the associated value | Default value | Description |
 | --- | --- | --- | --- |
 | save_queries | bool | true | all queries will be saved in memory with execution time and the connection time |
-| permanent_connection | bool | false | use permanent connection |
-| report_error | string | 'exception' | how PDO react with errors; values used: silent \| exception |
-| charset | string | 'utf8mb4' | set specific database charset |
+| persistent_connection | bool | false | use persistent connection |
+| charset | string | it depends on the driver | set specific database charset |
 | parameters | array | [] | extra parameters used by PDO on connection |
 
 ### Methods
-* createPDOConnection(): PDO  
-* disablePermanentConnection(): void  
-* disableSaveQueries(): void  
-* enablePermanentConnection(): void  
-* enableSaveQueries(): void  
-* getCharset(): string  
-* getDatabase(): string  
-* getDsn(): string  
-* getEngine(): string  
-* getHost(): string  
-* getParameters(): array  
-* getParametersForPDO(): array  
-* getPassword(): string  
-* getReportError(): string  
-* getUser(): string  
-* hasPermanentConnection(): bool  
-* hasSaveQueries(): bool  
-* setCharset(charset: string): void  
-* setDatabase(database: string): void  
-* setEngine(engine: string): void  
-* setHost(host: string): void  
-* setParameter(key: mixed, value: mixed): void  
-* setParameters(parameters: array): void  
-* setPassword(password: string): void  
-* setReportError(reportError: string): void  
-* setUser(user: string): void  
+* createPDOConnection(): PDO
+* disablePersistentConnection(): void
+* disableSaveQueries(): void
+* enablePersistentConnection(): void
+* enableSaveQueries(): void
+* getCharset(): string
+* getDatabase(): string
+* getDsn(): string
+* getDriver(): string
+* getHost(): string
+* getParameters(): array
+* getParametersForPDO(): array
+* getPassword(): string
+* getUser(): string
+* hasPersistentConnection(): bool
+* hasSaveQueries(): bool
+* setCharset(charset: string): void
+* setDatabase(database: string): void
+* setDriver(driver: string): void
+* setHost(host: string): void
+* setParameter(key: mixed, value: mixed): void
+* setParameters(parameters: array): void
+* setPassword(password: string): void
+* setUser(user: string): void
 
 ## Database
 ### Constructor
@@ -227,53 +225,53 @@ Here it's the description of the array passed to the construct
 | --- | --- | --- |
 | configurator | Configurator | Database configuration |
 
-### General Commands  
-* selectAll(sql: string, [parameters: array = []]): array  
-* selectRow(sql: string, [parameters: array = []]): array  
-* selectCol(sql: string, [parameters: array = []]): array  
-* selectVar(sql: string, [parameters: array = []]): mixed  
-* insert(sql: string, [parameters: array = []], [getLastInsertId: bool = false]): ?int  
-* update(sql: string, [parameters: array = []], [getCountRowAffected: bool = false]): ?int  
-* delete(sql: string, [parameters: array = []], [getCountRowAffected: bool = false]): ?int  
-* count(sql: string, [parameters: array = []]): ?int  
-* exec(sql: string, [parameters: array = []]): void  
-* select(sql: string, [parameters: array = []]): PDOStatement  
-* read(statement: PDOStatement, [fetchType: int = PDO::FETCH_ASSOC]): mixed  
-* readAll(statement: PDOStatement, [fetchType: int = PDO::FETCH_ASSOC]): array  
+### General Commands
+* selectAll(sql: string, [parameters: array = []]): array
+* selectRow(sql: string, [parameters: array = []]): array
+* selectCol(sql: string, [parameters: array = []]): array
+* selectVar(sql: string, [parameters: array = []]): mixed
+* insert(sql: string, [parameters: array = []], [getLastInsertId: bool = false]): ?int
+* update(sql: string, [parameters: array = []], [getCountRowAffected: bool = false]): ?int
+* delete(sql: string, [parameters: array = []], [getCountRowAffected: bool = false]): ?int
+* count(sql: string, [parameters: array = []]): ?int
+* exec(sql: string, [parameters: array = []]): void
+* select(sql: string, [parameters: array = []]): PDOStatement
+* read(statement: PDOStatement, [fetchType: int = PDO::FETCH_ASSOC]): mixed
+* readAll(statement: PDOStatement, [fetchType: int = PDO::FETCH_ASSOC]): array
 
 ### Transactions
-* startTransaction(): void  
-* completeTransaction(): void  
-* commitTransaction(): void  
-* rollbackTransaction(): void  
+* startTransaction(): void
+* completeTransaction(): void
+* commitTransaction(): void
+* rollbackTransaction(): void
 
 ### Errors
-* hasErrors(): bool  
-* getErrors(): array  
-* getLastError(): ?array  
-* cleanErrors(): void  
+* hasErrors(): bool
+* getErrors(): array
+* getLastError(): ?array
+* cleanErrors(): void
 
 ### Save Queries
-* hasSaveQueries(): bool  
-* enableSaveQueries(): void  
-* disableSaveQueries(): void  
-* cleanSavedQueries(): void  
-* getSavedQueries(): array  
+* hasSavedQueries(): bool
+* enableSaveQueries(): void
+* disableSaveQueries(): void
+* cleanSavedQueries(): void
+* getSavedQueries(): array
 
 ### Specific Commands
-* truncateTables(...tables: string): void  
-* dropTables(...tables: string): void  
-* useSqlFile(filepath: string): void  
+* truncateTables(...tables: string): void
+* dropTables(...tables: string): void
+* useSqlFile(filepath: string): void
 
 ### Low Level
-* connect(): void  
-* disconnect(): void  
-* getPdo(): ?PDO  
+* connect(): void
+* disconnect(): void
+* getPdo(): ?PDO
 
 ### Static Method
-* getInstance([configurator: Configurator = null]): self  
+* getInstance([configurator: Configurator = null]): self
 
 ## How to Dev
-`composer ci` for php-cs-fixer and phpunit and coverage  
-`composer lint` for php-cs-fixer  
-`composer test` for phpunit and coverage  
+`composer ci` for php-cs-fixer and phpunit and coverage
+`composer lint` for php-cs-fixer
+`composer test` for phpunit and coverage

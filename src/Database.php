@@ -29,7 +29,7 @@ class Database
     protected static ?Database $instance = null;
 
     /** @var string[] */
-    protected array $nestedTransactionsEngineSupported = ['mysql', 'pgsql', 'sqlite'];
+    protected array $nestedTransactionsDriverSupported = ['mysql', 'pgsql', 'sqlite'];
 
     /** @var int */
     protected int $transactionDepth = 0;
@@ -67,7 +67,7 @@ class Database
 
     public function isNestedTransactionSupported(): bool
     {
-        return \in_array($this->configurator->getEngine(), $this->nestedTransactionsEngineSupported, true);
+        return \in_array($this->configurator->getDriver(), $this->nestedTransactionsDriverSupported, true);
     }
 
     /**
@@ -82,13 +82,8 @@ class Database
 
             $endTime = \microtime(true);
 
-            if ($this->configurator->hasSaveQueries()) {
+            if ($this->configurator->hasSavedQueries()) {
                 $this->savedQueries[] = ['Connection' => $this->getTime($startTime, $endTime)];
-            }
-
-            if ($this->pdo === null) {
-                /* @noinspection ThrowRawExceptionInspection */
-                throw new Exception('Error Connecting Database');
             }
         } catch (Exception $e) {
             $this->addErrorConnection($e);
@@ -215,7 +210,7 @@ class Database
 
     protected function addQuery(PDOStatement $statement, array $parameters, float $time): void
     {
-        if ($this->configurator->hasSaveQueries()) {
+        if ($this->configurator->hasSavedQueries()) {
             $this->savedQueries[] = [
                 'query'      => $statement->queryString,
                 'parameters' => $parameters,
@@ -331,13 +326,13 @@ class Database
     /**
      * @param string $sql
      * @param array  $parameters
-     * @param bool   $getCountRowsAffected
+     * @param bool   $getAffectedRowsCount
      *
      * @throws DatabaseException
      *
      * @return int|null
      */
-    public function update(string $sql, array $parameters = [], bool $getCountRowsAffected = false): ?int
+    public function update(string $sql, array $parameters = [], bool $getAffectedRowsCount = false): ?int
     {
         $statement = $this->prepareBind($sql, $parameters);
 
@@ -349,27 +344,27 @@ class Database
 
         $this->addQuery($statement, $parameters, $this->getTime($startTime, $endTime));
 
-        $countRowAffected = null;
-        if ($getCountRowsAffected) {
-            $countRowAffected = (int) $statement->rowCount();
+        $affectedRowsCount = null;
+        if ($getAffectedRowsCount) {
+            $affectedRowsCount = (int) $statement->rowCount();
         }
 
         $statement->closeCursor();
         $statement = null;
 
-        return $countRowAffected;
+        return $affectedRowsCount;
     }
 
     /**
      * @param string $sql
      * @param array  $parameters
-     * @param bool   $getCountRowsAffected
+     * @param bool   $getAffectedRowsCount
      *
      * @throws DatabaseException
      *
      * @return int|null
      */
-    public function delete(string $sql, array $parameters = [], bool $getCountRowsAffected = false): ?int
+    public function delete(string $sql, array $parameters = [], bool $getAffectedRowsCount = false): ?int
     {
         $statement = $this->prepareBind($sql, $parameters);
 
@@ -381,15 +376,15 @@ class Database
 
         $this->addQuery($statement, $parameters, $this->getTime($startTime, $endTime));
 
-        $countRowAffected = null;
-        if ($getCountRowsAffected) {
-            $countRowAffected = (int) $statement->rowCount();
+        $affectedRowsCount = null;
+        if ($getAffectedRowsCount) {
+            $affectedRowsCount = (int) $statement->rowCount();
         }
 
         $statement->closeCursor();
         $statement = null;
 
-        return $countRowAffected;
+        return $affectedRowsCount;
     }
 
     /**
@@ -496,10 +491,10 @@ class Database
     {
         $statement = $this->select($sql, $parameters);
 
-        $datas = $this->readAll($statement);
+        $data = $this->readAll($statement);
         $col = [];
-        foreach ($datas as $data) {
-            $col[] = \current($data);
+        foreach ($data as $row) {
+            $col[] = \current($row);
         }
 
         $statement->closeCursor();
@@ -653,7 +648,7 @@ class Database
 
     public function hasSaveQueries(): bool
     {
-        return $this->configurator->hasSaveQueries();
+        return $this->configurator->hasSavedQueries();
     }
 
     public function enableSaveQueries(): void
@@ -687,10 +682,9 @@ class Database
         \array_unshift($tables, $tableMandatory);
 
         foreach ($tables as $table) {
-            $sql = 'TRUNCATE TABLE ' . $table;
-            if ($this->configurator->getEngine() === 'sqlite') {
-                $sql = 'DELETE FROM ' . $table;
-            }
+            $sql = ($this->configurator->getDriver() === 'sqlite')
+                    ? 'DELETE FROM ' . $table
+                    : 'TRUNCATE TABLE ' . $table;
 
             $this->exec($sql);
         }
@@ -706,7 +700,7 @@ class Database
     {
         \array_unshift($tables, $tableMandatory);
 
-        if ($this->configurator->getEngine() === 'sqlite') {
+        if ($this->configurator->getDriver() === 'sqlite') {
             foreach ($tables as $table) {
                 $sql = 'DROP TABLE IF EXISTS ' . $table;
                 $this->exec($sql);
@@ -732,10 +726,13 @@ class Database
         if (!\file_exists($filepath)) {
             throw new DatabaseException('File missing for useSqlFile method: ' . $filepath);
         }
+        if (!\is_readable($filepath)) {
+            throw new DatabaseException('File is not readable for useSqlFile method: ' . $filepath);
+        }
 
         $sqlFile = \file_get_contents($filepath);
 
-        if ($this->configurator->getEngine() === 'sqlite') {
+        if ($this->configurator->getDriver() === 'sqlite') {
             // sqlite support only one statement by exec
             $sqlFileQueries = \explode(";\n", $sqlFile);
             foreach ($sqlFileQueries as $sqlFileQuery) {

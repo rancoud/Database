@@ -20,7 +20,7 @@ class DatabaseSingletonTest extends TestCase
     protected ?Database $db;
 
     protected array $params = [
-        'engine'       => 'mysql',
+        'driver'       => 'mysql',
         'host'         => 'localhost',
         'user'         => 'root',
         'password'     => '',
@@ -35,7 +35,7 @@ class DatabaseSingletonTest extends TestCase
         $databaseConf = new Configurator($this->params);
         $this->db = new Database($databaseConf);
     }
-    
+
     /** @runInSeparateProcess  */
     public function testSingletonEmptyConfiguratorException(): void
     {
@@ -44,19 +44,15 @@ class DatabaseSingletonTest extends TestCase
 
         Database::getInstance();
     }
-    
+
     /**
      * @runInSeparateProcess
      * @throws DatabaseException
      */
     public function testSingleton(): void
     {
-        try {
-            Database::getInstance(new Configurator($this->params));
-            $this->expectNotToPerformAssertions();
-        } catch (DatabaseException $e) {
-            throw $e;
-        }
+		Database::getInstance(new Configurator($this->params));
+		$this->expectNotToPerformAssertions();
     }
 
     /** @runInSeparateProcess  */

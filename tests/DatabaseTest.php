@@ -18,12 +18,12 @@ use Rancoud\Database\DatabaseException;
  */
 class DatabaseTest extends TestCase
 {
-    protected array $sgbds = [
+    protected array $dbms = [
         'mysql' => [
             /** @var ?Database $db; */
             'db' => null,
             'parameters' => [
-                'engine'       => 'mysql',
+                'driver'       => 'mysql',
                 'host'         => '127.0.0.1',
                 'user'         => 'root',
                 'password'     => '',
@@ -34,7 +34,7 @@ class DatabaseTest extends TestCase
             /** @var ?Database $db; */
             'db' => null,
             'parameters' => [
-                'engine'        => 'pgsql',
+                'driver'        => 'pgsql',
                 'host'          => '127.0.0.1',
                 'user'          => 'postgres',
                 'password'      => '',
@@ -45,7 +45,7 @@ class DatabaseTest extends TestCase
             /** @var ?Database $db; */
             'db' => null,
             'parameters' => [
-                'engine'       => 'sqlite',
+                'driver'       => 'sqlite',
                 'host'         => '127.0.0.1',
                 'user'         => '',
                 'password'     => '',
@@ -72,9 +72,7 @@ class DatabaseTest extends TestCase
                     name VARCHAR(255) NOT NULL,
                     PRIMARY KEY (id)
                 ) DEFAULT CHARSET=utf8mb4;',
-                "INSERT INTO test_update (name) VALUES ('A');",
-                "INSERT INTO test_update (name) VALUES ('B');",
-                "INSERT INTO test_update (name) VALUES ('C');",
+                "INSERT INTO test_update (name) VALUES ('A'),('B'),('C');",
             ],
             'delete' => [
                 'CREATE TABLE test_delete (
@@ -82,9 +80,7 @@ class DatabaseTest extends TestCase
                     name VARCHAR(255) NOT NULL,
                     PRIMARY KEY (id)
                 ) DEFAULT CHARSET=utf8mb4;',
-                "INSERT INTO test_delete (name) VALUES ('A');",
-                "INSERT INTO test_delete (name) VALUES ('B');",
-                "INSERT INTO test_delete (name) VALUES ('C');",
+                "INSERT INTO test_delete (name) VALUES ('A'),('B'),('C');",
             ],
             'select' => [
                 'CREATE TABLE `test_select` (
@@ -107,17 +103,13 @@ class DatabaseTest extends TestCase
                     name VARCHAR(255) NOT NULL,
                     PRIMARY KEY (id)
                 ) DEFAULT CHARSET=utf8mb4;',
-                "INSERT INTO test_truncate1 (name) VALUES ('A');",
-                "INSERT INTO test_truncate1 (name) VALUES ('B');",
-                "INSERT INTO test_truncate1 (name) VALUES ('C');",
+                "INSERT INTO test_truncate1 (name) VALUES ('A'),('B'),('C');",
                 'CREATE TABLE test_truncate2 (
                     id INT UNSIGNED NOT NULL AUTO_INCREMENT,
                     name VARCHAR(255) NOT NULL,
                     PRIMARY KEY (id)
                 ) DEFAULT CHARSET=utf8mb4;',
-                "INSERT INTO test_truncate2 (name) VALUES ('A');",
-                "INSERT INTO test_truncate2 (name) VALUES ('B');",
-                "INSERT INTO test_truncate2 (name) VALUES ('C');",
+                "INSERT INTO test_truncate2 (name) VALUES ('A'),('B'),('C');",
             ]
         ],
         'pgsql' => [
@@ -134,18 +126,14 @@ class DatabaseTest extends TestCase
                     id SERIAL PRIMARY KEY,
                     name character varying(255) NOT NULL
                 );',
-                "INSERT INTO test_update (name) VALUES ('A');",
-                "INSERT INTO test_update (name) VALUES ('B');",
-                "INSERT INTO test_update (name) VALUES ('C');",
+                "INSERT INTO test_update (name) VALUES ('A'),('B'),('C');",
             ],
             'delete' => [
                 'CREATE TABLE test_delete (
                     id SERIAL PRIMARY KEY,
                     name character varying(255) NOT NULL
                 );',
-                "INSERT INTO test_delete (name) VALUES ('A');",
-                "INSERT INTO test_delete (name) VALUES ('B');",
-                "INSERT INTO test_delete (name) VALUES ('C');",
+                "INSERT INTO test_delete (name) VALUES ('A'),('B'),('C');",
             ],
             'select' => [
                 'CREATE TABLE test_select(
@@ -166,16 +154,12 @@ class DatabaseTest extends TestCase
                     id SERIAL PRIMARY KEY,
                     name character varying(255) NOT NULL
                 );',
-                "INSERT INTO test_truncate1 (name) VALUES ('A');",
-                "INSERT INTO test_truncate1 (name) VALUES ('B');",
-                "INSERT INTO test_truncate1 (name) VALUES ('C');",
+                "INSERT INTO test_truncate1 (name) VALUES ('A'),('B'),('C');",
                 'CREATE TABLE test_truncate2 (
                     id SERIAL PRIMARY KEY,
                     name character varying(255) NOT NULL
                 );',
-                "INSERT INTO test_truncate2 (name) VALUES ('A');",
-                "INSERT INTO test_truncate2 (name) VALUES ('B');",
-                "INSERT INTO test_truncate2 (name) VALUES ('C');",
+                "INSERT INTO test_truncate2 (name) VALUES ('A'),('B'),('C');",
             ]
         ],
         'sqlite' => [
@@ -363,7 +347,7 @@ class DatabaseTest extends TestCase
 
     // region Data Provider
 
-    public function sgbds(): array
+    public function dbms(): array
     {
         return [
             'mysql' => ['mysql'],
@@ -381,9 +365,10 @@ class DatabaseTest extends TestCase
      */
     public function setUp(): void
     {
-        foreach ($this->sgbds as $k => $sgbd) {
-            $configurator = new Configurator($this->sgbds[$k]['parameters']);
-            $this->sgbds[$k]['db'] = new Database(new Configurator($this->sgbds[$k]['parameters']));
+        foreach ($this->dbms as $k => $dbms) {
+            $configurator = new Configurator($dbms['parameters']);
+            $this->dbms[$k]['db'] = new Database($configurator);
+
             $pdo = $configurator->createPDOConnection();
 
             $pdo->exec('DROP TABLE IF EXISTS test_exec');
@@ -398,9 +383,9 @@ class DatabaseTest extends TestCase
 
     public function tearDown(): void
     {
-        foreach ($this->sgbds as $k => $sgbd) {
-            $this->sgbds[$k]['db']->disconnect();
-            $this->sgbds[$k]['db'] = null;
+        foreach ($this->dbms as $k => $dbms) {
+            $dbms['db']->disconnect();
+            $this->dbms[$k]['db'] = null;
         }
     }
 
@@ -409,30 +394,30 @@ class DatabaseTest extends TestCase
     // region Database->Exec
 
     /**
-     * @dataProvider sgbds
-     * @param string $sgbd
+     * @dataProvider dbms
+     * @param string $driver
      * @throws DatabaseException
      */
-    public function testExec(string $sgbd): void
+    public function testExec(string $driver): void
     {
         /** @var Database $db */
-        $db = $this->sgbds[$sgbd]['db'];
-        $sql = $this->sqlQueries[$sgbd]['exec'];
+        $db = $this->dbms[$driver]['db'];
+        $sql = $this->sqlQueries[$driver]['exec'];
 
         try {
             $db->exec($sql);
-            if ($sgbd === 'mysql') {
+            if ($driver === 'mysql') {
                 $sql1 = "SELECT COUNT(*) FROM information_schema.tables
                          WHERE table_schema = 'test_database' AND table_name = 'test_exec';";
 
                 static::assertSame(1, $db->count($sql1));
-            } elseif ($sgbd === 'pgsql') {
+            } elseif ($driver === 'pgsql') {
                 static::assertSame('test_exec', $db->selectVar("SELECT to_regclass('test_exec');"));
-            } elseif ($sgbd === 'sqlite') {
+            } elseif ($driver === 'sqlite') {
                 $sql1 = "SELECT count(*) FROM sqlite_master WHERE type='table' AND name='test_exec';";
                 static::assertSame(1, $db->count($sql1));
             } else {
-                throw new DatabaseException('sgbd ' . $sgbd . ' not supported!');
+                throw new DatabaseException('dbms ' . $driver . ' not supported!');
             }
         } catch (DatabaseException $e) {
             var_dump($db->getErrors());
@@ -441,14 +426,14 @@ class DatabaseTest extends TestCase
     }
 
     /**
-     * @dataProvider sgbds
-     * @param string $sgbd
+     * @dataProvider dbms
+     * @param string $driver
      * @throws DatabaseException
      */
-    public function testExecException(string $sgbd): void
+    public function testExecException(string $driver): void
     {
         /** @var Database $db */
-        $db = $this->sgbds[$sgbd]['db'];
+        $db = $this->dbms[$driver]['db'];
 
         $this->expectException(DatabaseException::class);
 
@@ -460,15 +445,15 @@ class DatabaseTest extends TestCase
     // region Database->Insert
 
     /**
-     * @dataProvider sgbds
-     * @param string $sgbd
+     * @dataProvider dbms
+     * @param string $driver
      * @throws DatabaseException
      */
-    public function testInsert(string $sgbd): void
+    public function testInsert(string $driver): void
     {
         /** @var Database $db */
-        $db = $this->sgbds[$sgbd]['db'];
-        $sql = $this->sqlQueries[$sgbd]['insert'];
+        $db = $this->dbms[$driver]['db'];
+        $sql = $this->sqlQueries[$driver]['insert'];
         $db->exec($sql);
 
         try {
@@ -498,14 +483,14 @@ class DatabaseTest extends TestCase
     }
 
     /**
-     * @dataProvider sgbds
-     * @param string $sgbd
+     * @dataProvider dbms
+     * @param string $driver
      * @throws DatabaseException
      */
-    public function testInsertException(string $sgbd): void
+    public function testInsertException(string $driver): void
     {
         /** @var Database $db */
-        $db = $this->sgbds[$sgbd]['db'];
+        $db = $this->dbms[$driver]['db'];
 
         $this->expectException(DatabaseException::class);
 
@@ -517,15 +502,15 @@ class DatabaseTest extends TestCase
     // region Database->Update
 
     /**
-     * @dataProvider sgbds
-     * @param string $sgbd
+     * @dataProvider dbms
+     * @param string $driver
      * @throws DatabaseException
      */
-    public function testUpdate(string $sgbd): void
+    public function testUpdate(string $driver): void
     {
         /** @var Database $db */
-        $db = $this->sgbds[$sgbd]['db'];
-        $sqls = $this->sqlQueries[$sgbd]['update'];
+        $db = $this->dbms[$driver]['db'];
+        $sqls = $this->sqlQueries[$driver]['update'];
         foreach ($sqls as $sql) {
             $db->exec($sql);
         }
@@ -554,14 +539,14 @@ class DatabaseTest extends TestCase
     }
 
     /**
-     * @dataProvider sgbds
-     * @param string $sgbd
+     * @dataProvider dbms
+     * @param string $driver
      * @throws DatabaseException
      */
-    public function testUpdateException(string $sgbd): void
+    public function testUpdateException(string $driver): void
     {
         /** @var Database $db */
-        $db = $this->sgbds[$sgbd]['db'];
+        $db = $this->dbms[$driver]['db'];
 
         $this->expectException(DatabaseException::class);
 
@@ -573,15 +558,15 @@ class DatabaseTest extends TestCase
     // region Database->Delete
 
     /**
-     * @dataProvider sgbds
-     * @param string $sgbd
+     * @dataProvider dbms
+     * @param string $driver
      * @throws DatabaseException
      */
-    public function testDelete(string $sgbd): void
+    public function testDelete(string $driver): void
     {
         /** @var Database $db */
-        $db = $this->sgbds[$sgbd]['db'];
-        $sqls = $this->sqlQueries[$sgbd]['delete'];
+        $db = $this->dbms[$driver]['db'];
+        $sqls = $this->sqlQueries[$driver]['delete'];
         foreach ($sqls as $sql) {
             $db->exec($sql);
         }
@@ -610,14 +595,14 @@ class DatabaseTest extends TestCase
     }
 
     /**
-     * @dataProvider sgbds
-     * @param string $sgbd
+     * @dataProvider dbms
+     * @param string $driver
      * @throws DatabaseException
      */
-    public function testDeleteException(string $sgbd): void
+    public function testDeleteException(string $driver): void
     {
         /** @var Database $db */
-        $db = $this->sgbds[$sgbd]['db'];
+        $db = $this->dbms[$driver]['db'];
 
         $this->expectException(DatabaseException::class);
 
@@ -629,16 +614,16 @@ class DatabaseTest extends TestCase
     // region Database->SelectAll
 
     /**
-     * @dataProvider sgbds
-     * @param string $sgbd
+     * @dataProvider dbms
+     * @param string $driver
      * @throws DatabaseException
      */
-    public function testSelectAll(string $sgbd): void
+    public function testSelectAll(string $driver): void
     {
         /** @var Database $db */
-        $db = $this->sgbds[$sgbd]['db'];
+        $db = $this->dbms[$driver]['db'];
 
-        $sqls = $this->sqlQueries[$sgbd]['select'];
+        $sqls = $this->sqlQueries[$driver]['select'];
         foreach ($sqls as $sql) {
             $db->exec($sql);
         }
@@ -646,14 +631,14 @@ class DatabaseTest extends TestCase
         try {
             $sql = 'SELECT * FROM test_select';
             $rows = $db->selectAll($sql);
-            static::assertSame($this->selectData[$sgbd], $rows);
+            static::assertSame($this->selectData[$driver], $rows);
 
             $sql = 'SELECT * FROM test_select WHERE ranking >= :ranking';
             $params = ['ranking' => 20];
             $rows = $db->selectAll($sql, $params);
-            $data[] = $this->selectData[$sgbd][2];
-            $data[] = $this->selectData[$sgbd][3];
-            $data[] = $this->selectData[$sgbd][4];
+            $data[] = $this->selectData[$driver][2];
+            $data[] = $this->selectData[$driver][3];
+            $data[] = $this->selectData[$driver][4];
             static::assertSame($data, $rows);
 
             $sql = 'SELECT * FROM test_select WHERE ranking >= :ranking';
@@ -667,14 +652,14 @@ class DatabaseTest extends TestCase
     }
 
     /**
-     * @dataProvider sgbds
-     * @param string $sgbd
+     * @dataProvider dbms
+     * @param string $driver
      * @throws DatabaseException
      */
-    public function testSelectAllException(string $sgbd): void
+    public function testSelectAllException(string $driver): void
     {
         /** @var Database $db */
-        $db = $this->sgbds[$sgbd]['db'];
+        $db = $this->dbms[$driver]['db'];
 
         $this->expectException(DatabaseException::class);
 
@@ -686,16 +671,16 @@ class DatabaseTest extends TestCase
     // region Database->SelectRow
 
     /**
-     * @dataProvider sgbds
-     * @param string $sgbd
+     * @dataProvider dbms
+     * @param string $driver
      * @throws DatabaseException
      */
-    public function testSelectRow(string $sgbd): void
+    public function testSelectRow(string $driver): void
     {
         /** @var Database $db */
-        $db = $this->sgbds[$sgbd]['db'];
+        $db = $this->dbms[$driver]['db'];
 
-        $sqls = $this->sqlQueries[$sgbd]['select'];
+        $sqls = $this->sqlQueries[$driver]['select'];
         foreach ($sqls as $sql) {
             $db->exec($sql);
         }
@@ -703,12 +688,12 @@ class DatabaseTest extends TestCase
         try {
             $sql = 'SELECT * FROM test_select';
             $row = $db->selectRow($sql);
-            static::assertSame($this->selectData[$sgbd][0], $row);
+            static::assertSame($this->selectData[$driver][0], $row);
 
             $sql = 'SELECT * FROM test_select WHERE ranking >= :ranking';
             $params = ['ranking' => 20];
             $row = $db->selectRow($sql, $params);
-            static::assertSame($this->selectData[$sgbd][2], $row);
+            static::assertSame($this->selectData[$driver][2], $row);
 
             $sql = 'SELECT * FROM test_select WHERE ranking >= :ranking';
             $params = ['ranking' => 100];
@@ -721,14 +706,14 @@ class DatabaseTest extends TestCase
     }
 
     /**
-     * @dataProvider sgbds
-     * @param string $sgbd
+     * @dataProvider dbms
+     * @param string $driver
      * @throws DatabaseException
      */
-    public function testSelectRowException(string $sgbd): void
+    public function testSelectRowException(string $driver): void
     {
         /** @var Database $db */
-        $db = $this->sgbds[$sgbd]['db'];
+        $db = $this->dbms[$driver]['db'];
 
         $this->expectException(DatabaseException::class);
 
@@ -740,16 +725,16 @@ class DatabaseTest extends TestCase
     // region Database->SelectCol
 
     /**
-     * @dataProvider sgbds
-     * @param string $sgbd
+     * @dataProvider dbms
+     * @param string $driver
      * @throws DatabaseException
      */
-    public function testSelectCol(string $sgbd): void
+    public function testSelectCol(string $driver): void
     {
         /** @var Database $db */
-        $db = $this->sgbds[$sgbd]['db'];
+        $db = $this->dbms[$driver]['db'];
 
-        $sqls = $this->sqlQueries[$sgbd]['select'];
+        $sqls = $this->sqlQueries[$driver]['select'];
         foreach ($sqls as $sql) {
             $db->exec($sql);
         }
@@ -758,21 +743,21 @@ class DatabaseTest extends TestCase
             $sql = 'SELECT * FROM test_select';
             $col = $db->selectCol($sql);
             static::assertSame([
-                $this->selectData[$sgbd][0]['id'],
-                $this->selectData[$sgbd][1]['id'],
-                $this->selectData[$sgbd][2]['id'],
-                $this->selectData[$sgbd][3]['id'],
-                $this->selectData[$sgbd][4]['id'],
-                $this->selectData[$sgbd][5]['id']
+                $this->selectData[$driver][0]['id'],
+                $this->selectData[$driver][1]['id'],
+                $this->selectData[$driver][2]['id'],
+                $this->selectData[$driver][3]['id'],
+                $this->selectData[$driver][4]['id'],
+                $this->selectData[$driver][5]['id']
             ], $col);
 
             $sql = 'SELECT name FROM test_select WHERE ranking >= :ranking';
             $params = ['ranking' => 20];
             $col = $db->selectCol($sql, $params);
             static::assertSame([
-                $this->selectData[$sgbd][2]['name'],
-                $this->selectData[$sgbd][3]['name'],
-                $this->selectData[$sgbd][4]['name']
+                $this->selectData[$driver][2]['name'],
+                $this->selectData[$driver][3]['name'],
+                $this->selectData[$driver][4]['name']
             ], $col);
 
             $sql = 'SELECT ranking FROM test_select WHERE ranking >= :ranking';
@@ -786,14 +771,14 @@ class DatabaseTest extends TestCase
     }
 
     /**
-     * @dataProvider sgbds
-     * @param string $sgbd
+     * @dataProvider dbms
+     * @param string $driver
      * @throws DatabaseException
      */
-    public function testSelectColException(string $sgbd): void
+    public function testSelectColException(string $driver): void
     {
         /** @var Database $db */
-        $db = $this->sgbds[$sgbd]['db'];
+        $db = $this->dbms[$driver]['db'];
 
         $this->expectException(DatabaseException::class);
 
@@ -805,16 +790,16 @@ class DatabaseTest extends TestCase
     // region Database->SelectVar
 
     /**
-     * @dataProvider sgbds
-     * @param string $sgbd
+     * @dataProvider dbms
+     * @param string $driver
      * @throws DatabaseException
      */
-    public function testSelectVar(string $sgbd): void
+    public function testSelectVar(string $driver): void
     {
         /** @var Database $db */
-        $db = $this->sgbds[$sgbd]['db'];
+        $db = $this->dbms[$driver]['db'];
 
-        $sqls = $this->sqlQueries[$sgbd]['select'];
+        $sqls = $this->sqlQueries[$driver]['select'];
         foreach ($sqls as $sql) {
             $db->exec($sql);
         }
@@ -822,12 +807,12 @@ class DatabaseTest extends TestCase
         try {
             $sql = 'SELECT * FROM test_select';
             $var = $db->selectVar($sql);
-            static::assertSame($this->selectData[$sgbd][0]['id'], $var);
+            static::assertSame($this->selectData[$driver][0]['id'], $var);
 
             $sql = 'SELECT name FROM test_select WHERE ranking >= :ranking';
             $params = ['ranking' => 20];
             $var = $db->selectVar($sql, $params);
-            static::assertSame($this->selectData[$sgbd][2]['name'], $var);
+            static::assertSame($this->selectData[$driver][2]['name'], $var);
 
             $sql = 'SELECT ranking FROM test_select WHERE ranking >= :ranking';
             $params = ['ranking' => 100];
@@ -840,14 +825,14 @@ class DatabaseTest extends TestCase
     }
 
     /**
-     * @dataProvider sgbds
-     * @param string $sgbd
+     * @dataProvider dbms
+     * @param string $driver
      * @throws DatabaseException
      */
-    public function testSelectVarException(string $sgbd): void
+    public function testSelectVarException(string $driver): void
     {
         /** @var Database $db */
-        $db = $this->sgbds[$sgbd]['db'];
+        $db = $this->dbms[$driver]['db'];
 
         $this->expectException(DatabaseException::class);
 
@@ -859,16 +844,16 @@ class DatabaseTest extends TestCase
     // region Database->Select
 
     /**
-     * @dataProvider sgbds
-     * @param string $sgbd
+     * @dataProvider dbms
+     * @param string $driver
      * @throws DatabaseException
      */
-    public function testSelect(string $sgbd): void
+    public function testSelect(string $driver): void
     {
         /** @var Database $db */
-        $db = $this->sgbds[$sgbd]['db'];
+        $db = $this->dbms[$driver]['db'];
 
-        $sqls = $this->sqlQueries[$sgbd]['select'];
+        $sqls = $this->sqlQueries[$driver]['select'];
         foreach ($sqls as $sql) {
             $db->exec($sql);
         }
@@ -894,14 +879,14 @@ class DatabaseTest extends TestCase
     }
 
     /**
-     * @dataProvider sgbds
-     * @param string $sgbd
+     * @dataProvider dbms
+     * @param string $driver
      * @throws DatabaseException
      */
-    public function testSelectException(string $sgbd): void
+    public function testSelectException(string $driver): void
     {
         /** @var Database $db */
-        $db = $this->sgbds[$sgbd]['db'];
+        $db = $this->dbms[$driver]['db'];
 
         $this->expectException(DatabaseException::class);
 
@@ -913,17 +898,17 @@ class DatabaseTest extends TestCase
     // region Database->Read
 
     /**
-     * @dataProvider sgbds
-     * @param string $sgbd
+     * @dataProvider dbms
+     * @param string $driver
      * @throws DatabaseException
      * @noinspection PhpAssignmentInConditionInspection
      */
-    public function testRead(string $sgbd): void
+    public function testRead(string $driver): void
     {
         /** @var Database $db */
-        $db = $this->sgbds[$sgbd]['db'];
+        $db = $this->dbms[$driver]['db'];
 
-        $sqls = $this->sqlQueries[$sgbd]['select'];
+        $sqls = $this->sqlQueries[$driver]['select'];
         foreach ($sqls as $sql) {
             $db->exec($sql);
         }
@@ -964,16 +949,16 @@ class DatabaseTest extends TestCase
     // region Database->ReadAll
 
     /**
-     * @dataProvider sgbds
-     * @param string $sgbd
+     * @dataProvider dbms
+     * @param string $driver
      * @throws DatabaseException
      */
-    public function testReadAll(string $sgbd): void
+    public function testReadAll(string $driver): void
     {
         /** @var Database $db */
-        $db = $this->sgbds[$sgbd]['db'];
+        $db = $this->dbms[$driver]['db'];
 
-        $sqls = $this->sqlQueries[$sgbd]['select'];
+        $sqls = $this->sqlQueries[$driver]['select'];
         foreach ($sqls as $sql) {
             $db->exec($sql);
         }
@@ -1006,15 +991,15 @@ class DatabaseTest extends TestCase
     // region Database->Count
 
     /**
-     * @dataProvider sgbds
-     * @param string $sgbd
+     * @dataProvider dbms
+     * @param string $driver
      * @throws DatabaseException
      */
-    public function testCount(string $sgbd): void
+    public function testCount(string $driver): void
     {
         /** @var Database $db */
-        $db = $this->sgbds[$sgbd]['db'];
-        $sqls = $this->sqlQueries[$sgbd]['select'];
+        $db = $this->dbms[$driver]['db'];
+        $sqls = $this->sqlQueries[$driver]['select'];
         foreach ($sqls as $sql) {
             $db->exec($sql);
         }
@@ -1028,14 +1013,14 @@ class DatabaseTest extends TestCase
     }
 
     /**
-     * @dataProvider sgbds
-     * @param string $sgbd
+     * @dataProvider dbms
+     * @param string $driver
      * @throws DatabaseException
      */
-    public function testCountException(string $sgbd): void
+    public function testCountException(string $driver): void
     {
         /** @var Database $db */
-        $db = $this->sgbds[$sgbd]['db'];
+        $db = $this->dbms[$driver]['db'];
 
         $this->expectException(DatabaseException::class);
 
@@ -1047,18 +1032,18 @@ class DatabaseTest extends TestCase
     // region Database Pdo Param
 
     /**
-     * @dataProvider sgbds
-     * @param string $sgbd
+     * @dataProvider dbms
+     * @param string $driver
      * @throws DatabaseException
      * @noinspection FopenBinaryUnsafeUsageInspection
      */
-    public function testPdoParamType(string $sgbd): void
+    public function testPdoParamType(string $driver): void
     {
         /** @var Database $db */
-        $db = $this->sgbds[$sgbd]['db'];
+        $db = $this->dbms[$driver]['db'];
 
         try {
-            if ($sgbd !== 'pgsql') {
+            if ($driver !== 'pgsql') {
                 $sql = 'SELECT :true AS `true`, :false AS `false`, :null AS `null`, :float AS `float`,
                 :int AS `int`, :string AS `string`, :resource AS `resource`';
                 $params = [
@@ -1109,14 +1094,14 @@ class DatabaseTest extends TestCase
     }
 
     /**
-     * @dataProvider sgbds
-     * @param string $sgbd
+     * @dataProvider dbms
+     * @param string $driver
      * @throws DatabaseException
      */
-    public function testPdoParamTypeException(string $sgbd): void
+    public function testPdoParamTypeException(string $driver): void
     {
         /** @var Database $db */
-        $db = $this->sgbds[$sgbd]['db'];
+        $db = $this->dbms[$driver]['db'];
 
         $this->expectException(DatabaseException::class);
 
@@ -1130,16 +1115,16 @@ class DatabaseTest extends TestCase
     // region Database startTransaction/commitTransaction/rollbackTransaction/completeTransaction
 
     /**
-     * @dataProvider sgbds
-     * @param string $sgbd
+     * @dataProvider dbms
+     * @param string $driver
      * @throws DatabaseException
      */
-    public function testStartTransaction(string $sgbd): void
+    public function testStartTransaction(string $driver): void
     {
         /** @var Database $db */
-        $db = $this->sgbds[$sgbd]['db'];
+        $db = $this->dbms[$driver]['db'];
 
-        $sqls = $this->sqlQueries[$sgbd]['select'];
+        $sqls = $this->sqlQueries[$driver]['select'];
         foreach ($sqls as $sql) {
             $db->exec($sql);
         }
@@ -1163,16 +1148,16 @@ class DatabaseTest extends TestCase
     }
 
     /**
-     * @dataProvider sgbds
-     * @param string $sgbd
+     * @dataProvider dbms
+     * @param string $driver
      * @throws DatabaseException
      */
-    public function testCommitTransaction(string $sgbd): void
+    public function testCommitTransaction(string $driver): void
     {
         /** @var Database $db */
-        $db = $this->sgbds[$sgbd]['db'];
+        $db = $this->dbms[$driver]['db'];
 
-        $sqls = $this->sqlQueries[$sgbd]['select'];
+        $sqls = $this->sqlQueries[$driver]['select'];
         foreach ($sqls as $sql) {
             $db->exec($sql);
         }
@@ -1196,16 +1181,16 @@ class DatabaseTest extends TestCase
     }
 
     /**
-     * @dataProvider sgbds
-     * @param string $sgbd
+     * @dataProvider dbms
+     * @param string $driver
      * @throws DatabaseException
      */
-    public function testCommitTransactionException(string $sgbd): void
+    public function testCommitTransactionException(string $driver): void
     {
         /** @var Database $db */
-        $db = $this->sgbds[$sgbd]['db'];
+        $db = $this->dbms[$driver]['db'];
 
-        $sqls = $this->sqlQueries[$sgbd]['select'];
+        $sqls = $this->sqlQueries[$driver]['select'];
         foreach ($sqls as $sql) {
             $db->exec($sql);
         }
@@ -1230,16 +1215,16 @@ class DatabaseTest extends TestCase
     }
 
     /**
-     * @dataProvider sgbds
-     * @param string $sgbd
+     * @dataProvider dbms
+     * @param string $driver
      * @throws DatabaseException
      */
-    public function testRollbackTransaction(string $sgbd): void
+    public function testRollbackTransaction(string $driver): void
     {
         /** @var Database $db */
-        $db = $this->sgbds[$sgbd]['db'];
+        $db = $this->dbms[$driver]['db'];
 
-        $sqls = $this->sqlQueries[$sgbd]['select'];
+        $sqls = $this->sqlQueries[$driver]['select'];
         foreach ($sqls as $sql) {
             $db->exec($sql);
         }
@@ -1271,16 +1256,16 @@ class DatabaseTest extends TestCase
     }
 
     /**
-     * @dataProvider sgbds
-     * @param string $sgbd
+     * @dataProvider dbms
+     * @param string $driver
      * @throws DatabaseException
      */
-    public function testRollbackTransactionException(string $sgbd): void
+    public function testRollbackTransactionException(string $driver): void
     {
         /** @var Database $db */
-        $db = $this->sgbds[$sgbd]['db'];
+        $db = $this->dbms[$driver]['db'];
 
-        $sqls = $this->sqlQueries[$sgbd]['select'];
+        $sqls = $this->sqlQueries[$driver]['select'];
         foreach ($sqls as $sql) {
             $db->exec($sql);
         }
@@ -1305,16 +1290,16 @@ class DatabaseTest extends TestCase
     }
 
     /**
-     * @dataProvider sgbds
-     * @param string $sgbd
+     * @dataProvider dbms
+     * @param string $driver
      * @throws DatabaseException
      */
-    public function testNestedTransaction(string $sgbd): void
+    public function testNestedTransaction(string $driver): void
     {
         /** @var Database $db */
-        $db = $this->sgbds[$sgbd]['db'];
+        $db = $this->dbms[$driver]['db'];
 
-        $sqls = $this->sqlQueries[$sgbd]['select'];
+        $sqls = $this->sqlQueries[$driver]['select'];
         foreach ($sqls as $sql) {
             $db->exec($sql);
         }
@@ -1380,16 +1365,16 @@ class DatabaseTest extends TestCase
     }
 
     /**
-     * @dataProvider sgbds
-     * @param string $sgbd
+     * @dataProvider dbms
+     * @param string $driver
      * @throws DatabaseException
      */
-    public function testCompleteTransactionOK(string $sgbd): void
+    public function testCompleteTransactionOK(string $driver): void
     {
         /** @var Database $db */
-        $db = $this->sgbds[$sgbd]['db'];
+        $db = $this->dbms[$driver]['db'];
 
-        $sqls = $this->sqlQueries[$sgbd]['select'];
+        $sqls = $this->sqlQueries[$driver]['select'];
         foreach ($sqls as $sql) {
             $db->exec($sql);
         }
@@ -1413,16 +1398,16 @@ class DatabaseTest extends TestCase
     }
 
     /**
-     * @dataProvider sgbds
-     * @param string $sgbd
+     * @dataProvider dbms
+     * @param string $driver
      * @throws DatabaseException
      */
-    public function testCompleteTransactionKO(string $sgbd): void
+    public function testCompleteTransactionKO(string $driver): void
     {
         /** @var Database $db */
-        $db = $this->sgbds[$sgbd]['db'];
+        $db = $this->dbms[$driver]['db'];
 
-        $sqls = $this->sqlQueries[$sgbd]['select'];
+        $sqls = $this->sqlQueries[$driver]['select'];
         foreach ($sqls as $sql) {
             $db->exec($sql);
         }
@@ -1447,16 +1432,16 @@ class DatabaseTest extends TestCase
     }
 
     /**
-     * @dataProvider sgbds
-     * @param string $sgbd
+     * @dataProvider dbms
+     * @param string $driver
      * @throws DatabaseException
      */
-    public function testStartCommitAutoConnect(string $sgbd): void
+    public function testStartCommitAutoConnect(string $driver): void
     {
-        $db = new Database(new Configurator($this->sgbds[$sgbd]['parameters']));
-        static::assertNull($db->getPdo());
+        $db = new Database(new Configurator($this->dbms[$driver]['parameters']));
+        static::assertNull($db->getPDO());
         $db->startTransaction();
-        static::assertNotNull($db->getPdo());
+        static::assertNotNull($db->getPDO());
     }
 
     // endregion
@@ -1464,16 +1449,16 @@ class DatabaseTest extends TestCase
     // region Database hasErrors/getErrors/getLastError/cleanErrors
 
     /**
-     * @dataProvider sgbds
-     * @param string $sgbd
+     * @dataProvider dbms
+     * @param string $driver
      * @throws DatabaseException
      */
-    public function testErrorsException(string $sgbd): void
+    public function testErrorsException(string $driver): void
     {
         /** @var Database $db */
-        $db = $this->sgbds[$sgbd]['db'];
+        $db = $this->dbms[$driver]['db'];
 
-        $sqls = $this->sqlQueries[$sgbd]['select'];
+        $sqls = $this->sqlQueries[$driver]['select'];
         foreach ($sqls as $sql) {
             $db->exec($sql);
         }
@@ -1503,16 +1488,16 @@ class DatabaseTest extends TestCase
     // region Database hasSaveQueries/getSavedQueries/cleanSavedQueries
 
     /**
-     * @dataProvider sgbds
-     * @param string $sgbd
+     * @dataProvider dbms
+     * @param string $driver
      * @throws DatabaseException
      */
-    public function testSaveQueries(string $sgbd): void
+    public function testSaveQueries(string $driver): void
     {
         /** @var Database $db */
-        $db = $this->sgbds[$sgbd]['db'];
+        $db = $this->dbms[$driver]['db'];
 
-        $sqls = $this->sqlQueries[$sgbd]['select'];
+        $sqls = $this->sqlQueries[$driver]['select'];
         foreach ($sqls as $sql) {
             $db->exec($sql);
         }
@@ -1556,15 +1541,15 @@ class DatabaseTest extends TestCase
     // region Database->useSqlFile
 
     /**
-     * @dataProvider sgbds
-     * @param string $sgbd
+     * @dataProvider dbms
+     * @param string $driver
      * @throws DatabaseException
      */
-    public function testUseSqlFile(string $sgbd): void
+    public function testUseSqlFile(string $driver): void
     {
         /** @var Database $db */
-        $db = $this->sgbds[$sgbd]['db'];
-        $sqlFiles = $this->sqlFiles[$sgbd];
+        $db = $this->dbms[$driver]['db'];
+        $sqlFiles = $this->sqlFiles[$driver];
 
         try {
             foreach ($sqlFiles as $sqlFile) {
@@ -1579,13 +1564,13 @@ class DatabaseTest extends TestCase
     }
 
     /**
-     * @dataProvider sgbds
-     * @param string $sgbd
+     * @dataProvider dbms
+     * @param string $driver
      */
-    public function testUseSqlFileExceptionMissingFile(string $sgbd): void
+    public function testUseSqlFileExceptionMissingFile(string $driver): void
     {
         /** @var Database $db */
-        $db = $this->sgbds[$sgbd]['db'];
+        $db = $this->dbms[$driver]['db'];
 
         $this->expectException(DatabaseException::class);
 
@@ -1593,13 +1578,13 @@ class DatabaseTest extends TestCase
     }
 
     /**
-     * @dataProvider sgbds
-     * @param string $sgbd
+     * @dataProvider dbms
+     * @param string $driver
      */
-    public function testUseSqlFileException(string $sgbd): void
+    public function testUseSqlFileException(string $driver): void
     {
         /** @var Database $db */
-        $db = $this->sgbds[$sgbd]['db'];
+        $db = $this->dbms[$driver]['db'];
 
         $this->expectException(DatabaseException::class);
 
@@ -1611,16 +1596,16 @@ class DatabaseTest extends TestCase
     // region Database->TruncateTables
 
     /**
-     * @dataProvider sgbds
-     * @param string $sgbd
+     * @dataProvider dbms
+     * @param string $driver
      * @throws DatabaseException
      */
-    public function testTruncateTables(string $sgbd): void
+    public function testTruncateTables(string $driver): void
     {
         /** @var Database $db */
-        $db = $this->sgbds[$sgbd]['db'];
+        $db = $this->dbms[$driver]['db'];
 
-        $sqls = $this->sqlQueries[$sgbd]['truncate'];
+        $sqls = $this->sqlQueries[$driver]['truncate'];
         foreach ($sqls as $sql) {
             $db->exec($sql);
         }
@@ -1638,14 +1623,14 @@ class DatabaseTest extends TestCase
     }
 
     /**
-     * @dataProvider sgbds
-     * @param string $sgbd
+     * @dataProvider dbms
+     * @param string $driver
      * @throws DatabaseException
      */
-    public function testTruncateTablesException(string $sgbd): void
+    public function testTruncateTablesException(string $driver): void
     {
         /** @var Database $db */
-        $db = $this->sgbds[$sgbd]['db'];
+        $db = $this->dbms[$driver]['db'];
 
         $this->expectException(DatabaseException::class);
 
@@ -1657,22 +1642,22 @@ class DatabaseTest extends TestCase
     // region Database->DropTables
 
     /**
-     * @dataProvider sgbds
-     * @param string $sgbd
+     * @dataProvider dbms
+     * @param string $driver
      * @throws DatabaseException
      */
-    public function testDropTables(string $sgbd): void
+    public function testDropTables(string $driver): void
     {
         /** @var Database $db */
-        $db = $this->sgbds[$sgbd]['db'];
+        $db = $this->dbms[$driver]['db'];
 
-        $sqls = $this->sqlQueries[$sgbd]['truncate'];
+        $sqls = $this->sqlQueries[$driver]['truncate'];
         foreach ($sqls as $sql) {
             $db->exec($sql);
         }
 
         try {
-            if ($sgbd === 'mysql') {
+            if ($driver === 'mysql') {
                 $sql1 = "SELECT COUNT(*) FROM information_schema.tables
                          WHERE table_schema = 'test_database' AND table_name = 'test_truncate1';";
                 $sql2 = "SELECT COUNT(*) FROM information_schema.tables
@@ -1683,13 +1668,13 @@ class DatabaseTest extends TestCase
                 $db->dropTables('test_truncate1', 'test_truncate2');
                 static::assertSame(0, $db->count($sql1));
                 static::assertSame(0, $db->count($sql2));
-            } elseif ($sgbd === 'pgsql') {
+            } elseif ($driver === 'pgsql') {
                 static::assertSame('test_truncate1', $db->selectVar("SELECT to_regclass('test_truncate1');"));
                 static::assertSame('test_truncate2', $db->selectVar("SELECT to_regclass('test_truncate2');"));
                 $db->dropTables('test_truncate1', 'test_truncate2');
                 static::assertNull($db->selectVar("SELECT to_regclass('test_truncate2');"));
                 static::assertNull($db->selectVar("SELECT to_regclass('test_truncate2');"));
-            } elseif ($sgbd === 'sqlite') {
+            } elseif ($driver === 'sqlite') {
                 $sql1 = "SELECT count(*) FROM sqlite_master WHERE type='table' AND name='test_truncate1';";
                 $sql2 = "SELECT count(*) FROM sqlite_master WHERE type='table' AND name='test_truncate2';";
                 static::assertSame(1, $db->count($sql1));
@@ -1698,7 +1683,7 @@ class DatabaseTest extends TestCase
                 static::assertSame(0, $db->count($sql1));
                 static::assertSame(0, $db->count($sql2));
             } else {
-                throw new DatabaseException('sgbd ' . $sgbd . ' not supported!');
+                throw new DatabaseException('driver ' . $driver . ' not supported!');
             }
         } catch (DatabaseException $e) {
             var_dump($db->getErrors());
@@ -1707,14 +1692,14 @@ class DatabaseTest extends TestCase
     }
 
     /**
-     * @dataProvider sgbds
-     * @param string $sgbd
+     * @dataProvider dbms
+     * @param string $driver
      * @throws DatabaseException
      */
-    public function testDropTablesException(string $sgbd): void
+    public function testDropTablesException(string $driver): void
     {
         /** @var Database $db */
-        $db = $this->sgbds[$sgbd]['db'];
+        $db = $this->dbms[$driver]['db'];
 
         $this->expectException(DatabaseException::class);
 
@@ -1726,23 +1711,23 @@ class DatabaseTest extends TestCase
     // region Database->Connect
 
     /**
-     * @dataProvider sgbds
-     * @param string $sgbd
+     * @dataProvider dbms
+     * @param string $driver
      * @throws DatabaseException
      * @noinspection GetClassUsageInspection
      */
-    public function testConnect(string $sgbd): void
+    public function testConnect(string $driver): void
     {
         /** @var Database $db */
-        $db = $this->sgbds[$sgbd]['db'];
+        $db = $this->dbms[$driver]['db'];
 
         try {
-            static::assertNull($db->getPdo());
+            static::assertNull($db->getPDO());
 
             $db->enableSaveQueries();
             $db->connect();
 
-            static::assertSame('PDO', get_class($db->getPdo()));
+            static::assertSame('PDO', get_class($db->getPDO()));
             static::assertCount(1, $db->getSavedQueries());
         } catch (DatabaseException $e) {
             var_dump($db->getErrors());
@@ -1751,15 +1736,15 @@ class DatabaseTest extends TestCase
     }
 
     /**
-     * @dataProvider sgbds
-     * @param string $sgbd
+     * @dataProvider dbms
+     * @param string $driver
      */
-    public function testConnectException(string $sgbd): void
+    public function testConnectException(string $driver): void
     {
         $this->expectException(DatabaseException::class);
         $this->expectExceptionMessage('Error Connecting Database');
 
-        $params = $this->sgbds[$sgbd]['parameters'];
+        $params = $this->dbms[$driver]['parameters'];
         $params['database'] = '/';
         $databaseConf = new Configurator($params);
         $db = new Database($databaseConf);
@@ -1771,22 +1756,22 @@ class DatabaseTest extends TestCase
     // region Database->GetPdo
 
     /**
-     * @dataProvider sgbds
-     * @param string $sgbd
+     * @dataProvider dbms
+     * @param string $driver
      * @throws DatabaseException
      * @noinspection GetClassUsageInspection
      */
-    public function testGetPdo(string $sgbd): void
+    public function testGetPdo(string $driver): void
     {
         /** @var Database $db */
-        $db = $this->sgbds[$sgbd]['db'];
+        $db = $this->dbms[$driver]['db'];
 
         try {
-            static::assertNull($db->getPdo());
+            static::assertNull($db->getPDO());
 
             $db->connect();
 
-            static::assertSame('PDO', get_class($db->getPdo()));
+            static::assertSame('PDO', get_class($db->getPDO()));
         } catch (DatabaseException $e) {
             var_dump($db->getErrors());
             throw $e;
@@ -1798,24 +1783,24 @@ class DatabaseTest extends TestCase
     // region Database->Disconnect
 
     /**
-     * @dataProvider sgbds
-     * @param string $sgbd
+     * @dataProvider dbms
+     * @param string $driver
      * @throws DatabaseException
      * @noinspection GetClassUsageInspection
      */
-    public function testDisconnect(string $sgbd): void
+    public function testDisconnect(string $driver): void
     {
         /** @var Database $db */
-        $db = $this->sgbds[$sgbd]['db'];
+        $db = $this->dbms[$driver]['db'];
 
         try {
             $db->connect();
 
-            static::assertSame('PDO', get_class($db->getPdo()));
+            static::assertSame('PDO', get_class($db->getPDO()));
 
             $db->disconnect();
 
-            static::assertNull($db->getPdo());
+            static::assertNull($db->getPDO());
         } catch (DatabaseException $e) {
             var_dump($db->getErrors());
             throw $e;
