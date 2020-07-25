@@ -729,9 +729,11 @@ class Database
             throw new DatabaseException('File missing for useSqlFile method: ' . $filepath);
         }
 
+        // @codeCoverageIgnoreStart
         if (!\is_readable($filepath)) {
             throw new DatabaseException('File is not readable for useSqlFile method: ' . $filepath);
         }
+        // @codeCoverageIgnoreEnd
 
         $sqlFile = \file_get_contents($filepath);
 

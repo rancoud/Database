@@ -1581,21 +1581,6 @@ class DatabaseTest extends TestCase
      * @dataProvider dbms
      * @param string $driver
      */
-    public function testUseSqlFileExceptionNotReadableFile(string $driver): void
-    {
-        /** @var Database $db */
-        $db = $this->dbms[$driver]['db'];
-
-        $this->expectException(DatabaseException::class);
-        $this->expectExceptionMessage('File is not readable for useSqlFile method: file_unread');
-
-        $db->useSqlFile('file_unread');
-    }
-
-    /**
-     * @dataProvider dbms
-     * @param string $driver
-     */
     public function testUseSqlFileException(string $driver): void
     {
         /** @var Database $db */
