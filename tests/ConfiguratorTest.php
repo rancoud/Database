@@ -588,7 +588,7 @@ class ConfiguratorTest extends TestCase
     /**
      * @throws DatabaseException
      */
-    public function testCreatePDOConnectionMysqlInReportErrorException(): void
+    public function testCreatePDOConnectionMysql(): void
     {
 
         $params = [
@@ -604,7 +604,7 @@ class ConfiguratorTest extends TestCase
         static::assertNotNull($conf->createPDOConnection());
     }
 
-    public function testCreatePDOConnectionMysqlInReportErrorExceptionThrowException(): void
+    public function testCreatePDOConnectionMysqlThrowException(): void
     {
         $this->expectException(DatabaseException::class);
 
@@ -624,10 +624,8 @@ class ConfiguratorTest extends TestCase
     /**
      * @throws DatabaseException
      */
-    public function testCreatePDOConnectionPgsqlInReportErrorException(): void
+    public function testCreatePDOConnectionPgsql(): void
     {
-        $this->expectException(DatabaseException::class);
-
         $params = [
             'driver'        => 'pgsql',
             'host'          => '127.0.0.1',
@@ -639,6 +637,26 @@ class ConfiguratorTest extends TestCase
         $conf = new Configurator($params);
 
         static::assertNotNull($conf->createPDOConnection());
+    }
+
+    /**
+     * @throws DatabaseException
+     */
+    public function testCreatePDOConnectionPgsqlThrowException(): void
+    {
+        $this->expectException(DatabaseException::class);
+
+        $params = [
+            'driver'        => 'pgsql',
+            'host'          => '127.0.0.1',
+            'user'          => 'postgres',
+            'password'      => 'postgres',
+            'database'      => ''
+        ];
+
+        $conf = new Configurator($params);
+
+        $conf->createPDOConnection();
     }
 
     /**

@@ -209,6 +209,7 @@ class Configurator
     /**
      * @param $key
      * @param $value
+     *
      * @throws DatabaseException
      */
     public function setParameter($key, $value): void

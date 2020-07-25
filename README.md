@@ -266,7 +266,7 @@ Here is the description of the array passed to the construct
 ### Low Level
 * connect(): void
 * disconnect(): void
-* getPdo(): ?PDO
+* getPDO(): ?PDO
 
 ### Static Method
 * getInstance([configurator: Configurator = null]): self

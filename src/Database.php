@@ -431,7 +431,7 @@ class Database
         $statement = null;
     }
 
-    public function getPdo(): ?PDO
+    public function getPDO(): ?PDO
     {
         return $this->pdo;
     }
