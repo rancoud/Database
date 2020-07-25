@@ -62,7 +62,7 @@ class Configurator
         'password',
         'database',
         'save_queries',
-        'permanent_connection',
+        'persistent_connection',
         'charset',
         'parameters'
     ];
@@ -124,8 +124,8 @@ class Configurator
             $this->saveQueries = (bool) $settings['save_queries'];
         }
 
-        if (isset($settings['permanent_connection'])) {
-            $this->persistentConnection = (bool) $settings['permanent_connection'];
+        if (isset($settings['persistent_connection'])) {
+            $this->persistentConnection = (bool) $settings['persistent_connection'];
         }
 
         if (\array_key_exists('charset', $settings)) {
