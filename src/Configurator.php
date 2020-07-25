@@ -13,7 +13,7 @@ use PDOException;
 class Configurator
 {
     /** @var string */
-    protected string $engine;
+    protected string $driver;
 
     /** @var string */
     protected string $host;
@@ -34,20 +34,35 @@ class Configurator
     protected bool $saveQueries = false;
 
     /** @var bool */
-    protected bool $permanentConnection = false;
+    protected bool $persistentConnection = false;
 
-    /** @var string */
-    protected string $charset = 'utf8mb4';
+    /** @var array */
+    protected static array $defaultCharsetByDriver = [
+        'mysql' => 'utf8mb4',
+        'pgsql' => 'UTF8'
+    ];
+
+    /** @var string|null */
+    protected ?string $charset = null;
 
     /** @var string[] */
-    protected array $keySettings = [
-        'engine',
+    protected static array $mandatorySettings = [
+        'driver',
+        'host',
+        'user',
+        'password',
+        'database'
+    ];
+
+    /** @var string[] */
+    protected static array $keySettings = [
+        'driver',
         'host',
         'user',
         'password',
         'database',
         'save_queries',
-        'permanent_connection',
+        'persistent_connection',
         'charset',
         'parameters'
     ];
@@ -65,7 +80,7 @@ class Configurator
 
         $this->setMandatorySettings($settings);
 
-        $this->setOptionnalsParameters($settings);
+        $this->setOptionalsParameters($settings);
     }
 
     /**
@@ -75,10 +90,11 @@ class Configurator
      */
     protected function verifySettings(array $settings): void
     {
-        foreach ($settings as $key => $value) {
-            if (!\in_array($key, $this->keySettings, true)) {
-                throw new DatabaseException('"' . $key . '" settings is not recognized');
-            }
+        $keys = \array_keys($settings);
+        $wrongSettings = \array_diff($keys, static::$keySettings);
+        if (!empty($wrongSettings)) {
+            $key = \reset($wrongSettings);
+            throw new DatabaseException('"' . $key . '" settings is not recognized');
         }
     }
 
@@ -89,27 +105,27 @@ class Configurator
      */
     protected function setMandatorySettings(array $settings): void
     {
-        $props = ['engine', 'host', 'user', 'password', 'database'];
-        foreach ($props as $prop) {
+        foreach (static::$mandatorySettings as $prop) {
             if (!isset($settings[$prop]) || !\is_string($settings[$prop])) {
                 throw new DatabaseException('"' . $prop . '" settings is not defined or not a string');
             }
 
-            $this->{'set' . \ucfirst($prop)}($settings[$prop]);
+            $setter = 'set' . \ucfirst($prop);
+            $this->{$setter}($settings[$prop]);
         }
     }
 
     /**
      * @param array $settings
      */
-    protected function setOptionnalsParameters(array $settings): void
+    protected function setOptionalsParameters(array $settings): void
     {
-        if (\array_key_exists('save_queries', $settings)) {
+        if (isset($settings['save_queries'])) {
             $this->saveQueries = (bool) $settings['save_queries'];
         }
 
-        if (\array_key_exists('permanent_connection', $settings)) {
-            $this->permanentConnection = (bool) $settings['permanent_connection'];
+        if (isset($settings['persistent_connection'])) {
+            $this->persistentConnection = (bool) $settings['persistent_connection'];
         }
 
         if (\array_key_exists('charset', $settings)) {
@@ -121,24 +137,28 @@ class Configurator
         }
     }
 
-    public function getEngine(): string
+    public function getDriver(): string
     {
-        return $this->engine;
+        return $this->driver;
     }
 
     /**
-     * @param string $engine
+     * @param string $driver
      *
      * @throws DatabaseException
      */
-    public function setEngine(string $engine): void
+    public function setDriver(string $driver): void
     {
-        $enginesAvailables = PDO::getAvailableDrivers();
-        if (!\in_array($engine, $enginesAvailables, true)) {
-            throw new DatabaseException('The engine "' . $engine . '" is not available for PDO');
+        $availableDrivers = PDO::getAvailableDrivers();
+        if (!\in_array($driver, $availableDrivers, true)) {
+            throw new DatabaseException('The driver "' . $driver . '" is not available for PDO');
         }
 
-        $this->engine = $engine;
+        $this->driver = $driver;
+
+        if ($this->getCharset() === null) {
+            $this->setDriverDefaultCharset();
+        }
     }
 
     public function getHost(): string
@@ -187,11 +207,19 @@ class Configurator
     }
 
     /**
-     * @param mixed $key
-     * @param mixed $value
+     * @param $key
+     * @param $value
+     *
+     * @throws DatabaseException
      */
     public function setParameter($key, $value): void
     {
+        $errorModeAttributeKeys = [PDO::ATTR_ERRMODE, (string) PDO::ATTR_ERRMODE];
+        if ($value !== PDO::ERRMODE_EXCEPTION && \in_array($key, $errorModeAttributeKeys, true)) {
+            $message = 'Database module only support error mode with exception. You can\'t modify this setting';
+            throw new DatabaseException($message);
+        }
+
         $this->parameters[$key] = $value;
     }
 
@@ -204,17 +232,17 @@ class Configurator
     {
         $parameters = $this->getParameters();
 
-        if ($this->getEngine() === 'mysql') {
+        if ($this->getDriver() === 'mysql') {
             $parameters[PDO::MYSQL_ATTR_INIT_COMMAND] = 'SET NAMES ' . $this->getCharset();
         }
 
         $parameters[PDO::ATTR_ERRMODE] = PDO::ERRMODE_EXCEPTION;
-        $parameters[PDO::ATTR_PERSISTENT] = $this->permanentConnection;
+        $parameters[PDO::ATTR_PERSISTENT] = $this->persistentConnection;
 
         return $parameters;
     }
 
-    public function hasSaveQueries(): bool
+    public function hasSavedQueries(): bool
     {
         return $this->saveQueries;
     }
@@ -229,39 +257,48 @@ class Configurator
         $this->saveQueries = false;
     }
 
-    public function hasPermanentConnection(): bool
+    public function hasPersistentConnection(): bool
     {
-        return $this->permanentConnection;
+        return $this->persistentConnection;
     }
 
-    public function enablePermanentConnection(): void
+    public function enablePersistentConnection(): void
     {
-        $this->permanentConnection = true;
+        $this->persistentConnection = true;
     }
 
-    public function disablePermanentConnection(): void
+    public function disablePersistentConnection(): void
     {
-        $this->permanentConnection = false;
+        $this->persistentConnection = false;
     }
 
-    public function getCharset(): string
+    public function getCharset(): ?string
     {
         return $this->charset;
     }
 
-    public function setCharset(string $charset): void
+    public function setCharset(?string $charset): void
     {
         $this->charset = $charset;
     }
 
+    public function setDriverDefaultCharset(): ?string
+    {
+        $charset = static::$defaultCharsetByDriver[$this->driver] ?? null;
+
+        $this->setCharset($charset);
+
+        return $charset;
+    }
+
     public function getDsn(): string
     {
-        $engine = $this->getEngine();
+        $driver = $this->getDriver();
         $host = $this->getHost();
         $database = $this->getDatabase();
 
-        $dsn = $engine . ':host=' . $host . ';dbname=' . $database;
-        if ($engine === 'sqlite') {
+        $dsn = $driver . ':host=' . $host . ';dbname=' . $database;
+        if ($driver === 'sqlite') {
             $dsn = 'sqlite:' . $database;
         }
 
@@ -279,11 +316,18 @@ class Configurator
         $dsn = $this->getDsn();
 
         try {
-            if ($this->getEngine() !== 'sqlite') {
-                return new PDO($dsn, $user, $password, $parameters);
+            if ($this->getDriver() === 'sqlite') {
+                $user = null;
+                $password = null;
             }
 
-            return new PDO($dsn, null, null, $parameters);
+            $pdo = new PDO($dsn, $user, $password, $parameters);
+
+            if ($this->getDriver() === 'pgsql' && !empty($this->getCharset())) {
+                $pdo->exec('SET NAMES \'' . $this->getCharset() . '\'');
+            }
+
+            return $pdo;
         } catch (PDOException $e) {
             throw new DatabaseException($e->getMessage());
         }

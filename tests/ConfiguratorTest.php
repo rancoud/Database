@@ -21,24 +21,20 @@ class ConfiguratorTest extends TestCase
     public function testConstructMandatory(): void
     {
         $params = [
-            'engine'        => 'mysql',
+            'driver'        => 'mysql',
             'host'          => 'localhost',
             'user'          => 'root',
             'password'      => '',
             'database'      => 'test_database'
         ];
 
-        try {
-            $conf = new Configurator($params);
+        $conf = new Configurator($params);
 
-            static::assertSame('mysql', $conf->getEngine());
-            static::assertSame('localhost', $conf->getHost());
-            static::assertSame('root', $conf->getUser());
-            static::assertSame('', $conf->getPassword());
-            static::assertSame('test_database', $conf->getDatabase());
-        } catch (DatabaseException $e) {
-            throw $e;
-        }
+        static::assertSame('mysql', $conf->getDriver());
+        static::assertSame('localhost', $conf->getHost());
+        static::assertSame('root', $conf->getUser());
+        static::assertSame('', $conf->getPassword());
+        static::assertSame('test_database', $conf->getDatabase());
     }
 
     public function testConstructInvalidSettingsException(): void
@@ -54,8 +50,8 @@ class ConfiguratorTest extends TestCase
     public function testConstructMandatoryException(): void
     {
         $this->expectException(DatabaseException::class);
-        $this->expectExceptionMessage('"engine" settings is not defined or not a string');
-        
+        $this->expectExceptionMessage('"driver" settings is not defined or not a string');
+
         $params = [
             'database'      => 'test_database'
         ];
@@ -66,10 +62,10 @@ class ConfiguratorTest extends TestCase
     public function testConstructMandatoryEngineException(): void
     {
         $this->expectException(DatabaseException::class);
-        $this->expectExceptionMessage('The engine "engine" is not available for PDO');
-        
+        $this->expectExceptionMessage('The driver "driver" is not available for PDO');
+
         $params = [
-            'engine'        => 'engine',
+            'driver'        => 'driver',
             'host'          => 'localhost',
             'user'          => 'root',
             'password'      => '',
@@ -88,7 +84,7 @@ class ConfiguratorTest extends TestCase
         $this->expectException(\TypeError::class);
 
         $params = [
-            'engine'        => 'mysql',
+            'driver'        => 'mysql',
             'host'          => 'localhost',
             'user'          => 'root',
             'password'      => '',
@@ -105,30 +101,7 @@ class ConfiguratorTest extends TestCase
     public function testSetEngine(): void
     {
         $params = [
-            'engine'        => 'mysql',
-            'host'          => 'localhost',
-            'user'          => 'root',
-            'password'      => '',
-            'database'      => 'test_database'
-        ];
-
-        try {
-            $conf = new Configurator($params);
-
-            $conf->setEngine('sqlite');
-            static::assertSame('sqlite', $conf->getEngine());
-        } catch (DatabaseException $e) {
-            throw $e;
-        }
-    }
-
-    public function testSetEngineException(): void
-    {
-        $this->expectException(DatabaseException::class);
-        $this->expectExceptionMessage('The engine "engine" is not available for PDO');
-
-        $params = [
-            'engine'        => 'mysql',
+            'driver'        => 'mysql',
             'host'          => 'localhost',
             'user'          => 'root',
             'password'      => '',
@@ -137,7 +110,26 @@ class ConfiguratorTest extends TestCase
 
         $conf = new Configurator($params);
 
-        $conf->setEngine('engine');
+        $conf->setDriver('sqlite');
+        static::assertSame('sqlite', $conf->getDriver());
+    }
+
+    public function testSetEngineException(): void
+    {
+        $this->expectException(DatabaseException::class);
+        $this->expectExceptionMessage('The driver "driver" is not available for PDO');
+
+        $params = [
+            'driver'        => 'mysql',
+            'host'          => 'localhost',
+            'user'          => 'root',
+            'password'      => '',
+            'database'      => 'test_database'
+        ];
+
+        $conf = new Configurator($params);
+
+        $conf->setDriver('driver');
     }
 
     /**
@@ -146,21 +138,17 @@ class ConfiguratorTest extends TestCase
     public function testSetHost(): void
     {
         $params = [
-            'engine'        => 'mysql',
+            'driver'        => 'mysql',
             'host'          => 'localhost',
             'user'          => 'root',
             'password'      => '',
             'database'      => 'test_database'
         ];
 
-        try {
-            $conf = new Configurator($params);
+        $conf = new Configurator($params);
 
-            $conf->setHost('host');
-            static::assertSame('host', $conf->getHost());
-        } catch (DatabaseException $e) {
-            throw $e;
-        }
+        $conf->setHost('host');
+        static::assertSame('host', $conf->getHost());
     }
 
     /**
@@ -169,21 +157,17 @@ class ConfiguratorTest extends TestCase
     public function testSetUser(): void
     {
         $params = [
-            'engine'        => 'mysql',
+            'driver'        => 'mysql',
             'host'          => 'localhost',
             'user'          => 'root',
             'password'      => '',
             'database'      => 'test_database'
         ];
 
-        try {
-            $conf = new Configurator($params);
+        $conf = new Configurator($params);
+        $conf->setUser('user');
 
-            $conf->setUser('user');
-            static::assertSame('user', $conf->getUser());
-        } catch (DatabaseException $e) {
-            throw $e;
-        }
+        static::assertSame('user', $conf->getUser());
     }
 
     /**
@@ -192,21 +176,17 @@ class ConfiguratorTest extends TestCase
     public function testSetPassword(): void
     {
         $params = [
-            'engine'        => 'mysql',
+            'driver'        => 'mysql',
             'host'          => 'localhost',
             'user'          => 'root',
             'password'      => '',
             'database'      => 'test_database'
         ];
 
-        try {
-            $conf = new Configurator($params);
+        $conf = new Configurator($params);
+        $conf->setPassword('password');
 
-            $conf->setPassword('password');
-            static::assertSame('password', $conf->getPassword());
-        } catch (DatabaseException $e) {
-            throw $e;
-        }
+        static::assertSame('password', $conf->getPassword());
     }
 
     /**
@@ -215,21 +195,17 @@ class ConfiguratorTest extends TestCase
     public function testSetDatabase(): void
     {
         $params = [
-            'engine'        => 'mysql',
+            'driver'        => 'mysql',
             'host'          => 'localhost',
             'user'          => 'root',
             'password'      => '',
             'database'      => 'test_database'
         ];
 
-        try {
-            $conf = new Configurator($params);
+        $conf = new Configurator($params);
+        $conf->setDatabase('database');
 
-            $conf->setDatabase('database');
-            static::assertSame('database', $conf->getDatabase());
-        } catch (DatabaseException $e) {
-            throw $e;
-        }
+        static::assertSame('database', $conf->getDatabase());
     }
 
     /**
@@ -238,20 +214,16 @@ class ConfiguratorTest extends TestCase
     public function testDefaultSaveQueriesFalse(): void
     {
         $params = [
-            'engine'        => 'mysql',
+            'driver'        => 'mysql',
             'host'          => 'localhost',
             'user'          => 'root',
             'password'      => '',
             'database'      => 'test_database'
         ];
 
-        try {
-            $conf = new Configurator($params);
+        $conf = new Configurator($params);
 
-            static::assertFalse($conf->hasSaveQueries());
-        } catch (DatabaseException $e) {
-            throw $e;
-        }
+        static::assertFalse($conf->hasSavedQueries());
     }
 
     /**
@@ -260,7 +232,7 @@ class ConfiguratorTest extends TestCase
     public function testSaveQueries(): void
     {
         $params = [
-            'engine'        => 'mysql',
+            'driver'        => 'mysql',
             'host'          => 'localhost',
             'user'          => 'root',
             'password'      => '',
@@ -268,90 +240,78 @@ class ConfiguratorTest extends TestCase
             'save_queries'  => true
         ];
 
-        try {
-            $conf = new Configurator($params);
+        $conf = new Configurator($params);
 
-            static::assertTrue($conf->hasSaveQueries());
+        static::assertTrue($conf->hasSavedQueries());
 
-            $conf->disableSaveQueries();
+        $conf->disableSaveQueries();
 
-            static::assertFalse($conf->hasSaveQueries());
+        static::assertFalse($conf->hasSavedQueries());
 
-            $conf->disableSaveQueries();
+        $conf->disableSaveQueries();
 
-            static::assertFalse($conf->hasSaveQueries());
+        static::assertFalse($conf->hasSavedQueries());
 
-            $conf->enableSaveQueries();
+        $conf->enableSaveQueries();
 
-            static::assertTrue($conf->hasSaveQueries());
+        static::assertTrue($conf->hasSavedQueries());
 
-            $conf->enableSaveQueries();
+        $conf->enableSaveQueries();
 
-            static::assertTrue($conf->hasSaveQueries());
-        } catch (DatabaseException $e) {
-            throw $e;
-        }
+        static::assertTrue($conf->hasSavedQueries());
     }
 
     /**
      * @throws DatabaseException
      */
-    public function testDefaultPermanentConnectionFalse(): void
+    public function testDefaultPersistentConnectionFalse(): void
     {
         $params = [
-            'engine'        => 'mysql',
+            'driver'        => 'mysql',
             'host'          => 'localhost',
             'user'          => 'root',
             'password'      => '',
             'database'      => 'test_database'
         ];
 
-        try {
-            $conf = new Configurator($params);
+        $conf = new Configurator($params);
 
-            static::assertFalse($conf->hasPermanentConnection());
-        } catch (DatabaseException $e) {
-            throw $e;
-        }
+        static::assertFalse($conf->hasPersistentConnection());
     }
 
     /**
      * @throws DatabaseException
      */
-    public function testPermanentConnection(): void
+    public function testPersistentConnection(): void
     {
         $params = [
-            'engine'                => 'mysql',
+            'driver'                => 'mysql',
             'host'                  => 'localhost',
             'user'                  => 'root',
             'password'              => '',
             'database'              => 'test_database',
-            'permanent_connection'  => true
+            'persistent_connection' => true
         ];
 
-        try {
-            $conf = new Configurator($params);
+        $conf = new Configurator($params);
 
-            static::assertTrue($conf->hasPermanentConnection());
+        static::assertTrue($conf->hasPersistentConnection());
 
-            $conf->disablePermanentConnection();
+        $conf->disablePersistentConnection();
 
-            static::assertFalse($conf->hasPermanentConnection());
+        static::assertFalse($conf->hasPersistentConnection());
 
-            $conf->disablePermanentConnection();
+        $conf->disablePersistentConnection();
 
-            static::assertFalse($conf->hasPermanentConnection());
+        static::assertFalse($conf->hasPersistentConnection());
 
-            $conf->enablePermanentConnection();
+        $conf->enablePersistentConnection();
 
-            static::assertTrue($conf->hasPermanentConnection());
+        static::assertTrue($conf->hasPersistentConnection());
 
-            $conf->enablePermanentConnection();
+        $conf->enablePersistentConnection();
 
-            static::assertTrue($conf->hasPermanentConnection());
-        } catch (DatabaseException $e) {
-            throw $e;
-        }
+        static::assertTrue($conf->hasPersistentConnection());
     }
 
     /**
@@ -360,20 +320,16 @@ class ConfiguratorTest extends TestCase
     public function testDefaultGetCharsetUtf8mb4(): void
     {
         $params = [
-            'engine'        => 'mysql',
+            'driver'        => 'mysql',
             'host'          => 'localhost',
             'user'          => 'root',
             'password'      => '',
             'database'      => 'test_database'
         ];
 
-        try {
-            $conf = new Configurator($params);
+        $conf = new Configurator($params);
 
-            static::assertSame('utf8mb4', $conf->getCharset());
-        } catch (DatabaseException $e) {
-            throw $e;
-        }
+        static::assertSame('utf8mb4', $conf->getCharset());
     }
 
     /**
@@ -382,7 +338,7 @@ class ConfiguratorTest extends TestCase
     public function testSetCharset(): void
     {
         $params = [
-            'engine'        => 'mysql',
+            'driver'        => 'mysql',
             'host'          => 'localhost',
             'user'          => 'root',
             'password'      => '',
@@ -390,17 +346,13 @@ class ConfiguratorTest extends TestCase
             'charset'       => 'charset'
         ];
 
-        try {
-            $conf = new Configurator($params);
+        $conf = new Configurator($params);
 
-            static::assertSame('charset', $conf->getCharset());
+        static::assertSame('charset', $conf->getCharset());
 
-            $conf->setCharset('new_charset');
+        $conf->setCharset('new_charset');
 
-            static::assertSame('new_charset', $conf->getCharset());
-        } catch (DatabaseException $e) {
-            throw $e;
-        }
+        static::assertSame('new_charset', $conf->getCharset());
     }
 
     /**
@@ -409,20 +361,16 @@ class ConfiguratorTest extends TestCase
     public function testDefaultGetParametersEmpty(): void
     {
         $params = [
-            'engine'        => 'mysql',
+            'driver'        => 'mysql',
             'host'          => 'localhost',
             'user'          => 'root',
             'password'      => '',
             'database'      => 'test_database'
         ];
 
-        try {
-            $conf = new Configurator($params);
+        $conf = new Configurator($params);
 
-            static::assertSame([], $conf->getParameters());
-        } catch (DatabaseException $e) {
-            throw $e;
-        }
+        static::assertSame([], $conf->getParameters());
     }
 
     /**
@@ -431,7 +379,7 @@ class ConfiguratorTest extends TestCase
     public function testSetParameterKeyValue(): void
     {
         $params = [
-            'engine'        => 'mysql',
+            'driver'        => 'mysql',
             'host'          => 'localhost',
             'user'          => 'root',
             'password'      => '',
@@ -439,21 +387,37 @@ class ConfiguratorTest extends TestCase
             'parameters'    => ['key' => 'value']
         ];
 
-        try {
-            $conf = new Configurator($params);
+        $conf = new Configurator($params);
 
-            static::assertSame(['key' => 'value'], $conf->getParameters());
+        static::assertSame(['key' => 'value'], $conf->getParameters());
 
-            $conf->setParameter('new_key', 'new_value');
+        $conf->setParameter('new_key', 'new_value');
 
-            static::assertSame(['key' => 'value', 'new_key' => 'new_value'], $conf->getParameters());
+        static::assertSame(['key' => 'value', 'new_key' => 'new_value'], $conf->getParameters());
 
-            $conf->setParameter('key', 'another_value');
+        $conf->setParameter('key', 'another_value');
 
-            static::assertSame(['key' => 'another_value', 'new_key' => 'new_value'], $conf->getParameters());
-        } catch (DatabaseException $e) {
-            throw $e;
-        }
+        static::assertSame(['key' => 'another_value', 'new_key' => 'new_value'], $conf->getParameters());
+    }
+
+    /**
+     * @throws DatabaseException
+     */
+    public function testSetParameterThrowException(): void
+    {
+        $this->expectException(DatabaseException::class);
+        $this->expectExceptionMessage('Database module only support error mode with exception. You can\'t modify this setting');
+
+        $params = [
+            'driver'        => 'mysql',
+            'host'          => 'localhost',
+            'user'          => 'root',
+            'password'      => '',
+            'database'      => 'test_database'
+        ];
+
+        $conf = new Configurator($params);
+        $conf->setParameter(PDO::ATTR_ERRMODE, 1);
     }
 
     /**
@@ -462,22 +426,18 @@ class ConfiguratorTest extends TestCase
     public function testSetParameters(): void
     {
         $params = [
-            'engine'        => 'mysql',
+            'driver'        => 'mysql',
             'host'          => 'localhost',
             'user'          => 'root',
             'password'      => '',
             'database'      => 'test_database'
         ];
 
-        try {
-            $conf = new Configurator($params);
+        $conf = new Configurator($params);
 
-            $conf->setParameters(['key' => 'value']);
+        $conf->setParameters(['key' => 'value']);
 
-            static::assertSame(['key' => 'value'], $conf->getParameters());
-        } catch (DatabaseException $e) {
-            throw $e;
-        }
+        static::assertSame(['key' => 'value'], $conf->getParameters());
     }
 
     /**
@@ -486,20 +446,16 @@ class ConfiguratorTest extends TestCase
     public function testGetDsnMysql(): void
     {
         $params = [
-            'engine'        => 'mysql',
+            'driver'        => 'mysql',
             'host'          => 'localhost',
             'user'          => 'root',
             'password'      => '',
             'database'      => 'test_database'
         ];
 
-        try {
-            $conf = new Configurator($params);
+        $conf = new Configurator($params);
 
-            static::assertSame('mysql:host=localhost;dbname=test_database', $conf->getDsn());
-        } catch (DatabaseException $e) {
-            throw $e;
-        }
+        static::assertSame('mysql:host=localhost;dbname=test_database', $conf->getDsn());
     }
 
     /**
@@ -508,20 +464,16 @@ class ConfiguratorTest extends TestCase
     public function testGetDsnSqlite(): void
     {
         $params = [
-            'engine'        => 'sqlite',
+            'driver'        => 'sqlite',
             'host'          => '',
             'user'          => '',
             'password'      => '',
             'database'      => __DIR__ . '/test_database.db'
         ];
 
-        try {
-            $conf = new Configurator($params);
+        $conf = new Configurator($params);
 
-            static::assertSame('sqlite:' . __DIR__ . '/test_database.db', $conf->getDsn());
-        } catch (DatabaseException $e) {
-            throw $e;
-        }
+        static::assertSame('sqlite:' . __DIR__ . '/test_database.db', $conf->getDsn());
     }
 
     /**
@@ -530,20 +482,16 @@ class ConfiguratorTest extends TestCase
     public function testGetDsnPgsql(): void
     {
         $params = [
-            'engine'        => 'pgsql',
+            'driver'        => 'pgsql',
             'host'          => '127.0.0.1',
             'user'          => 'postgres',
             'password'      => '',
             'database'      => 'test_database'
         ];
 
-        try {
-            $conf = new Configurator($params);
+        $conf = new Configurator($params);
 
-            static::assertSame('pgsql:host=127.0.0.1;dbname=test_database', $conf->getDsn());
-        } catch (DatabaseException $e) {
-            throw $e;
-        }
+        static::assertSame('pgsql:host=127.0.0.1;dbname=test_database', $conf->getDsn());
     }
 
     /**
@@ -552,41 +500,37 @@ class ConfiguratorTest extends TestCase
     public function testGetParametersForPDOMysql(): void
     {
         $params = [
-            'engine'        => 'mysql',
+            'driver'        => 'mysql',
             'host'          => '127.0.0.1',
             'user'          => 'root',
             'password'      => '',
             'database'      => 'test_database'
         ];
 
-        try {
-            $conf = new Configurator($params);
+        $conf = new Configurator($params);
 
-            $expected = [
-                PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8mb4',
-                PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-                PDO::ATTR_PERSISTENT         => false
-            ];
-            static::assertSame($expected, $conf->getParametersForPDO());
+        $expected = [
+            PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8mb4',
+            PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_PERSISTENT         => false
+        ];
+        static::assertSame($expected, $conf->getParametersForPDO());
 
-            $conf->setCharset('charset');
-            $expected = [
-                PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES charset',
-                PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-                PDO::ATTR_PERSISTENT         => false
-            ];
-            static::assertSame($expected, $conf->getParametersForPDO());
+        $conf->setCharset('charset');
+        $expected = [
+            PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES charset',
+            PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_PERSISTENT         => false
+        ];
+        static::assertSame($expected, $conf->getParametersForPDO());
 
-            $conf->enablePermanentConnection();
-            $expected = [
-                PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES charset',
-                PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-                PDO::ATTR_PERSISTENT         => true
-            ];
-            static::assertSame($expected, $conf->getParametersForPDO());
-        } catch (DatabaseException $e) {
-            throw $e;
-        }
+        $conf->enablePersistentConnection();
+        $expected = [
+            PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES charset',
+            PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_PERSISTENT         => true
+        ];
+        static::assertSame($expected, $conf->getParametersForPDO());
     }
 
     /**
@@ -595,38 +539,34 @@ class ConfiguratorTest extends TestCase
     public function testGetParametersForPDOSqlite(): void
     {
         $params = [
-            'engine'        => 'sqlite',
+            'driver'        => 'sqlite',
             'host'          => '',
             'user'          => '',
             'password'      => '',
             'database'      => __DIR__ . '/test_database.db'
         ];
 
-        try {
-            $conf = new Configurator($params);
+        $conf = new Configurator($params);
 
-            $expected = [
-                PDO::ATTR_ERRMODE    => PDO::ERRMODE_EXCEPTION,
-                PDO::ATTR_PERSISTENT => false
-            ];
-            static::assertSame($expected, $conf->getParametersForPDO());
+        $expected = [
+            PDO::ATTR_ERRMODE    => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_PERSISTENT => false
+        ];
+        static::assertSame($expected, $conf->getParametersForPDO());
 
-            $conf->setCharset('charset');
-            $expected = [
-                PDO::ATTR_ERRMODE    => PDO::ERRMODE_EXCEPTION,
-                PDO::ATTR_PERSISTENT => false
-            ];
-            static::assertSame($expected, $conf->getParametersForPDO());
+        $conf->setCharset('charset');
+        $expected = [
+            PDO::ATTR_ERRMODE    => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_PERSISTENT => false
+        ];
+        static::assertSame($expected, $conf->getParametersForPDO());
 
-            $conf->enablePermanentConnection();
-            $expected = [
-                PDO::ATTR_ERRMODE    => PDO::ERRMODE_EXCEPTION,
-                PDO::ATTR_PERSISTENT => true
-            ];
-            static::assertSame($expected, $conf->getParametersForPDO());
-        } catch (DatabaseException $e) {
-            throw $e;
-        }
+        $conf->enablePersistentConnection();
+        $expected = [
+            PDO::ATTR_ERRMODE    => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_PERSISTENT => true
+        ];
+        static::assertSame($expected, $conf->getParametersForPDO());
     }
 
     /**
@@ -635,68 +575,61 @@ class ConfiguratorTest extends TestCase
     public function testGetParametersForPDOPgsql(): void
     {
         $params = [
-            'engine'        => 'pgsql',
+            'driver'        => 'pgsql',
             'host'          => '127.0.0.1',
             'user'          => 'postgres',
             'password'      => '',
             'database'      => 'test_database'
         ];
 
-        try {
-            $conf = new Configurator($params);
+        $conf = new Configurator($params);
 
-            $expected = [
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                PDO::ATTR_PERSISTENT => false
-            ];
-            static::assertSame($expected, $conf->getParametersForPDO());
+        $expected = [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_PERSISTENT => false
+        ];
+        static::assertSame($expected, $conf->getParametersForPDO());
 
-            $conf->setCharset('charset');
-            $expected = [
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                PDO::ATTR_PERSISTENT => false
-            ];
-            static::assertSame($expected, $conf->getParametersForPDO());
+        $conf->setCharset('charset');
+        $expected = [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_PERSISTENT => false
+        ];
+        static::assertSame($expected, $conf->getParametersForPDO());
 
-            $conf->enablePermanentConnection();
-            $expected = [
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                PDO::ATTR_PERSISTENT => true
-            ];
-            static::assertSame($expected, $conf->getParametersForPDO());
-        } catch (DatabaseException $e) {
-            throw $e;
-        }
+        $conf->enablePersistentConnection();
+        $expected = [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_PERSISTENT => true
+        ];
+        static::assertSame($expected, $conf->getParametersForPDO());
     }
 
     /**
      * @throws DatabaseException
      */
-    public function testCreatePDOConnectionMysqlInReportErrorException(): void
+    public function testCreatePDOConnectionMysql(): void
     {
+
         $params = [
-            'engine'        => 'mysql',
+            'driver'        => 'mysql',
             'host'          => '127.0.0.1',
             'user'          => 'root',
             'password'      => '',
             'database'      => 'test_database'
         ];
 
-        try {
-            $conf = new Configurator($params);
+        $conf = new Configurator($params);
 
-            static::assertNotNull($conf->createPDOConnection());
-        } catch (DatabaseException $e) {
-            throw $e;
-        }
+        static::assertNotNull($conf->createPDOConnection());
     }
 
-    public function testCreatePDOConnectionMysqlInReportErrorExceptionThrowException(): void
+    public function testCreatePDOConnectionMysqlThrowException(): void
     {
         $this->expectException(DatabaseException::class);
 
         $params = [
-            'engine'        => 'mysql',
+            'driver'        => 'mysql',
             'host'          => '127.0.0.1',
             'user'          => 'root',
             'password'      => 'root',
@@ -711,85 +644,39 @@ class ConfiguratorTest extends TestCase
     /**
      * @throws DatabaseException
      */
-    public function testCreatePDOConnectionMysqlInReportErrorSilent(): void
+    public function testCreatePDOConnectionPgsql(): void
     {
         $params = [
-            'engine'        => 'mysql',
+            'driver'        => 'pgsql',
             'host'          => '127.0.0.1',
-            'user'          => 'root',
-            'password'      => '',
+            'user'          => 'postgres',
+            'password'      => 'postgres',
             'database'      => 'test_database'
         ];
 
-        try {
-            $conf = new Configurator($params);
+        $conf = new Configurator($params);
 
-            static::assertNotNull($conf->createPDOConnection());
-        } catch (DatabaseException $e) {
-            throw $e;
-        }
+        static::assertNotNull($conf->createPDOConnection());
     }
 
-    public function testCreatePDOConnectionMysqlInReportErrorSilentErrorThrowException(): void
+    /**
+     * @throws DatabaseException
+     */
+    public function testCreatePDOConnectionPgsqlThrowException(): void
     {
         $this->expectException(DatabaseException::class);
 
         $params = [
-            'engine'        => 'mysql',
+            'driver'        => 'pgsql',
             'host'          => '127.0.0.1',
-            'user'          => 'root',
-            'password'      => 'root',
-            'database'      => 'test_database',
-            'report_error'  => 'silent'
+            'user'          => 'postgres',
+            'password'      => 'postgres',
+            'database'      => ''
         ];
 
         $conf = new Configurator($params);
 
         $conf->createPDOConnection();
-    }
-
-    /**
-     * @throws DatabaseException
-     */
-    public function testCreatePDOConnectionPgsqlInReportErrorException(): void
-    {
-        $params = [
-            'engine'        => 'pgsql',
-            'host'          => '127.0.0.1',
-            'user'          => 'postgres',
-            'password'      => '',
-            'database'      => 'test_database'
-        ];
-
-        try {
-            $conf = new Configurator($params);
-
-            static::assertNotNull($conf->createPDOConnection());
-        } catch (DatabaseException $e) {
-            throw $e;
-        }
-    }
-
-    /**
-     * @throws DatabaseException
-     */
-    public function testCreatePDOConnectionPgsqlInReportErrorSilent(): void
-    {
-        $params = [
-            'engine'        => 'pgsql',
-            'host'          => '127.0.0.1',
-            'user'          => 'postgres',
-            'password'      => '',
-            'database'      => 'test_database'
-        ];
-
-        try {
-            $conf = new Configurator($params);
-
-            static::assertNotNull($conf->createPDOConnection());
-        } catch (DatabaseException $e) {
-            throw $e;
-        }
     }
 
     /**
@@ -798,19 +685,15 @@ class ConfiguratorTest extends TestCase
     public function testCreatePDOConnectionSqlite(): void
     {
         $params = [
-            'engine'        => 'sqlite',
+            'driver'        => 'sqlite',
             'host'          => '',
             'user'          => '',
             'password'      => '',
             'database'      => __DIR__ . '/test_database.db'
         ];
 
-        try {
-            $conf = new Configurator($params);
+        $conf = new Configurator($params);
 
-            static::assertNotNull($conf->createPDOConnection());
-        } catch (DatabaseException $e) {
-            throw $e;
-        }
+        static::assertNotNull($conf->createPDOConnection());
     }
 }
