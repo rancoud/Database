@@ -315,12 +315,14 @@ class Configurator
         $dsn = $this->getDsn();
 
         try {
-            /** @var PDO */
-            $pdo = ($this->getDriver() === 'sqlite')
-                    ? new PDO($dsn, null, null, $parameters)
-                    : new PDO($dsn, $user, $password, $parameters);
+            if ($this->getDriver() === 'sqlite') {
+                $user = null;
+                $password = null;
+            }
 
-            if ($pdo !== null && $this->getDriver() === 'pgsql' && !empty($this->getCharset())) {
+            $pdo = new PDO($dsn, $user, $password, $parameters);
+
+            if ($this->getDriver() === 'pgsql' && !empty($this->getCharset())) {
                 $pdo->exec('SET NAMES \'' . $this->getCharset() . '\'');
             }
 
