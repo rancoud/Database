@@ -31,8 +31,8 @@ $databaseConf = new Configurator($params);
 // No singleton
 $database = new Database($databaseConf);
 
-// With singleton
-$singletonDatabase = Database::getInstance($databaseConf);
+// With named instances
+$database = Database::setInstance($databaseConf, 'primary');
 ```
 
 ## Examples
@@ -171,6 +171,18 @@ if (isOk()) {
 }
 ```
 
+## Named instances
+You have to name your instances.  
+Then you can get them by their name.
+```php
+Database::setInstance($databaseConfA, 'primary');
+Database::setInstance($databaseConfB, 'secondary');
+
+/** A few moments later **/
+
+$db = Database::getInstance('secondary');
+```
+
 ## Configurator
 ### Constructor Settings
 Here is the description of the array passed to the construct
@@ -269,7 +281,9 @@ Here is the description of the array passed to the construct
 * getPDO(): ?PDO
 
 ### Static Method
-* getInstance([configurator: Configurator = null]): self
+* setInstance(configurator: Configurator, [name: string = primary]]): self
+* hasInstance([name: string = primary]): bool
+* getInstance([name: string = primary]): ?self
 
 ## How to Dev
 `composer ci` for php-cs-fixer and phpunit and coverage  
