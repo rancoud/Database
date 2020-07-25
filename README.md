@@ -8,7 +8,7 @@
 [![Codecov](https://img.shields.io/codecov/c/github/rancoud/database?logo=codecov)](https://codecov.io/gh/rancoud/database)
 [![composer.lock](https://poser.pugx.org/rancoud/database/composerlock)](https://packagist.org/packages/rancoud/database)
 
-Request Database (use PDO). Drivers supported: MySQL, PostgreSQL, SQLite.
+Request Database (use PDO). Supported drivers: MySQL, PostgreSQL, SQLite.
 
 ## Installation
 ```php

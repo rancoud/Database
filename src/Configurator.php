@@ -207,8 +207,9 @@ class Configurator
     }
 
     /**
-     * @param mixed $key
-     * @param mixed $value
+     * @param $key
+     * @param $value
+     * @throws DatabaseException
      */
     public function setParameter($key, $value): void
     {
@@ -255,17 +256,17 @@ class Configurator
         $this->saveQueries = false;
     }
 
-    public function hasPermanentConnection(): bool
+    public function hasPersistentConnection(): bool
     {
         return $this->persistentConnection;
     }
 
-    public function enablePermanentConnection(): void
+    public function enablePersistentConnection(): void
     {
         $this->persistentConnection = true;
     }
 
-    public function disablePermanentConnection(): void
+    public function disablePersistentConnection(): void
     {
         $this->persistentConnection = false;
     }

@@ -51,8 +51,8 @@ class DatabaseSingletonTest extends TestCase
      */
     public function testSingleton(): void
     {
-		Database::getInstance(new Configurator($this->params));
-		$this->expectNotToPerformAssertions();
+        Database::getInstance(new Configurator($this->params));
+        $this->expectNotToPerformAssertions();
     }
 
     /** @runInSeparateProcess  */

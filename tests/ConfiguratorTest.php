@@ -28,13 +28,13 @@ class ConfiguratorTest extends TestCase
             'database'      => 'test_database'
         ];
 
-		$conf = new Configurator($params);
+        $conf = new Configurator($params);
 
-		static::assertSame('mysql', $conf->getDriver());
-		static::assertSame('localhost', $conf->getHost());
-		static::assertSame('root', $conf->getUser());
-		static::assertSame('', $conf->getPassword());
-		static::assertSame('test_database', $conf->getDatabase());
+        static::assertSame('mysql', $conf->getDriver());
+        static::assertSame('localhost', $conf->getHost());
+        static::assertSame('root', $conf->getUser());
+        static::assertSame('', $conf->getPassword());
+        static::assertSame('test_database', $conf->getDatabase());
     }
 
     public function testConstructInvalidSettingsException(): void
@@ -108,10 +108,10 @@ class ConfiguratorTest extends TestCase
             'database'      => 'test_database'
         ];
 
-		$conf = new Configurator($params);
+        $conf = new Configurator($params);
 
-		$conf->setDriver('sqlite');
-		static::assertSame('sqlite', $conf->getDriver());
+        $conf->setDriver('sqlite');
+        static::assertSame('sqlite', $conf->getDriver());
     }
 
     public function testSetEngineException(): void
@@ -145,10 +145,10 @@ class ConfiguratorTest extends TestCase
             'database'      => 'test_database'
         ];
 
-		$conf = new Configurator($params);
+        $conf = new Configurator($params);
 
-		$conf->setHost('host');
-		static::assertSame('host', $conf->getHost());
+        $conf->setHost('host');
+        static::assertSame('host', $conf->getHost());
     }
 
     /**
@@ -164,10 +164,10 @@ class ConfiguratorTest extends TestCase
             'database'      => 'test_database'
         ];
 
-		$conf = new Configurator($params);
-		$conf->setUser('user');
+        $conf = new Configurator($params);
+        $conf->setUser('user');
 
-		static::assertSame('user', $conf->getUser());
+        static::assertSame('user', $conf->getUser());
     }
 
     /**
@@ -183,10 +183,10 @@ class ConfiguratorTest extends TestCase
             'database'      => 'test_database'
         ];
 
-		$conf = new Configurator($params);
-		$conf->setPassword('password');
+        $conf = new Configurator($params);
+        $conf->setPassword('password');
 
-		static::assertSame('password', $conf->getPassword());
+        static::assertSame('password', $conf->getPassword());
     }
 
     /**
@@ -202,10 +202,10 @@ class ConfiguratorTest extends TestCase
             'database'      => 'test_database'
         ];
 
-		$conf = new Configurator($params);
-		$conf->setDatabase('database');
+        $conf = new Configurator($params);
+        $conf->setDatabase('database');
 
-		static::assertSame('database', $conf->getDatabase());
+        static::assertSame('database', $conf->getDatabase());
     }
 
     /**
@@ -221,9 +221,9 @@ class ConfiguratorTest extends TestCase
             'database'      => 'test_database'
         ];
 
-		$conf = new Configurator($params);
+        $conf = new Configurator($params);
 
-		static::assertFalse($conf->hasSavedQueries());
+        static::assertFalse($conf->hasSavedQueries());
     }
 
     /**
@@ -240,31 +240,31 @@ class ConfiguratorTest extends TestCase
             'save_queries'  => true
         ];
 
-		$conf = new Configurator($params);
+        $conf = new Configurator($params);
 
-		static::assertTrue($conf->hasSavedQueries());
+        static::assertTrue($conf->hasSavedQueries());
 
-		$conf->disableSaveQueries();
+        $conf->disableSaveQueries();
 
-		static::assertFalse($conf->hasSavedQueries());
+        static::assertFalse($conf->hasSavedQueries());
 
-		$conf->disableSaveQueries();
+        $conf->disableSaveQueries();
 
-		static::assertFalse($conf->hasSavedQueries());
+        static::assertFalse($conf->hasSavedQueries());
 
-		$conf->enableSaveQueries();
+        $conf->enableSaveQueries();
 
-		static::assertTrue($conf->hasSavedQueries());
+        static::assertTrue($conf->hasSavedQueries());
 
-		$conf->enableSaveQueries();
+        $conf->enableSaveQueries();
 
-		static::assertTrue($conf->hasSavedQueries());
+        static::assertTrue($conf->hasSavedQueries());
     }
 
     /**
      * @throws DatabaseException
      */
-    public function testDefaultPermanentConnectionFalse(): void
+    public function testDefaultPersistentConnectionFalse(): void
     {
         $params = [
             'driver'        => 'mysql',
@@ -274,15 +274,15 @@ class ConfiguratorTest extends TestCase
             'database'      => 'test_database'
         ];
 
-		$conf = new Configurator($params);
+        $conf = new Configurator($params);
 
-		static::assertFalse($conf->hasPermanentConnection());
+        static::assertFalse($conf->hasPersistentConnection());
     }
 
     /**
      * @throws DatabaseException
      */
-    public function testPermanentConnection(): void
+    public function testPersistentConnection(): void
     {
         $params = [
             'driver'                => 'mysql',
@@ -290,28 +290,28 @@ class ConfiguratorTest extends TestCase
             'user'                  => 'root',
             'password'              => '',
             'database'              => 'test_database',
-            'permanent_connection'  => true
+            'persistent_connection' => true
         ];
 
-		$conf = new Configurator($params);
+        $conf = new Configurator($params);
 
-		static::assertTrue($conf->hasPermanentConnection());
+        static::assertTrue($conf->hasPersistentConnection());
 
-		$conf->disablePermanentConnection();
+        $conf->disablePersistentConnection();
 
-		static::assertFalse($conf->hasPermanentConnection());
+        static::assertFalse($conf->hasPersistentConnection());
 
-		$conf->disablePermanentConnection();
+        $conf->disablePersistentConnection();
 
-		static::assertFalse($conf->hasPermanentConnection());
+        static::assertFalse($conf->hasPersistentConnection());
 
-		$conf->enablePermanentConnection();
+        $conf->enablePersistentConnection();
 
-		static::assertTrue($conf->hasPermanentConnection());
+        static::assertTrue($conf->hasPersistentConnection());
 
-		$conf->enablePermanentConnection();
+        $conf->enablePersistentConnection();
 
-		static::assertTrue($conf->hasPermanentConnection());
+        static::assertTrue($conf->hasPersistentConnection());
     }
 
     /**
@@ -327,9 +327,9 @@ class ConfiguratorTest extends TestCase
             'database'      => 'test_database'
         ];
 
-		$conf = new Configurator($params);
+        $conf = new Configurator($params);
 
-		static::assertSame('utf8mb4', $conf->getCharset());
+        static::assertSame('utf8mb4', $conf->getCharset());
     }
 
     /**
@@ -346,13 +346,13 @@ class ConfiguratorTest extends TestCase
             'charset'       => 'charset'
         ];
 
-		$conf = new Configurator($params);
+        $conf = new Configurator($params);
 
-		static::assertSame('charset', $conf->getCharset());
+        static::assertSame('charset', $conf->getCharset());
 
-		$conf->setCharset('new_charset');
+        $conf->setCharset('new_charset');
 
-		static::assertSame('new_charset', $conf->getCharset());
+        static::assertSame('new_charset', $conf->getCharset());
     }
 
     /**
@@ -368,9 +368,9 @@ class ConfiguratorTest extends TestCase
             'database'      => 'test_database'
         ];
 
-		$conf = new Configurator($params);
+        $conf = new Configurator($params);
 
-		static::assertSame([], $conf->getParameters());
+        static::assertSame([], $conf->getParameters());
     }
 
     /**
@@ -387,17 +387,17 @@ class ConfiguratorTest extends TestCase
             'parameters'    => ['key' => 'value']
         ];
 
-		$conf = new Configurator($params);
+        $conf = new Configurator($params);
 
-		static::assertSame(['key' => 'value'], $conf->getParameters());
+        static::assertSame(['key' => 'value'], $conf->getParameters());
 
-		$conf->setParameter('new_key', 'new_value');
+        $conf->setParameter('new_key', 'new_value');
 
-		static::assertSame(['key' => 'value', 'new_key' => 'new_value'], $conf->getParameters());
+        static::assertSame(['key' => 'value', 'new_key' => 'new_value'], $conf->getParameters());
 
-		$conf->setParameter('key', 'another_value');
+        $conf->setParameter('key', 'another_value');
 
-		static::assertSame(['key' => 'another_value', 'new_key' => 'new_value'], $conf->getParameters());
+        static::assertSame(['key' => 'another_value', 'new_key' => 'new_value'], $conf->getParameters());
     }
 
     /**
@@ -413,11 +413,11 @@ class ConfiguratorTest extends TestCase
             'database'      => 'test_database'
         ];
 
-		$conf = new Configurator($params);
+        $conf = new Configurator($params);
 
-		$conf->setParameters(['key' => 'value']);
+        $conf->setParameters(['key' => 'value']);
 
-		static::assertSame(['key' => 'value'], $conf->getParameters());
+        static::assertSame(['key' => 'value'], $conf->getParameters());
     }
 
     /**
@@ -433,9 +433,9 @@ class ConfiguratorTest extends TestCase
             'database'      => 'test_database'
         ];
 
-		$conf = new Configurator($params);
+        $conf = new Configurator($params);
 
-		static::assertSame('mysql:host=localhost;dbname=test_database', $conf->getDsn());
+        static::assertSame('mysql:host=localhost;dbname=test_database', $conf->getDsn());
     }
 
     /**
@@ -451,9 +451,9 @@ class ConfiguratorTest extends TestCase
             'database'      => __DIR__ . '/test_database.db'
         ];
 
-		$conf = new Configurator($params);
+        $conf = new Configurator($params);
 
-		static::assertSame('sqlite:' . __DIR__ . '/test_database.db', $conf->getDsn());
+        static::assertSame('sqlite:' . __DIR__ . '/test_database.db', $conf->getDsn());
     }
 
     /**
@@ -469,9 +469,9 @@ class ConfiguratorTest extends TestCase
             'database'      => 'test_database'
         ];
 
-		$conf = new Configurator($params);
+        $conf = new Configurator($params);
 
-		static::assertSame('pgsql:host=127.0.0.1;dbname=test_database', $conf->getDsn());
+        static::assertSame('pgsql:host=127.0.0.1;dbname=test_database', $conf->getDsn());
     }
 
     /**
@@ -487,30 +487,30 @@ class ConfiguratorTest extends TestCase
             'database'      => 'test_database'
         ];
 
-		$conf = new Configurator($params);
+        $conf = new Configurator($params);
 
-		$expected = [
-			PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8mb4',
-			PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-			PDO::ATTR_PERSISTENT         => false
-		];
-		static::assertSame($expected, $conf->getParametersForPDO());
+        $expected = [
+            PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8mb4',
+            PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_PERSISTENT         => false
+        ];
+        static::assertSame($expected, $conf->getParametersForPDO());
 
-		$conf->setCharset('charset');
-		$expected = [
-			PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES charset',
-			PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-			PDO::ATTR_PERSISTENT         => false
-		];
-		static::assertSame($expected, $conf->getParametersForPDO());
+        $conf->setCharset('charset');
+        $expected = [
+            PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES charset',
+            PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_PERSISTENT         => false
+        ];
+        static::assertSame($expected, $conf->getParametersForPDO());
 
-		$conf->enablePermanentConnection();
-		$expected = [
-			PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES charset',
-			PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-			PDO::ATTR_PERSISTENT         => true
-		];
-		static::assertSame($expected, $conf->getParametersForPDO());
+        $conf->enablePersistentConnection();
+        $expected = [
+            PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES charset',
+            PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_PERSISTENT         => true
+        ];
+        static::assertSame($expected, $conf->getParametersForPDO());
     }
 
     /**
@@ -526,27 +526,27 @@ class ConfiguratorTest extends TestCase
             'database'      => __DIR__ . '/test_database.db'
         ];
 
-		$conf = new Configurator($params);
+        $conf = new Configurator($params);
 
-		$expected = [
-			PDO::ATTR_ERRMODE    => PDO::ERRMODE_EXCEPTION,
-			PDO::ATTR_PERSISTENT => false
-		];
-		static::assertSame($expected, $conf->getParametersForPDO());
+        $expected = [
+            PDO::ATTR_ERRMODE    => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_PERSISTENT => false
+        ];
+        static::assertSame($expected, $conf->getParametersForPDO());
 
-		$conf->setCharset('charset');
-		$expected = [
-			PDO::ATTR_ERRMODE    => PDO::ERRMODE_EXCEPTION,
-			PDO::ATTR_PERSISTENT => false
-		];
-		static::assertSame($expected, $conf->getParametersForPDO());
+        $conf->setCharset('charset');
+        $expected = [
+            PDO::ATTR_ERRMODE    => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_PERSISTENT => false
+        ];
+        static::assertSame($expected, $conf->getParametersForPDO());
 
-		$conf->enablePermanentConnection();
-		$expected = [
-			PDO::ATTR_ERRMODE    => PDO::ERRMODE_EXCEPTION,
-			PDO::ATTR_PERSISTENT => true
-		];
-		static::assertSame($expected, $conf->getParametersForPDO());
+        $conf->enablePersistentConnection();
+        $expected = [
+            PDO::ATTR_ERRMODE    => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_PERSISTENT => true
+        ];
+        static::assertSame($expected, $conf->getParametersForPDO());
     }
 
     /**
@@ -562,27 +562,27 @@ class ConfiguratorTest extends TestCase
             'database'      => 'test_database'
         ];
 
-		$conf = new Configurator($params);
+        $conf = new Configurator($params);
 
-		$expected = [
-			PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-			PDO::ATTR_PERSISTENT => false
-		];
-		static::assertSame($expected, $conf->getParametersForPDO());
+        $expected = [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_PERSISTENT => false
+        ];
+        static::assertSame($expected, $conf->getParametersForPDO());
 
-		$conf->setCharset('charset');
-		$expected = [
-			PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-			PDO::ATTR_PERSISTENT => false
-		];
-		static::assertSame($expected, $conf->getParametersForPDO());
+        $conf->setCharset('charset');
+        $expected = [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_PERSISTENT => false
+        ];
+        static::assertSame($expected, $conf->getParametersForPDO());
 
-		$conf->enablePermanentConnection();
-		$expected = [
-			PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-			PDO::ATTR_PERSISTENT => true
-		];
-		static::assertSame($expected, $conf->getParametersForPDO());
+        $conf->enablePersistentConnection();
+        $expected = [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_PERSISTENT => true
+        ];
+        static::assertSame($expected, $conf->getParametersForPDO());
     }
 
     /**
@@ -636,9 +636,9 @@ class ConfiguratorTest extends TestCase
             'database'      => 'test_database'
         ];
 
-		$conf = new Configurator($params);
+        $conf = new Configurator($params);
 
-		static::assertNotNull($conf->createPDOConnection());
+        static::assertNotNull($conf->createPDOConnection());
     }
 
     /**
@@ -654,8 +654,8 @@ class ConfiguratorTest extends TestCase
             'database'      => __DIR__ . '/test_database.db'
         ];
 
-		$conf = new Configurator($params);
+        $conf = new Configurator($params);
 
-		static::assertNotNull($conf->createPDOConnection());
+        static::assertNotNull($conf->createPDOConnection());
     }
 }
