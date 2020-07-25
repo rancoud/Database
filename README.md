@@ -160,7 +160,7 @@ $affectedRowsCount = $database->delete("DELETE FROM users WHERE id = :id", $para
 ```
 
 ## Transactions
-Nested transactions are supported for MySQL / PostgreSQL / SQLite.
+Nested transactions are supported for MySQL, PostgreSQL, SQLite.
 ```php
 $database->startTransaction();
 
@@ -176,7 +176,7 @@ if (isOk()) {
 Here is the description of the array passed to the construct
 
 #### Mandatory keys
-| Parameter | Type of the associated value | Description |
+| Parameter | Type | Description |
 | --- | --- | --- |
 | driver | string | driver of the database, it will be check with PDO::getAvailableDrivers |
 | host | string | hostname of the database (port number may be included, e.g `example.org:5342`) |
@@ -185,11 +185,11 @@ Here is the description of the array passed to the construct
 | database | string | name of the database |
 
 #### Optional keys
-| Parameter | Type of the associated value | Default value | Description |
+| Parameter | Type | Default value | Description |
 | --- | --- | --- | --- |
 | save_queries | bool | true | all queries will be saved in memory with execution time and the connection time |
 | persistent_connection | bool | false | use persistent connection |
-| charset | string | it depends on the driver | set specific database charset |
+| charset | string | it depends on the driver (MySQL: `utf8mb4` , PostgreSQL: `UTF8`) | set specific database charset |
 | parameters | array | [] | extra parameters used by PDO on connection |
 
 ### Methods
@@ -208,7 +208,7 @@ Here is the description of the array passed to the construct
 * getPassword(): string
 * getUser(): string
 * hasPersistentConnection(): bool
-* hasSaveQueries(): bool
+* hasSavedQueries(): bool
 * setCharset(charset: string): void
 * setDatabase(database: string): void
 * setDriver(driver: string): void
