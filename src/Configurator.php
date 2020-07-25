@@ -296,9 +296,10 @@ class Configurator
         $host = $this->getHost();
         $database = $this->getDatabase();
 
-        $dsn = ($driver === 'sqlite')
-                ? 'sqlite:' . $database
-                : $driver . ':host=' . $host . ';dbname=' . $database;
+        $dsn = $driver . ':host=' . $host . ';dbname=' . $database;
+        if ($driver === 'sqlite') {
+            $dsn = 'sqlite:' . $database;
+        }
 
         return $dsn;
     }
