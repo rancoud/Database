@@ -736,7 +736,7 @@ class Database
 
         if ($this->configurator->getDriver() === 'sqlite') {
             // sqlite support only one statement by exec
-            $sqlFileQueries = \explode(";\n", $sqlFile);
+            $sqlFileQueries = \preg_split('/;\R/', $sqlFile);
             foreach ($sqlFileQueries as $sqlFileQuery) {
                 if ($sqlFileQuery === '') {
                     continue;
