@@ -42,7 +42,7 @@ class Configurator
         'pgsql' => 'UTF8'
     ];
 
-    /** @var ?string */
+    /** @var string|null */
     protected ?string $charset = null;
 
     /** @var string[] */
@@ -91,9 +91,9 @@ class Configurator
     protected function verifySettings(array $settings): void
     {
         $keys = \array_keys($settings);
-        $wrong_settings = \array_diff($keys, static::$keySettings);
-        if (!empty($wrong_settings)) {
-            $key = \reset($wrong_settings);
+        $wrongSettings = \array_diff($keys, static::$keySettings);
+        if (!empty($wrongSettings)) {
+            $key = \reset($wrongSettings);
             throw new DatabaseException('"' . $key . '" settings is not recognized');
         }
     }
