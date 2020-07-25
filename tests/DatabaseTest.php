@@ -1587,16 +1587,9 @@ class DatabaseTest extends TestCase
         $db = $this->dbms[$driver]['db'];
 
         $this->expectException(DatabaseException::class);
-        $this->expectExceptionMessage('File is not readable for useSqlFile method: ' . $driver);
+        $this->expectExceptionMessage('File is not readable for useSqlFile method: file_unread');
 
-        $newFile = fopen($driver, 'w+');
-        fwrite($newFile, "aze");
-        fclose($newFile);
-        chmod($driver, 0000);
-        var_dump(is_readable($driver));
-        var_dump(file_get_contents($driver));
-
-        $db->useSqlFile($driver);
+        $db->useSqlFile('file_unread');
     }
 
     /**

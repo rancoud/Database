@@ -728,6 +728,7 @@ class Database
         if (!\file_exists($filepath)) {
             throw new DatabaseException('File missing for useSqlFile method: ' . $filepath);
         }
+
         if (!\is_readable($filepath)) {
             throw new DatabaseException('File is not readable for useSqlFile method: ' . $filepath);
         }
