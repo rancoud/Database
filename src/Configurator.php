@@ -214,7 +214,7 @@ class Configurator
     public function setParameter($key, $value): void
     {
         $errorModeAttributeKeys = [PDO::ATTR_ERRMODE, (string) PDO::ATTR_ERRMODE];
-        if (\in_array($key, $errorModeAttributeKeys, true) && $value !== PDO::ERRMODE_EXCEPTION) {
+        if ($value !== PDO::ERRMODE_EXCEPTION && \in_array($key, $errorModeAttributeKeys, true)) {
             $message = 'Database module only support error mode with exception. You can\'t modify this setting';
             throw new DatabaseException($message);
         }
