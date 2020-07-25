@@ -231,8 +231,8 @@ Here is the description of the array passed to the construct
 * selectCol(sql: string, [parameters: array = []]): array
 * selectVar(sql: string, [parameters: array = []]): mixed
 * insert(sql: string, [parameters: array = []], [getLastInsertId: bool = false]): ?int
-* update(sql: string, [parameters: array = []], [getCountRowAffected: bool = false]): ?int
-* delete(sql: string, [parameters: array = []], [getCountRowAffected: bool = false]): ?int
+* update(sql: string, [parameters: array = []], [getAffectedRowsCount: bool = false]): ?int
+* delete(sql: string, [parameters: array = []], [getAffectedRowsCount: bool = false]): ?int
 * count(sql: string, [parameters: array = []]): ?int
 * exec(sql: string, [parameters: array = []]): void
 * select(sql: string, [parameters: array = []]): PDOStatement

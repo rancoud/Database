@@ -681,10 +681,12 @@ class Database
     {
         \array_unshift($tables, $tableMandatory);
 
+        $isSqlite = ($this->configurator->getDriver() === 'sqlite');
         foreach ($tables as $table) {
-            $sql = ($this->configurator->getDriver() === 'sqlite')
-                    ? 'DELETE FROM ' . $table
-                    : 'TRUNCATE TABLE ' . $table;
+            $sql = 'TRUNCATE TABLE ' . $table;
+            if ($isSqlite) {
+                $sql = 'DELETE FROM ' . $table;
+            }
 
             $this->exec($sql);
         }
