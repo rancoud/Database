@@ -403,6 +403,26 @@ class ConfiguratorTest extends TestCase
     /**
      * @throws DatabaseException
      */
+    public function testSetParameterThrowException(): void
+    {
+        $this->expectException(DatabaseException::class);
+        $this->expectExceptionMessage('Database module only support error mode with exception. You can\'t modify this setting');
+
+        $params = [
+            'driver'        => 'mysql',
+            'host'          => 'localhost',
+            'user'          => 'root',
+            'password'      => '',
+            'database'      => 'test_database'
+        ];
+
+        $conf = new Configurator($params);
+        $conf->setParameter(PDO::ATTR_ERRMODE, 1);
+    }
+
+    /**
+     * @throws DatabaseException
+     */
     public function testSetParameters(): void
     {
         $params = [
