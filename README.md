@@ -212,7 +212,7 @@ Here is the description of the array passed to the construct
 * enableSaveQueries(): void
 * getCharset(): string
 * getDatabase(): string
-* getDsn(): string
+* getDSN(): string
 * getDriver(): string
 * getHost(): string
 * getParameters(): array

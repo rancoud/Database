@@ -209,7 +209,7 @@ class Database
     protected function addErrorConnection(Exception $exception): void
     {
         $this->errors[] = [
-            'query'       => $this->configurator->getDsn(),
+            'query'       => $this->configurator->getDSN(),
             'query_error' => null,
             'pdo_error'   => $exception->getMessage(),
             'dump_params' => $this->configurator->getParametersForPDO()
