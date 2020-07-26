@@ -67,6 +67,14 @@ class Configurator
         'parameters'
     ];
 
+    /** @var array */
+    protected static array $dsnFormats = [
+        'sqlite' => '%1$s:%3$s'
+    ];
+
+    /** @var string */
+    protected static string $defaultDSN = '%1$s:host=%2$s;dbname=%3$s';
+
     /**
      * DatabaseConfigurator constructor.
      *
@@ -291,18 +299,17 @@ class Configurator
         return $charset;
     }
 
-    public function getDsn(): string
+    public function getDSN(): string
     {
         $driver = $this->getDriver();
-        $host = $this->getHost();
-        $database = $this->getDatabase();
+        $format = static::$dsnFormats[$driver] ?? static::$defaultDSN;
 
-        $dsn = $driver . ':host=' . $host . ';dbname=' . $database;
-        if ($driver === 'sqlite') {
-            $dsn = 'sqlite:' . $database;
-        }
-
-        return $dsn;
+        return \sprintf(
+            $format,
+            $driver,
+            $this->getHost(),
+            $this->getDatabase()
+        );
     }
 
     /**
@@ -313,7 +320,7 @@ class Configurator
         $user = $this->getUser();
         $password = $this->getPassword();
         $parameters = $this->getParametersForPDO();
-        $dsn = $this->getDsn();
+        $dsn = $this->getDSN();
 
         try {
             if ($this->getDriver() === 'sqlite') {
