@@ -25,8 +25,8 @@ class Database
     /** @var array */
     protected array $savedQueries = [];
 
-    /** @var Database|null */
-    protected static ?Database $instance = null;
+    /** @var array */
+    protected static array $instances = [];
 
     /** @var string[] */
     protected array $nestedTransactionsDriverSupported = ['mysql', 'pgsql', 'sqlite'];
@@ -45,24 +45,42 @@ class Database
     }
 
     /**
-     * @param Configurator|null $configurator
+     * @param Configurator $configurator
+     * @param string       $name
      *
      * @throws DatabaseException
      *
      * @return Database
      */
-    public static function getInstance(Configurator $configurator = null): self
+    public static function setInstance(Configurator $configurator, string $name = 'primary'): self
     {
-        if (static::$instance === null) {
-            if ($configurator === null) {
-                throw new DatabaseException('Configurator Missing');
-            }
-            static::$instance = new static($configurator);
-        } elseif ($configurator !== null) {
-            throw new DatabaseException('Configurator Already Setup');
+        if (isset(static::$instances[$name])) {
+            throw new DatabaseException('Cannot overwrite instance "' . $name . '"');
         }
 
-        return static::$instance;
+        static::$instances[$name] = new self($configurator);
+
+        return static::$instances[$name];
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return bool
+     */
+    public static function hasInstance(string $name = 'primary'): bool
+    {
+        return isset(static::$instances[$name]);
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return static|null
+     */
+    public static function getInstance(string $name = 'primary'): ?self
+    {
+        return static::$instances[$name] ?? null;
     }
 
     public function isNestedTransactionSupported(): bool
