@@ -7,6 +7,6 @@
 
     <file>src</file>
 
-    <rule ref="PSR2"></rule>
+    <rule ref="PSR2"/>
 
 </ruleset>

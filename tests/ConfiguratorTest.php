@@ -443,7 +443,7 @@ class ConfiguratorTest extends TestCase
     /**
      * @throws DatabaseException
      */
-    public function testGetDsnMysql(): void
+    public function testGetDSNMysql(): void
     {
         $params = [
             'driver'        => 'mysql',
@@ -455,13 +455,13 @@ class ConfiguratorTest extends TestCase
 
         $conf = new Configurator($params);
 
-        static::assertSame('mysql:host=localhost;dbname=test_database', $conf->getDsn());
+        static::assertSame('mysql:host=localhost;dbname=test_database', $conf->getDSN());
     }
 
     /**
      * @throws DatabaseException
      */
-    public function testGetDsnSqlite(): void
+    public function testGetDSNSqlite(): void
     {
         $params = [
             'driver'        => 'sqlite',
@@ -473,13 +473,13 @@ class ConfiguratorTest extends TestCase
 
         $conf = new Configurator($params);
 
-        static::assertSame('sqlite:' . __DIR__ . '/test_database.db', $conf->getDsn());
+        static::assertSame('sqlite:' . __DIR__ . '/test_database.db', $conf->getDSN());
     }
 
     /**
      * @throws DatabaseException
      */
-    public function testGetDsnPgsql(): void
+    public function testGetDSNPgsql(): void
     {
         $params = [
             'driver'        => 'pgsql',
@@ -491,7 +491,7 @@ class ConfiguratorTest extends TestCase
 
         $conf = new Configurator($params);
 
-        static::assertSame('pgsql:host=127.0.0.1;dbname=test_database', $conf->getDsn());
+        static::assertSame('pgsql:host=127.0.0.1;dbname=test_database', $conf->getDSN());
     }
 
     /**
