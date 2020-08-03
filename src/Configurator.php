@@ -302,10 +302,10 @@ class Configurator
     public function getDSN(): string
     {
         $driver = $this->getDriver();
-        $format = static::$dsnFormats[$driver] ?? static::$defaultDSN;
+        $dsnFormat = static::$dsnFormats[$driver] ?? static::$defaultDSN;
 
         return \sprintf(
-            $format,
+            $dsnFormat,
             $driver,
             $this->getHost(),
             $this->getDatabase()
