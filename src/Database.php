@@ -58,7 +58,7 @@ class Database
             throw new DatabaseException('Cannot overwrite instance "' . $name . '"');
         }
 
-        static::$instances[$name] = new self($configurator);
+        static::$instances[$name] = new static($configurator);
 
         return static::$instances[$name];
     }
