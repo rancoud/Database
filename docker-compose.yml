@@ -1,0 +1,28 @@
+version: "3.8"
+
+services:
+  mariadb:
+    image: mariadb:10.4
+    environment:
+      - "MYSQL_ALLOW_EMPTY_PASSWORD=yes"
+      - "MYSQL_DATABASE=test_database"
+    restart: "on-failure"
+
+  postgres:
+    image: postgres:12
+    environment:
+      - "POSTGRES_DB=test_database"
+      - "POSTGRES_HOST_AUTH_METHOD=trust"
+    restart: "on-failure"
+
+  lib:
+    build: ./
+    depends_on:
+      - mariadb
+      - postgres
+    environment:
+      - "MYSQL_HOST=mariadb"
+      - "POSTGRES_HOST=postgres"
+    volumes:
+      - "./coverage:/app/coverage"
+    restart: "no"

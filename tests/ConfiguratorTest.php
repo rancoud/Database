@@ -610,10 +610,11 @@ class ConfiguratorTest extends TestCase
      */
     public function testCreatePDOConnectionMysql(): void
     {
+        $mysqlHost = getenv('MYSQL_HOST', true);
 
         $params = [
             'driver'        => 'mysql',
-            'host'          => '127.0.0.1',
+            'host'          => ($mysqlHost !== false) ?  $mysqlHost : '127.0.0.1',
             'user'          => 'root',
             'password'      => '',
             'database'      => 'test_database'
@@ -646,9 +647,11 @@ class ConfiguratorTest extends TestCase
      */
     public function testCreatePDOConnectionPgsql(): void
     {
+        $postgresHost = getenv('POSTGRES_HOST', true);
+
         $params = [
             'driver'        => 'pgsql',
-            'host'          => '127.0.0.1',
+            'host'          => ($postgresHost !== false) ?  $postgresHost : '127.0.0.1',
             'user'          => 'postgres',
             'password'      => 'postgres',
             'database'      => 'test_database'
