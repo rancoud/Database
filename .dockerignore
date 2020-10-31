@@ -1,5 +1,5 @@
 # Git
-.git/
+.git
 
 # IntelliJ
 .idea
@@ -9,16 +9,16 @@
 nb*
 
 # Composer
-vendor/
+vendor
 
 # PHP code sniffer
 .php_cs.cache
 
 # PHP Unit
-build/
+build
 .phpunit.result.cache
 
 # Dev / Testing
 test.php
 test_database.db*
-coverage/
+coverage/*
