@@ -35,7 +35,7 @@
             "php-cs-fixer fix"
         ],
         "test": [
-            "phpunit --colors --coverage-html ./coverage"
+            "phpdbg -qrr vendor/bin/phpunit --coverage-html ./coverage"
         ]
     }
 }

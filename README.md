@@ -286,6 +286,4 @@ Here is the description of the array passed to the construct
 * getInstance([name: string = primary]): ?self
 
 ## How to Dev
-`composer ci` for php-cs-fixer and phpunit and coverage  
-`composer lint` for php-cs-fixer  
-`composer test` for phpunit and coverage
+`docker-compose up --build` for launching tests

@@ -35,7 +35,7 @@ class DatabaseTest extends TestCase
             'db' => null,
             'parameters' => [
                 'driver'        => 'pgsql',
-                'host'          => '127.0.0.1',
+                'host'          => 'postgres',
                 'user'          => 'postgres',
                 'password'      => '',
                 'database'      => 'test_database'
@@ -46,7 +46,7 @@ class DatabaseTest extends TestCase
             'db' => null,
             'parameters' => [
                 'driver'       => 'sqlite',
-                'host'         => '127.0.0.1',
+                'host'         => '',
                 'user'         => '',
                 'password'     => '',
                 'database'     => __DIR__ . '/test_database.db'
@@ -367,6 +367,17 @@ class DatabaseTest extends TestCase
     {
         foreach ($this->dbms as $k => $dbms) {
             $configurator = new Configurator($dbms['parameters']);
+
+            if ($configurator->getDriver() === 'mysql') {
+                $mysqlHost = getenv('MYSQL_HOST', true);
+                $configurator->setHost(($mysqlHost !== false) ?  $mysqlHost : '127.0.0.1');
+            }
+
+            if ($configurator->getDriver() === 'pgsql') {
+                $postgresHost = getenv('POSTGRES_HOST', true);
+                $configurator->setHost(($postgresHost !== false) ?  $postgresHost : '127.0.0.1');
+            }
+
             $this->dbms[$k]['db'] = new Database($configurator);
 
             $pdo = $configurator->createPDOConnection();
@@ -1438,7 +1449,18 @@ class DatabaseTest extends TestCase
      */
     public function testStartCommitAutoConnect(string $driver): void
     {
-        $db = new Database(new Configurator($this->dbms[$driver]['parameters']));
+        $configurator = new Configurator($this->dbms[$driver]['parameters']);
+        if ($configurator->getDriver() === 'mysql') {
+            $mysqlHost = getenv('MYSQL_HOST', true);
+            $configurator->setHost(($mysqlHost !== false) ?  $mysqlHost : '127.0.0.1');
+        }
+
+        if ($configurator->getDriver() === 'pgsql') {
+            $postgresHost = getenv('POSTGRES_HOST', true);
+            $configurator->setHost(($postgresHost !== false) ?  $postgresHost : '127.0.0.1');
+        }
+
+        $db = new Database($configurator);
         static::assertNull($db->getPDO());
         $db->startTransaction();
         static::assertNotNull($db->getPDO());
