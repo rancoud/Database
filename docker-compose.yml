@@ -3,28 +3,26 @@ version: "3.8"
 services:
   mariadb:
     image: mariadb:10.4
-    container_name: database_mariadb
     environment:
       - "MYSQL_ALLOW_EMPTY_PASSWORD=yes"
       - "MYSQL_DATABASE=test_database"
+    restart: "on-failure"
 
   postgres:
     image: postgres:12
-    container_name: database_postgres
     environment:
       - "POSTGRES_DB=test_database"
       - "POSTGRES_HOST_AUTH_METHOD=trust"
+    restart: "on-failure"
 
-  database:
+  lib:
     build: ./
-    container_name: database
-    command: ci
     depends_on:
       - mariadb
       - postgres
     environment:
-      - "MYSQL_HOST=database_mariadb"
-      - "POSTGRES_HOST=database_postgres"
-    restart: "no"
+      - "MYSQL_HOST=mariadb"
+      - "POSTGRES_HOST=postgres"
     volumes:
-      - ./coverage:/app/coverage
+      - "./coverage:/app/coverage"
+    restart: "no"

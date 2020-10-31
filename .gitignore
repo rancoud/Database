@@ -19,3 +19,4 @@ build/
 test.php
 test_database.db*
 coverage/*
+!coverage/.gitkeep

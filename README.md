@@ -286,4 +286,5 @@ Here is the description of the array passed to the construct
 * getInstance([name: string = primary]): ?self
 
 ## How to Dev
-`docker-compose up --build` for launching tests
+
+`docker-compose run lib composer ci` for launching tests

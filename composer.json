@@ -35,7 +35,7 @@
             "php-cs-fixer fix"
         ],
         "test": [
-            "phpdbg -qrr vendor/bin/phpunit --coverage-html ./coverage"
+            "phpdbg -qrr vendor/bin/phpunit --colors --coverage-text --coverage-clover ./coverage/clover.xml"
         ]
     }
 }
