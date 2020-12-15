@@ -482,7 +482,7 @@ class Database
      *
      * @return array
      */
-    public function selectRow($sql, array $parameters = []): array
+    public function selectRow(string $sql, array $parameters = []): array
     {
         $statement = $this->select($sql, $parameters);
 
