@@ -32,7 +32,7 @@
         "lint": [
             "phpcbf",
             "phpcs",
-            "php-cs-fixer fix"
+            "PHP_CS_FIXER_IGNORE_ENV=1 php-cs-fixer fix"
         ],
         "test": [
             "phpdbg -qrr vendor/bin/phpunit --colors --coverage-text --coverage-clover ./coverage/clover.xml"
