@@ -1,2 +1,4 @@
 * text eol=lf
 /tests/*.sql linguist-detectable=false
+entrypoint.sh linguist-detectable=false
+Dockerfile linguist-detectable=false
