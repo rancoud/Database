@@ -17,7 +17,7 @@ jobs:
       - name: Test
         run: docker-compose run lib composer ci
       - name: Upload coverage
-        uses: codecov/codecov-action@v1.2.2
+        uses: codecov/codecov-action@v1.3.1
         if: success()
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
