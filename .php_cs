@@ -29,7 +29,7 @@ return PhpCsFixer\Config::create()
         'strict_param' => true,
         'concat_space' => ['spacing' => 'one'],
         'trailing_comma_in_multiline_array' => false,
-        'yoda_style' => null,
+        'yoda_style' => ['equal' => false, 'identical' => false, 'less_and_greater' => false],
         'single_line_throw' => false,
         'no_superfluous_phpdoc_tags' => false
     ])
