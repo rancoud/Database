@@ -12,40 +12,29 @@ use PDOException;
  */
 class Configurator
 {
-    /** @var string */
     protected string $driver;
 
-    /** @var string */
     protected string $host;
 
-    /** @var string */
     protected string $user;
 
-    /** @var string */
     protected string $password;
 
-    /** @var string */
     protected string $database;
 
-    /** @var array */
     protected array $parameters = [];
 
-    /** @var bool */
     protected bool $saveQueries = false;
 
-    /** @var bool */
     protected bool $persistentConnection = false;
 
-    /** @var array */
     protected static array $defaultCharsetByDriver = [
         'mysql' => 'utf8mb4',
         'pgsql' => 'UTF8'
     ];
 
-    /** @var string|null */
     protected ?string $charset = null;
 
-    /** @var string[] */
     protected static array $mandatorySettings = [
         'driver',
         'host',
@@ -54,7 +43,6 @@ class Configurator
         'database'
     ];
 
-    /** @var string[] */
     protected static array $keySettings = [
         'driver',
         'host',
@@ -67,12 +55,10 @@ class Configurator
         'parameters'
     ];
 
-    /** @var array */
     protected static array $dsnFormats = [
         'sqlite' => '%1$s:%3$s'
     ];
 
-    /** @var string */
     protected static string $defaultDSN = '%1$s:host=%2$s;dbname=%3$s';
 
     /**
@@ -336,7 +322,7 @@ class Configurator
 
             return $pdo;
         } catch (PDOException $e) {
-            throw new DatabaseException($e->getMessage());
+            throw new DatabaseException('could not connect: ' . $e->getMessage());
         }
     }
 }

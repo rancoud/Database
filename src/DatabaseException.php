@@ -7,7 +7,7 @@ namespace Rancoud\Database;
 use Exception;
 
 /**
- * Class RouterException.
+ * Class DatabaseException.
  */
 class DatabaseException extends Exception
 {

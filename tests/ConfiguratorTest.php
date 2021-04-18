@@ -1,9 +1,10 @@
 <?php
+
 /** @noinspection PhpIllegalPsrClassPathInspection */
 
 declare(strict_types=1);
 
-namespace Rancoud\Database\Test;
+namespace tests;
 
 use PDO;
 use PHPUnit\Framework\TestCase;
@@ -77,7 +78,6 @@ class ConfiguratorTest extends TestCase
 
     /**
      * @throws DatabaseException
-     * @noinspection PhpUndefinedClassInspection
      */
     public function testConstructInvalidSettingsParametersException(): void
     {
@@ -406,7 +406,7 @@ class ConfiguratorTest extends TestCase
     public function testSetParameterThrowException(): void
     {
         $this->expectException(DatabaseException::class);
-        $this->expectExceptionMessage('Database module only support error mode with exception. You can\'t modify this setting');
+        $this->expectExceptionMessage('Database module only support error mode with exception. You can\'t modify this setting'); //phpcs:ignore
 
         $params = [
             'driver'        => 'mysql',
@@ -585,21 +585,21 @@ class ConfiguratorTest extends TestCase
         $conf = new Configurator($params);
 
         $expected = [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_ERRMODE    => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_PERSISTENT => false
         ];
         static::assertSame($expected, $conf->getParametersForPDO());
 
         $conf->setCharset('charset');
         $expected = [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_ERRMODE    => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_PERSISTENT => false
         ];
         static::assertSame($expected, $conf->getParametersForPDO());
 
         $conf->enablePersistentConnection();
         $expected = [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_ERRMODE    => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_PERSISTENT => true
         ];
         static::assertSame($expected, $conf->getParametersForPDO());
@@ -610,11 +610,11 @@ class ConfiguratorTest extends TestCase
      */
     public function testCreatePDOConnectionMysql(): void
     {
-        $mysqlHost = getenv('MYSQL_HOST', true);
+        $mysqlHost = \getenv('MYSQL_HOST', true);
 
         $params = [
             'driver'        => 'mysql',
-            'host'          => ($mysqlHost !== false) ?  $mysqlHost : '127.0.0.1',
+            'host'          => ($mysqlHost !== false) ? $mysqlHost : '127.0.0.1',
             'user'          => 'root',
             'password'      => '',
             'database'      => 'test_database'
@@ -647,11 +647,11 @@ class ConfiguratorTest extends TestCase
      */
     public function testCreatePDOConnectionPgsql(): void
     {
-        $postgresHost = getenv('POSTGRES_HOST', true);
+        $postgresHost = \getenv('POSTGRES_HOST', true);
 
         $params = [
             'driver'        => 'pgsql',
-            'host'          => ($postgresHost !== false) ?  $postgresHost : '127.0.0.1',
+            'host'          => ($postgresHost !== false) ? $postgresHost : '127.0.0.1',
             'user'          => 'postgres',
             'password'      => 'postgres',
             'database'      => 'test_database'

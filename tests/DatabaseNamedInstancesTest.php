@@ -1,10 +1,13 @@
 <?php
-/** @noinspection PhpIllegalPsrClassPathInspection */
-/** @noinspection SqlDialectInspection */
+
+/**
+ * @noinspection PhpIllegalPsrClassPathInspection
+ * @noinspection SqlDialectInspection
+ */
 
 declare(strict_types=1);
 
-namespace Rancoud\Database\Test;
+namespace tests;
 
 use PHPUnit\Framework\TestCase;
 use Rancoud\Database\Configurator;
@@ -30,6 +33,7 @@ class DatabaseNamedInstancesTest extends TestCase
 
     /**
      * @runInSeparateProcess
+     *
      * @throws DatabaseException
      */
     public function testSetInstance(): void
@@ -54,6 +58,7 @@ class DatabaseNamedInstancesTest extends TestCase
 
     /**
      * @runInSeparateProcess
+     *
      * @throws DatabaseException
      */
     public function testSetInstanceThrowException(): void
@@ -67,6 +72,7 @@ class DatabaseNamedInstancesTest extends TestCase
 
     /**
      * @runInSeparateProcess
+     *
      * @throws DatabaseException
      */
     public function testHasInstance(): void
@@ -86,6 +92,7 @@ class DatabaseNamedInstancesTest extends TestCase
 
     /**
      * @runInSeparateProcess
+     *
      * @throws DatabaseException
      */
     public function testGetInstance(): void
