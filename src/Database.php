@@ -146,7 +146,7 @@ class Database
                 }
                 // @codeCoverageIgnoreStart
             } catch (Exception $e) {
-                /** Could not reach this statement without mocking database
+                /* Could not reach this statement without mocking database
                  */
                 $this->addErrorPrepare($sql, $parameters);
                 throw new DatabaseException('Error Bind Value');
@@ -561,7 +561,7 @@ class Database
             ++$this->transactionDepth;
             // @codeCoverageIgnoreStart
         } catch (Exception $e) {
-            /** Could not reach this statement without mocking database
+            /* Could not reach this statement without mocking database
              */
             throw new DatabaseException('Error Begin Transaction');
         }
@@ -601,7 +601,7 @@ class Database
             }
             // @codeCoverageIgnoreStart
         } catch (Exception $e) {
-            /** Could not reach this statement without mocking database
+            /* Could not reach this statement without mocking database
              */
             throw new DatabaseException('Error Commit Transaction');
         }
@@ -629,7 +629,7 @@ class Database
             }
             // @codeCoverageIgnoreStart
         } catch (Exception $e) {
-            /** Could not reach this statement without mocking database
+            /* Could not reach this statement without mocking database
              */
             throw new DatabaseException('Error Rollback Transaction');
         }
@@ -745,12 +745,11 @@ class Database
 
         if (!\is_readable($filepath)) {
             // @codeCoverageIgnoreStart
-            /** Could not reach this statement without mocking filesystem
+            /* Could not reach this statement without mocking filesystem
               */
             throw new DatabaseException('File is not readable for useSqlFile method: ' . $filepath);
             // @codeCoverageIgnoreEnd
         }
-
 
         $sqlFile = \file_get_contents($filepath);
 
