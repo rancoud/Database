@@ -19,7 +19,7 @@ WORKDIR /app
 COPY composer.json .
 COPY composer.lock .
 RUN composer validate
-RUN composer install --no-interaction --no-progress --no-suggest
+RUN composer install --no-interaction --no-progress
 
 COPY . .
 
