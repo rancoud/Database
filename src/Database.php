@@ -1,5 +1,7 @@
 <?php
 
+/** @noinspection SqlNoDataSourceInspection */
+
 declare(strict_types=1);
 
 namespace Rancoud\Database;
@@ -13,25 +15,18 @@ use PDOStatement;
  */
 class Database
 {
-    /** @var Configurator|null */
     protected ?Configurator $configurator = null;
 
-    /** @var PDO|null */
     protected ?PDO $pdo = null;
 
-    /** @var array */
     protected array $errors = [];
 
-    /** @var array */
     protected array $savedQueries = [];
 
-    /** @var array */
     protected static array $instances = [];
 
-    /** @var string[] */
     protected array $nestedTransactionsDriverSupported = ['mysql', 'pgsql', 'sqlite'];
 
-    /** @var int */
     protected int $transactionDepth = 0;
 
     /**
@@ -126,8 +121,7 @@ class Database
         try {
             $statement = $this->pdo->prepare($sql);
             if ($statement === false) {
-                /* @noinspection ThrowRawExceptionInspection */
-                throw new Exception('Error Prepare Statement');
+                throw new DatabaseException('Error Prepare Statement');
             }
         } catch (Exception $e) {
             $this->addErrorPrepare($sql, $parameters);
@@ -148,11 +142,12 @@ class Database
             try {
                 $success = $statement->bindValue(":$key", $value, $param);
                 if ($success === false) {
-                    /* @noinspection ThrowRawExceptionInspection */
-                    throw new Exception('Error Bind Value');
+                    throw new DatabaseException('Error Bind Value');
                 }
                 // @codeCoverageIgnoreStart
             } catch (Exception $e) {
+                /** Could not reach this statement without mocking database
+                 */
                 $this->addErrorPrepare($sql, $parameters);
                 throw new DatabaseException('Error Bind Value');
             }
@@ -278,8 +273,7 @@ class Database
         try {
             $success = $statement->execute();
             if ($success === false) {
-                /* @noinspection ThrowRawExceptionInspection */
-                throw new Exception('Error Execute');
+                throw new DatabaseException('Error Execute');
             }
         } catch (Exception $e) {
             $this->addErrorStatement($statement);
@@ -364,7 +358,7 @@ class Database
 
         $affectedRowsCount = null;
         if ($getAffectedRowsCount) {
-            $affectedRowsCount = (int) $statement->rowCount();
+            $affectedRowsCount = $statement->rowCount();
         }
 
         $statement->closeCursor();
@@ -396,7 +390,7 @@ class Database
 
         $affectedRowsCount = null;
         if ($getAffectedRowsCount) {
-            $affectedRowsCount = (int) $statement->rowCount();
+            $affectedRowsCount = $statement->rowCount();
         }
 
         $statement->closeCursor();
@@ -558,8 +552,7 @@ class Database
         try {
             if ($this->transactionDepth === 0 || $this->isNestedTransactionSupported() === false) {
                 if ($this->pdo->beginTransaction() === false) {
-                    /* @noinspection ThrowRawExceptionInspection */
-                    throw new Exception('Error Begin Transaction');
+                    throw new DatabaseException('Error Begin Transaction');
                 }
             } else {
                 $this->exec('SAVEPOINT LEVEL' . $this->transactionDepth);
@@ -568,6 +561,8 @@ class Database
             ++$this->transactionDepth;
             // @codeCoverageIgnoreStart
         } catch (Exception $e) {
+            /** Could not reach this statement without mocking database
+             */
             throw new DatabaseException('Error Begin Transaction');
         }
         // @codeCoverageIgnoreEnd
@@ -599,14 +594,15 @@ class Database
 
             if ($this->transactionDepth === 0 || $this->isNestedTransactionSupported() === false) {
                 if ($this->pdo->commit() === false) {
-                    /* @noinspection ThrowRawExceptionInspection */
-                    throw new Exception('Error Commit Transaction');
+                    throw new DatabaseException('Error Commit Transaction');
                 }
             } else {
                 $this->exec('RELEASE SAVEPOINT LEVEL' . $this->transactionDepth);
             }
             // @codeCoverageIgnoreStart
         } catch (Exception $e) {
+            /** Could not reach this statement without mocking database
+             */
             throw new DatabaseException('Error Commit Transaction');
         }
         // @codeCoverageIgnoreEnd
@@ -626,14 +622,15 @@ class Database
 
             if ($this->transactionDepth === 0 || $this->isNestedTransactionSupported() === false) {
                 if ($this->pdo->rollBack() === false) {
-                    /* @noinspection ThrowRawExceptionInspection */
-                    throw new Exception('Error Rollback Transaction');
+                    throw new DatabaseException('Error Rollback Transaction');
                 }
             } else {
                 $this->exec('ROLLBACK TO SAVEPOINT LEVEL' . $this->transactionDepth);
             }
             // @codeCoverageIgnoreStart
         } catch (Exception $e) {
+            /** Could not reach this statement without mocking database
+             */
             throw new DatabaseException('Error Rollback Transaction');
         }
         // @codeCoverageIgnoreEnd
@@ -729,7 +726,6 @@ class Database
             return;
         }
 
-        /** @noinspection CallableParameterUseCaseInTypeContextInspection */
         $tables = \implode(',', $tables);
 
         $sql = 'DROP TABLE IF EXISTS ' . $tables;
@@ -743,15 +739,18 @@ class Database
      */
     public function useSqlFile(string $filepath): void
     {
-        if (!\file_exists($filepath)) {
+        if (!\file_exists($filepath) || !\is_file($filepath)) {
             throw new DatabaseException('File missing for useSqlFile method: ' . $filepath);
         }
 
-        // @codeCoverageIgnoreStart
         if (!\is_readable($filepath)) {
+            // @codeCoverageIgnoreStart
+            /** Could not reach this statement without mocking filesystem
+              */
             throw new DatabaseException('File is not readable for useSqlFile method: ' . $filepath);
+            // @codeCoverageIgnoreEnd
         }
-        // @codeCoverageIgnoreEnd
+
 
         $sqlFile = \file_get_contents($filepath);
 
