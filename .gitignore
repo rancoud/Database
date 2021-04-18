@@ -2,9 +2,6 @@
 .idea
 *.iml
 
-# Netbeans
-nb*
-
 # Composer
 vendor/
 
