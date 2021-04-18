@@ -20,5 +20,4 @@ jobs:
         uses: codecov/codecov-action@v1.3.2
         if: success()
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
           file: ./coverage/clover.xml
