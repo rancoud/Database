@@ -1256,8 +1256,14 @@ class DatabaseTest extends TestCase
 
                 $row = $db->selectRow($sql, $params);
 
-                static::assertSame('1', $row['true']);
-                static::assertSame('0', $row['false']);
+                $selectData = $this->selectData;
+                if (PHP_MAJOR_VERSION >= 8 && PHP_MINOR_VERSION >= 1) {
+                    static::assertSame(1, $row['true']);
+                    static::assertSame(0, $row['false']);
+                } else {
+                    static::assertSame('1', $row['true']);
+                    static::assertSame('0', $row['false']);
+                }
             } else {
                 $sql = 'SELECT :true AS true, :false AS false, :null AS null, :float AS float,
                 :int AS int, :string AS string, :resource AS resource';
