@@ -6,7 +6,7 @@
 vendor/
 
 # PHP code sniffer
-.php_cs.cache
+.php-cs-fixer.cache
 
 # PHP Unit
 build/
