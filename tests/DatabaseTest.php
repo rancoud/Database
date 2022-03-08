@@ -1259,9 +1259,11 @@ class DatabaseTest extends TestCase
                 if (PHP_MAJOR_VERSION >= 8 && PHP_MINOR_VERSION >= 1) {
                     static::assertSame(1, $row['true']);
                     static::assertSame(0, $row['false']);
+                    static::assertSame(800, $row['int']);
                 } else {
                     static::assertSame('1', $row['true']);
                     static::assertSame('0', $row['false']);
+                    static::assertSame('800', $row['int']);
                 }
             } else {
                 $sql = 'SELECT :true AS true, :false AS false, :null AS null, :float AS float,
@@ -1279,17 +1281,12 @@ class DatabaseTest extends TestCase
 
                 static::assertSame('t', $row['true']);
                 static::assertSame('f', $row['false']);
+                static::assertSame('800', $row['int']);
             }
             static::assertNull($row['null']);
             static::assertSame('1.2', $row['float']);
             static::assertSame('string', $row['string']);
             static::assertSame('-- MySQL dump', \mb_substr($row['resource'], 0, 13));
-
-            if (PHP_MAJOR_VERSION >= 8 && PHP_MINOR_VERSION >= 1) {
-                static::assertSame(800, $row['int']);
-            } else {
-                static::assertSame('800', $row['int']);
-            }
         } catch (DatabaseException $e) {
             \var_dump($db->getErrors());
             throw $e;
