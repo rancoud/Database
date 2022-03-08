@@ -406,7 +406,7 @@ class ConfiguratorTest extends TestCase
     public function testSetParameterThrowException(): void
     {
         $this->expectException(DatabaseException::class);
-        $this->expectExceptionMessage('Database module only support error mode with exception. You can\'t modify this setting'); //phpcs:ignore
+        $this->expectExceptionMessage('Database module only support error mode with exception. You can\'t modify this setting'); // phpcs:ignore
 
         $params = [
             'driver'        => 'mysql',
