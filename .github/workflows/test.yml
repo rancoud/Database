@@ -31,7 +31,7 @@ jobs:
         run: docker-compose run lib composer ci
 
       - name: Upload coverage
-        uses: codecov/codecov-action@v2.1.0
+        uses: codecov/codecov-action@v3
         if: success()
         with:
           file: ./coverage/clover.xml
