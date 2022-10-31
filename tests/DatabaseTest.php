@@ -342,6 +342,124 @@ class DatabaseTest extends TestCase
         ]
     ];
 
+    protected array $selectDataPHP81 = [
+        'mysql' => [
+            [
+                'id'      => 1,
+                'name'    => 'A',
+                'ranking' => 0,
+                'comment' => null,
+            ],
+            [
+                'id'      => 2,
+                'name'    => 'B',
+                'ranking' => 10,
+                'comment' => 'yes',
+            ],
+            [
+                'id'      => 3,
+                'name'    => 'C',
+                'ranking' => 20,
+                'comment' => 'maybe',
+            ],
+            [
+                'id'      => 4,
+                'name'    => 'D',
+                'ranking' => 30,
+                'comment' => 'no',
+            ],
+            [
+                'id'      => 5,
+                'name'    => 'E',
+                'ranking' => 25,
+                'comment' => null,
+            ],
+            [
+                'id'      => 6,
+                'name'    => 'F',
+                'ranking' => 5,
+                'comment' => null,
+            ]
+        ],
+        'pgsql' => [
+            [
+                'id'      => 1,
+                'name'    => 'A',
+                'ranking' => 0,
+                'comment' => null,
+            ],
+            [
+                'id'      => 2,
+                'name'    => 'B',
+                'ranking' => 10,
+                'comment' => 'yes',
+            ],
+            [
+                'id'      => 3,
+                'name'    => 'C',
+                'ranking' => 20,
+                'comment' => 'maybe',
+            ],
+            [
+                'id'      => 4,
+                'name'    => 'D',
+                'ranking' => 30,
+                'comment' => 'no',
+            ],
+            [
+                'id'      => 5,
+                'name'    => 'E',
+                'ranking' => 25,
+                'comment' => null,
+            ],
+            [
+                'id'      => 6,
+                'name'    => 'F',
+                'ranking' => 5,
+                'comment' => null,
+            ]
+        ],
+        'sqlite' => [
+            [
+                'id'      => 1,
+                'name'    => 'A',
+                'ranking' => 0,
+                'comment' => null,
+            ],
+            [
+                'id'      => 2,
+                'name'    => 'B',
+                'ranking' => 10,
+                'comment' => 'yes',
+            ],
+            [
+                'id'      => 3,
+                'name'    => 'C',
+                'ranking' => 20,
+                'comment' => 'maybe',
+            ],
+            [
+                'id'      => 4,
+                'name'    => 'D',
+                'ranking' => 30,
+                'comment' => 'no',
+            ],
+            [
+                'id'      => 5,
+                'name'    => 'E',
+                'ranking' => 25,
+                'comment' => null,
+            ],
+            [
+                'id'      => 6,
+                'name'    => 'F',
+                'ranking' => 5,
+                'comment' => null,
+            ]
+        ]
+    ];
+
+
     protected array $sqlFiles = [
         'mysql'  => [__DIR__ . '/test-dump-mysql.sql'],
         'pgsql'  => [__DIR__ . '/test-dump-pgsql-create-table.sql', __DIR__ . '/test-dump-pgsql-insert-table.sql'],
@@ -660,17 +778,22 @@ class DatabaseTest extends TestCase
             $db->exec($sql);
         }
 
+        $selectData = $this->selectData;
+        if (PHP_MAJOR_VERSION >= 8 && PHP_MINOR_VERSION >= 1) {
+            $selectData = $this->selectDataPHP81;
+        }
+
         try {
             $sql = 'SELECT * FROM test_select';
             $rows = $db->selectAll($sql);
-            static::assertSame($this->selectData[$driver], $rows);
+            static::assertSame($selectData[$driver], $rows);
 
             $sql = 'SELECT * FROM test_select WHERE ranking >= :ranking';
             $params = ['ranking' => 20];
             $rows = $db->selectAll($sql, $params);
-            $data[] = $this->selectData[$driver][2];
-            $data[] = $this->selectData[$driver][3];
-            $data[] = $this->selectData[$driver][4];
+            $data[] = $selectData[$driver][2];
+            $data[] = $selectData[$driver][3];
+            $data[] = $selectData[$driver][4];
             static::assertSame($data, $rows);
 
             $sql = 'SELECT * FROM test_select WHERE ranking >= :ranking';
@@ -721,15 +844,20 @@ class DatabaseTest extends TestCase
             $db->exec($sql);
         }
 
+        $selectData = $this->selectData;
+        if (PHP_MAJOR_VERSION >= 8 && PHP_MINOR_VERSION >= 1) {
+            $selectData = $this->selectDataPHP81;
+        }
+
         try {
             $sql = 'SELECT * FROM test_select';
             $row = $db->selectRow($sql);
-            static::assertSame($this->selectData[$driver][0], $row);
+            static::assertSame($selectData[$driver][0], $row);
 
             $sql = 'SELECT * FROM test_select WHERE ranking >= :ranking';
             $params = ['ranking' => 20];
             $row = $db->selectRow($sql, $params);
-            static::assertSame($this->selectData[$driver][2], $row);
+            static::assertSame($selectData[$driver][2], $row);
 
             $sql = 'SELECT * FROM test_select WHERE ranking >= :ranking';
             $params = ['ranking' => 100];
@@ -779,25 +907,30 @@ class DatabaseTest extends TestCase
             $db->exec($sql);
         }
 
+        $selectData = $this->selectData;
+        if (PHP_MAJOR_VERSION >= 8 && PHP_MINOR_VERSION >= 1) {
+            $selectData = $this->selectDataPHP81;
+        }
+
         try {
             $sql = 'SELECT * FROM test_select';
             $col = $db->selectCol($sql);
             static::assertSame([
-                $this->selectData[$driver][0]['id'],
-                $this->selectData[$driver][1]['id'],
-                $this->selectData[$driver][2]['id'],
-                $this->selectData[$driver][3]['id'],
-                $this->selectData[$driver][4]['id'],
-                $this->selectData[$driver][5]['id']
+                $selectData[$driver][0]['id'],
+                $selectData[$driver][1]['id'],
+                $selectData[$driver][2]['id'],
+                $selectData[$driver][3]['id'],
+                $selectData[$driver][4]['id'],
+                $selectData[$driver][5]['id']
             ], $col);
 
             $sql = 'SELECT name FROM test_select WHERE ranking >= :ranking';
             $params = ['ranking' => 20];
             $col = $db->selectCol($sql, $params);
             static::assertSame([
-                $this->selectData[$driver][2]['name'],
-                $this->selectData[$driver][3]['name'],
-                $this->selectData[$driver][4]['name']
+                $selectData[$driver][2]['name'],
+                $selectData[$driver][3]['name'],
+                $selectData[$driver][4]['name']
             ], $col);
 
             $sql = 'SELECT ranking FROM test_select WHERE ranking >= :ranking';
@@ -848,15 +981,20 @@ class DatabaseTest extends TestCase
             $db->exec($sql);
         }
 
+        $selectData = $this->selectData;
+        if (PHP_MAJOR_VERSION >= 8 && PHP_MINOR_VERSION >= 1) {
+            $selectData = $this->selectDataPHP81;
+        }
+
         try {
             $sql = 'SELECT * FROM test_select';
             $var = $db->selectVar($sql);
-            static::assertSame($this->selectData[$driver][0]['id'], $var);
+            static::assertSame($selectData[$driver][0]['id'], $var);
 
             $sql = 'SELECT name FROM test_select WHERE ranking >= :ranking';
             $params = ['ranking' => 20];
             $var = $db->selectVar($sql, $params);
-            static::assertSame($this->selectData[$driver][2]['name'], $var);
+            static::assertSame($selectData[$driver][2]['name'], $var);
 
             $sql = 'SELECT ranking FROM test_select WHERE ranking >= :ranking';
             $params = ['ranking' => 100];
@@ -1118,8 +1256,15 @@ class DatabaseTest extends TestCase
 
                 $row = $db->selectRow($sql, $params);
 
-                static::assertSame('1', $row['true']);
-                static::assertSame('0', $row['false']);
+                if (PHP_MAJOR_VERSION >= 8 && PHP_MINOR_VERSION >= 1) {
+                    static::assertSame(1, $row['true']);
+                    static::assertSame(0, $row['false']);
+                    static::assertSame(800, $row['int']);
+                } else {
+                    static::assertSame('1', $row['true']);
+                    static::assertSame('0', $row['false']);
+                    static::assertSame('800', $row['int']);
+                }
             } else {
                 $sql = 'SELECT :true AS true, :false AS false, :null AS null, :float AS float,
                 :int AS int, :string AS string, :resource AS resource';
@@ -1136,10 +1281,10 @@ class DatabaseTest extends TestCase
 
                 static::assertSame('t', $row['true']);
                 static::assertSame('f', $row['false']);
+                static::assertSame('800', $row['int']);
             }
             static::assertNull($row['null']);
             static::assertSame('1.2', $row['float']);
-            static::assertSame('800', $row['int']);
             static::assertSame('string', $row['string']);
             static::assertSame('-- MySQL dump', \mb_substr($row['resource'], 0, 13));
         } catch (DatabaseException $e) {

@@ -32,37 +32,43 @@ class DatabaseNamedInstancesTest extends TestCase
     ];
 
     /**
-     * @runInSeparateProcess
-     *
      * @throws DatabaseException
      */
     public function testSetInstance(): void
     {
         $class = new ReflectionClass(Database::class);
+        $reflectedProperty = $class->getProperty('instances');
+        $reflectedProperty->setAccessible(true);
+        $reflectedProperty->setValue([]);
 
         $db1 = Database::setInstance(new Configurator($this->params));
 
-        $properties = $class->getStaticProperties();
-        static::assertNotEmpty($properties['instances']);
-        static::assertArrayHasKey('primary', $properties['instances']);
-        static::assertInstanceOf(Database::class, $properties['instances']['primary']);
-        static::assertSame($db1, $properties['instances']['primary']);
+        $propertiesOne = $class->getStaticProperties();
+        static::assertNotEmpty($propertiesOne['instances']);
+        static::assertArrayHasKey('primary', $propertiesOne['instances']);
+        static::assertInstanceOf(Database::class, $propertiesOne['instances']['primary']);
+        static::assertSame($db1, $propertiesOne['instances']['primary']);
 
         $db2 = Database::setInstance(new Configurator($this->params), 'secondary');
-        $properties = $class->getStaticProperties();
-        static::assertNotEmpty($properties['instances']);
-        static::assertArrayHasKey('secondary', $properties['instances']);
-        static::assertInstanceOf(Database::class, $properties['instances']['secondary']);
-        static::assertSame($db2, $properties['instances']['secondary']);
+        $propertiesTwo = $class->getStaticProperties();
+        static::assertNotEmpty($propertiesTwo['instances']);
+        static::assertArrayHasKey('secondary', $propertiesTwo['instances']);
+        static::assertInstanceOf(Database::class, $propertiesTwo['instances']['secondary']);
+        static::assertSame($db2, $propertiesTwo['instances']['secondary']);
+
+        $reflectedProperty->setValue([]);
     }
 
     /**
-     * @runInSeparateProcess
-     *
      * @throws DatabaseException
      */
     public function testSetInstanceThrowException(): void
     {
+        $class = new ReflectionClass(Database::class);
+        $reflectedProperty = $class->getProperty('instances');
+        $reflectedProperty->setAccessible(true);
+        $reflectedProperty->setValue([]);
+
         $this->expectException(DatabaseException::class);
         $this->expectExceptionMessage('Cannot overwrite instance "primary"');
 
@@ -71,12 +77,15 @@ class DatabaseNamedInstancesTest extends TestCase
     }
 
     /**
-     * @runInSeparateProcess
-     *
      * @throws DatabaseException
      */
     public function testHasInstance(): void
     {
+        $class = new ReflectionClass(Database::class);
+        $reflectedProperty = $class->getProperty('instances');
+        $reflectedProperty->setAccessible(true);
+        $reflectedProperty->setValue([]);
+
         static::assertFalse(Database::hasInstance());
 
         Database::setInstance(new Configurator($this->params));
@@ -88,15 +97,20 @@ class DatabaseNamedInstancesTest extends TestCase
         Database::setInstance(new Configurator($this->params), 'secondary');
 
         static::assertTrue(Database::hasInstance('secondary'));
+
+        $reflectedProperty->setValue([]);
     }
 
     /**
-     * @runInSeparateProcess
-     *
      * @throws DatabaseException
      */
     public function testGetInstance(): void
     {
+        $class = new ReflectionClass(Database::class);
+        $reflectedProperty = $class->getProperty('instances');
+        $reflectedProperty->setAccessible(true);
+        $reflectedProperty->setValue([]);
+
         static::assertNull(Database::getInstance());
         static::assertNull(Database::getInstance('secondary'));
 
@@ -108,5 +122,7 @@ class DatabaseNamedInstancesTest extends TestCase
 
         static::assertSame($db1, Database::getInstance());
         static::assertSame($db2, Database::getInstance('secondary'));
+
+        $reflectedProperty->setValue([]);
     }
 }
