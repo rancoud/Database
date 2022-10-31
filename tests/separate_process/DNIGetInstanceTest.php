@@ -7,18 +7,17 @@
 
 declare(strict_types=1);
 
-namespace tests;
+namespace tests\separate_process;
 
 use PHPUnit\Framework\TestCase;
 use Rancoud\Database\Configurator;
 use Rancoud\Database\Database;
 use Rancoud\Database\DatabaseException;
-use ReflectionClass;
 
 /**
- * Class DatabaseNamedInstancesTest.
+ * Class DNIGetInstanceTest.
  */
-class DatabaseNamedInstancesTest4 extends TestCase
+class DNIGetInstanceTest extends TestCase
 {
     /** @var Database|null */
     protected ?Database $db;

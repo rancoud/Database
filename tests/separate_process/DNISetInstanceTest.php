@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace tests;
+namespace tests\separate_process;
 
 use PHPUnit\Framework\TestCase;
 use Rancoud\Database\Configurator;
@@ -16,9 +16,9 @@ use Rancoud\Database\DatabaseException;
 use ReflectionClass;
 
 /**
- * Class DatabaseNamedInstancesTest.
+ * Class DNISetInstanceTest.
  */
-class DatabaseNamedInstancesTest1 extends TestCase
+class DNISetInstanceTest extends TestCase
 {
     /** @var Database|null */
     protected ?Database $db;
@@ -40,17 +40,17 @@ class DatabaseNamedInstancesTest1 extends TestCase
 
         $db1 = Database::setInstance(new Configurator($this->params));
 
-        $properties = $class->getStaticProperties();
-        static::assertNotEmpty($properties['instances']);
-        static::assertArrayHasKey('primary', $properties['instances']);
-        static::assertInstanceOf(Database::class, $properties['instances']['primary']);
-        static::assertSame($db1, $properties['instances']['primary']);
+        $propertiesOne = $class->getStaticProperties();
+        static::assertNotEmpty($propertiesOne['instances']);
+        static::assertArrayHasKey('primary', $propertiesOne['instances']);
+        static::assertInstanceOf(Database::class, $propertiesOne['instances']['primary']);
+        static::assertSame($db1, $propertiesOne['instances']['primary']);
 
         $db2 = Database::setInstance(new Configurator($this->params), 'secondary');
-        $properties = $class->getStaticProperties();
-        static::assertNotEmpty($properties['instances']);
-        static::assertArrayHasKey('secondary', $properties['instances']);
-        static::assertInstanceOf(Database::class, $properties['instances']['secondary']);
-        static::assertSame($db2, $properties['instances']['secondary']);
+        $propertiesTwo = $class->getStaticProperties();
+        static::assertNotEmpty($propertiesTwo['instances']);
+        static::assertArrayHasKey('secondary', $propertiesTwo['instances']);
+        static::assertInstanceOf(Database::class, $propertiesTwo['instances']['secondary']);
+        static::assertSame($db2, $propertiesTwo['instances']['secondary']);
     }
 }

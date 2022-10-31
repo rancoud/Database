@@ -7,18 +7,17 @@
 
 declare(strict_types=1);
 
-namespace tests;
+namespace tests\separate_process;
 
 use PHPUnit\Framework\TestCase;
 use Rancoud\Database\Configurator;
 use Rancoud\Database\Database;
 use Rancoud\Database\DatabaseException;
-use ReflectionClass;
 
 /**
- * Class DatabaseNamedInstancesTest.
+ * Class DNIHasInstanceTest.
  */
-class DatabaseNamedInstancesTest2 extends TestCase
+class DNIHasInstanceTest extends TestCase
 {
     /** @var Database|null */
     protected ?Database $db;
@@ -34,12 +33,18 @@ class DatabaseNamedInstancesTest2 extends TestCase
     /**
      * @throws DatabaseException
      */
-    public function testSetInstanceThrowException(): void
+    public function testHasInstance(): void
     {
-        $this->expectException(DatabaseException::class);
-        $this->expectExceptionMessage('Cannot overwrite instance "primary"');
+        static::assertFalse(Database::hasInstance());
 
         Database::setInstance(new Configurator($this->params));
-        Database::setInstance(new Configurator($this->params));
+
+        static::assertTrue(Database::hasInstance());
+
+        static::assertFalse(Database::hasInstance('secondary'));
+
+        Database::setInstance(new Configurator($this->params), 'secondary');
+
+        static::assertTrue(Database::hasInstance('secondary'));
     }
 }
