@@ -31,6 +31,8 @@ class DNIHasInstanceTest extends TestCase
     ];
 
     /**
+     * @runInSeparateProcess
+     *
      * @throws DatabaseException
      */
     public function testHasInstance(): void

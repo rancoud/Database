@@ -32,6 +32,8 @@ class DNISetInstanceTest extends TestCase
     ];
 
     /**
+     * @runInSeparateProcess
+     *
      * @throws DatabaseException
      */
     public function testSetInstance(): void
