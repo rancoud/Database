@@ -33,6 +33,7 @@ class DatabaseNamedInstancesTest extends TestCase
 
     /**
      * @runInSeparateProcess
+     * @preserveGlobalState disabled
      *
      * @throws DatabaseException
      */
@@ -58,6 +59,7 @@ class DatabaseNamedInstancesTest extends TestCase
 
     /**
      * @runInSeparateProcess
+     * @preserveGlobalState disabled
      *
      * @throws DatabaseException
      */
@@ -72,6 +74,7 @@ class DatabaseNamedInstancesTest extends TestCase
 
     /**
      * @runInSeparateProcess
+     * @preserveGlobalState disabled
      *
      * @throws DatabaseException
      */
@@ -92,6 +95,7 @@ class DatabaseNamedInstancesTest extends TestCase
 
     /**
      * @runInSeparateProcess
+     * @preserveGlobalState disabled
      *
      * @throws DatabaseException
      */
