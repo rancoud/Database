@@ -17,6 +17,7 @@ jobs:
           - '7.4'
           - '8.0'
           - '8.1'
+          - '8.2'
 
     steps:
       - name: Checkout
@@ -29,7 +30,7 @@ jobs:
         run: docker-compose build --build-arg PHPVERSION=${{ matrix.php-version }}
 
       - name: Test
-        run: docker-compose run lib composer ci
+        run: docker-compose run -e "PHP_CS_FIXER_IGNORE_ENV=True" lib composer ci
 
       - name: Upload coverage
         uses: codecov/codecov-action@v3
