@@ -1,7 +1,6 @@
 <?php
 
 /**
- * @noinspection PhpIllegalPsrClassPathInspection
  * @noinspection SqlDialectInspection
  */
 

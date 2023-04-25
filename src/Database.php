@@ -287,7 +287,7 @@ class Database
      *
      * @return mixed
      */
-    public function read(PDOStatement $statement, $fetchType = PDO::FETCH_ASSOC)
+    public function read(PDOStatement $statement, int $fetchType = PDO::FETCH_ASSOC)
     {
         return $statement->fetch($fetchType);
     }
@@ -298,7 +298,7 @@ class Database
      *
      * @return array
      */
-    public function readAll(PDOStatement $statement, $fetchType = PDO::FETCH_ASSOC): array
+    public function readAll(PDOStatement $statement, int $fetchType = PDO::FETCH_ASSOC): array
     {
         return $statement->fetchAll($fetchType);
     }

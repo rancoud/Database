@@ -1,7 +1,5 @@
 <?php
 
-/** @noinspection PhpIllegalPsrClassPathInspection */
-
 declare(strict_types=1);
 
 namespace tests;
@@ -555,10 +553,6 @@ class ConfiguratorTest extends TestCase
         static::assertSame($expected, $conf->getParametersForPDO());
 
         $conf->setCharset('charset');
-        $expected = [
-            PDO::ATTR_ERRMODE    => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_PERSISTENT => false
-        ];
         static::assertSame($expected, $conf->getParametersForPDO());
 
         $conf->enablePersistentConnection();
@@ -591,10 +585,6 @@ class ConfiguratorTest extends TestCase
         static::assertSame($expected, $conf->getParametersForPDO());
 
         $conf->setCharset('charset');
-        $expected = [
-            PDO::ATTR_ERRMODE    => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_PERSISTENT => false
-        ];
         static::assertSame($expected, $conf->getParametersForPDO());
 
         $conf->enablePersistentConnection();

@@ -37,19 +37,19 @@ $database = Database::setInstance($databaseConf, 'primary');
 ## Examples
 For example we have a table `users` with this schema:
 
-| Field | Type | Options |
-| --- | --- | --- |
-| id | int(8) | primary key, auto increment |
-| username | varchar(255) |  |
-| ranking | int(8) |  |
+| Field    | Type         | Options                     |
+|----------|--------------|-----------------------------|
+| id       | int(8)       | primary key, auto increment |
+| username | varchar(255) |                             |
+| ranking  | int(8)       |                             |
 
 In the table we have these data:
 
 | id | username | ranking |
-| --- | --- | --- |
-| 1 | taylor | 10 |
-| 2 | alison | 30 |
-| 3 | swifts | 20 |
+|----|----------|---------|
+| 1  | taylor   | 10      |
+| 2  | alison   | 30      |
+| 3  | swifts   | 20      |
 
 ### Select methods
 The output is always an array.
@@ -187,21 +187,21 @@ $db = Database::getInstance('secondary');
 Here is the description of the array passed to the construct
 
 #### Mandatory keys
-| Parameter | Type | Description |
-| --- | --- | --- |
-| driver | string | driver of the database, it will be check with PDO::getAvailableDrivers |
-| host | string | hostname of the database (port number may be included, e.g `example.org:5342`) |
-| user | string | user used to connect to the database |
-| password | string | password used to connect to the database |
-| database | string | name of the database |
+| Parameter | Type   | Description                                                                    |
+|-----------|--------|--------------------------------------------------------------------------------|
+| driver    | string | driver of the database, it will be check with PDO::getAvailableDrivers         |
+| host      | string | hostname of the database (port number may be included, e.g `example.org:5342`) |
+| user      | string | user used to connect to the database                                           |
+| password  | string | password used to connect to the database                                       |
+| database  | string | name of the database                                                           |
 
 #### Optional keys
-| Parameter | Type | Default value | Description |
-| --- | --- | --- | --- |
-| save_queries | bool | true | all queries will be saved in memory with execution time and the connection time |
-| persistent_connection | bool | false | use persistent connection |
-| charset | string | it depends on the driver (MySQL: `utf8mb4` , PostgreSQL: `UTF8`) | set specific database charset |
-| parameters | array | [] | extra parameters used by PDO on connection |
+| Parameter             | Type   | Default value                                                    | Description                                                                     |
+|-----------------------|--------|------------------------------------------------------------------|---------------------------------------------------------------------------------|
+| save_queries          | bool   | true                                                             | all queries will be saved in memory with execution time and the connection time |
+| persistent_connection | bool   | false                                                            | use persistent connection                                                       |
+| charset               | string | it depends on the driver (MySQL: `utf8mb4` , PostgreSQL: `UTF8`) | set specific database charset                                                   |
+| parameters            | array  | []                                                               | extra parameters used by PDO on connection                                      |
 
 ### Methods
 * createPDOConnection(): PDO
@@ -232,8 +232,8 @@ Here is the description of the array passed to the construct
 ## Database
 ### Constructor
 #### Mandatory
-| Parameter | Type | Description |
-| --- | --- | --- |
+| Parameter    | Type         | Description            |
+|--------------|--------------|------------------------|
 | configurator | Configurator | Database configuration |
 
 ### General Commands
