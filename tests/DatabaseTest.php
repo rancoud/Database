@@ -2,7 +2,6 @@
 
 /**
  * @noinspection ForgottenDebugOutputInspection
- * @noinspection PhpIllegalPsrClassPathInspection
  * @noinspection SqlDialectInspection
  */
 
@@ -459,7 +458,6 @@ class DatabaseTest extends TestCase
         ]
     ];
 
-
     protected array $sqlFiles = [
         'mysql'  => [__DIR__ . '/test-dump-mysql.sql'],
         'pgsql'  => [__DIR__ . '/test-dump-pgsql-create-table.sql', __DIR__ . '/test-dump-pgsql-insert-table.sql'],
@@ -609,8 +607,7 @@ class DatabaseTest extends TestCase
             static::assertSame('💪', $db->selectVar('SELECT name FROM test_insert WHERE id=2'));
 
             $params = ['name' => 'C'];
-            $getLastInsertId = true;
-            $id = $db->insert($sql, $params, $getLastInsertId);
+            $id = $db->insert($sql, $params, true);
             static::assertSame(3, $id);
 
             static::assertSame(1, $db->count("SELECT COUNT(*) FROM test_insert WHERE name='C' AND id=3"));
@@ -670,8 +667,7 @@ class DatabaseTest extends TestCase
             static::assertSame(1, $db->count("SELECT COUNT(*) FROM test_update WHERE name='BB' AND id=2"));
 
             $params = ['id' => 3, 'name' => 'CC'];
-            $getCountRowsAffected = true;
-            static::assertSame(1, $db->update($sql, $params, $getCountRowsAffected));
+            static::assertSame(1, $db->update($sql, $params, true));
 
             static::assertSame(1, $db->count("SELECT COUNT(*) FROM test_update WHERE name='CC' AND id=3"));
         } catch (DatabaseException $e) {
@@ -730,8 +726,7 @@ class DatabaseTest extends TestCase
             static::assertSame(0, $db->count('SELECT COUNT(*) FROM test_delete WHERE id = 2'));
 
             $params = ['id' => 3];
-            $getCountRowsAffected = true;
-            static::assertSame(1, $db->delete($sql, $params, $getCountRowsAffected));
+            static::assertSame(1, $db->delete($sql, $params, true));
 
             static::assertSame(0, $db->count('SELECT COUNT(*) FROM test_delete WHERE id = 3'));
         } catch (DatabaseException $e) {
@@ -779,7 +774,7 @@ class DatabaseTest extends TestCase
         }
 
         $selectData = $this->selectData;
-        if (PHP_MAJOR_VERSION >= 8 && PHP_MINOR_VERSION >= 1) {
+        if (\PHP_MAJOR_VERSION >= 8 && \PHP_MINOR_VERSION >= 1) {
             $selectData = $this->selectDataPHP81;
         }
 
@@ -796,7 +791,6 @@ class DatabaseTest extends TestCase
             $data[] = $selectData[$driver][4];
             static::assertSame($data, $rows);
 
-            $sql = 'SELECT * FROM test_select WHERE ranking >= :ranking';
             $params = ['ranking' => 100];
             $rows = $db->selectAll($sql, $params);
             static::assertSame([], $rows);
@@ -845,7 +839,7 @@ class DatabaseTest extends TestCase
         }
 
         $selectData = $this->selectData;
-        if (PHP_MAJOR_VERSION >= 8 && PHP_MINOR_VERSION >= 1) {
+        if (\PHP_MAJOR_VERSION >= 8 && \PHP_MINOR_VERSION >= 1) {
             $selectData = $this->selectDataPHP81;
         }
 
@@ -859,7 +853,6 @@ class DatabaseTest extends TestCase
             $row = $db->selectRow($sql, $params);
             static::assertSame($selectData[$driver][2], $row);
 
-            $sql = 'SELECT * FROM test_select WHERE ranking >= :ranking';
             $params = ['ranking' => 100];
             $rows = $db->selectRow($sql, $params);
             static::assertSame([], $rows);
@@ -908,7 +901,7 @@ class DatabaseTest extends TestCase
         }
 
         $selectData = $this->selectData;
-        if (PHP_MAJOR_VERSION >= 8 && PHP_MINOR_VERSION >= 1) {
+        if (\PHP_MAJOR_VERSION >= 8 && \PHP_MINOR_VERSION >= 1) {
             $selectData = $this->selectDataPHP81;
         }
 
@@ -982,7 +975,7 @@ class DatabaseTest extends TestCase
         }
 
         $selectData = $this->selectData;
-        if (PHP_MAJOR_VERSION >= 8 && PHP_MINOR_VERSION >= 1) {
+        if (\PHP_MAJOR_VERSION >= 8 && \PHP_MINOR_VERSION >= 1) {
             $selectData = $this->selectDataPHP81;
         }
 
@@ -1054,7 +1047,6 @@ class DatabaseTest extends TestCase
             $statement = $db->select($sql, $params);
             static::assertSame(PDOStatement::class, \get_class($statement));
 
-            $sql = 'SELECT * FROM test_select WHERE ranking >= :ranking';
             $params = ['ranking' => 100];
             $statement = $db->select($sql, $params);
             static::assertSame(PDOStatement::class, \get_class($statement));
@@ -1091,6 +1083,7 @@ class DatabaseTest extends TestCase
      * @param string $driver
      *
      * @throws DatabaseException
+     *
      * @noinspection PhpAssignmentInConditionInspection
      */
     public function testRead(string $driver): void
@@ -1115,7 +1108,6 @@ class DatabaseTest extends TestCase
             $rows = $db->read($statement);
             static::assertCount(4, $rows);
 
-            $sql = 'SELECT * FROM test_select WHERE ranking >= :ranking';
             $params = ['ranking' => 100];
             $statement = $db->select($sql, $params);
             $row = $db->read($statement);
@@ -1167,7 +1159,6 @@ class DatabaseTest extends TestCase
             $rows = $db->readAll($statement);
             static::assertCount(3, $rows);
 
-            $sql = 'SELECT * FROM test_select WHERE ranking >= :ranking';
             $params = ['ranking' => 100];
             $statement = $db->select($sql, $params);
             $rows = $db->readAll($statement);
@@ -1233,6 +1224,7 @@ class DatabaseTest extends TestCase
      * @param string $driver
      *
      * @throws DatabaseException
+     *
      * @noinspection FopenBinaryUnsafeUsageInspection
      */
     public function testPdoParamType(string $driver): void
@@ -1256,7 +1248,7 @@ class DatabaseTest extends TestCase
 
                 $row = $db->selectRow($sql, $params);
 
-                if (PHP_MAJOR_VERSION >= 8 && PHP_MINOR_VERSION >= 1) {
+                if (\PHP_MAJOR_VERSION >= 8 && \PHP_MINOR_VERSION >= 1) {
                     static::assertSame(1, $row['true']);
                     static::assertSame(0, $row['false']);
                     static::assertSame(800, $row['int']);
@@ -1452,16 +1444,12 @@ class DatabaseTest extends TestCase
 
             $db->rollbackTransaction();
 
-            $sql = 'SELECT name FROM test_select WHERE id = :id';
-            $params = ['id' => 1];
             static::assertSame('A', $db->selectVar($sql, $params));
         } catch (DatabaseException $e) {
             \var_dump($db->getErrors());
             throw $e;
         }
 
-        $sql = 'SELECT name FROM test_select WHERE id = :id';
-        $params = ['id' => 1];
         static::assertSame('A', $db->selectVar($sql, $params));
     }
 
@@ -1544,7 +1532,6 @@ class DatabaseTest extends TestCase
                     static::assertSame('my name 1', $db->selectVar($sql, $params));
 
                     $sql = 'DELETE FROM test_select WHERE id =:id';
-                    $params = ['id' => 1];
                     $db->delete($sql, $params);
 
                     $db->rollbackTransaction();
@@ -1554,7 +1541,6 @@ class DatabaseTest extends TestCase
                 }
 
                 $sql = 'SELECT name FROM test_select WHERE id = :id';
-                $params = ['id' => 1];
                 static::assertSame('my name 1', $db->selectVar($sql, $params));
 
                 $db->commitTransaction();
@@ -1563,8 +1549,6 @@ class DatabaseTest extends TestCase
                 throw $e;
             }
 
-            $sql = 'SELECT name FROM test_select WHERE id = :id';
-            $params = ['id' => 1];
             static::assertSame('my name 1', $db->selectVar($sql, $params));
 
             $db->commitTransaction();
@@ -1573,8 +1557,6 @@ class DatabaseTest extends TestCase
             throw $e;
         }
 
-        $sql = 'SELECT name FROM test_select WHERE id = :id';
-        $params = ['id' => 1];
         static::assertSame('my name 1', $db->selectVar($sql, $params));
     }
 
@@ -1702,7 +1684,7 @@ class DatabaseTest extends TestCase
         try {
             $db->select('aaa');
             // if assert is done then it's not good
-            static::assertFalse(true);
+            static::fail();
         } catch (DatabaseException $e) {
             static::assertTrue($db->hasErrors());
             static::assertCount(4, $db->getLastError());
@@ -1977,6 +1959,7 @@ class DatabaseTest extends TestCase
      * @param string $driver
      *
      * @throws DatabaseException
+     *
      * @noinspection GetClassUsageInspection
      */
     public function testConnect(string $driver): void
@@ -2025,6 +2008,7 @@ class DatabaseTest extends TestCase
      * @param string $driver
      *
      * @throws DatabaseException
+     *
      * @noinspection GetClassUsageInspection
      */
     public function testGetPdo(string $driver): void
@@ -2054,6 +2038,7 @@ class DatabaseTest extends TestCase
      * @param string $driver
      *
      * @throws DatabaseException
+     *
      * @noinspection GetClassUsageInspection
      */
     public function testDisconnect(string $driver): void
