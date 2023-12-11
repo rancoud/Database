@@ -40,7 +40,7 @@ class DatabaseNamedInstancesTest extends TestCase
         $reflectedProperty->setAccessible(true);
 
         if (\PHP_MAJOR_VERSION === 8 && \PHP_MINOR_VERSION >= 3) {
-            $reflectedProperty->setStaticPropertyValue('instances', []);
+            $class->setStaticPropertyValue('instances', []);
         } else {
             $reflectedProperty->setValue([]);
         }
@@ -61,7 +61,7 @@ class DatabaseNamedInstancesTest extends TestCase
         static::assertSame($db2, $propertiesTwo['instances']['secondary']);
 
         if (\PHP_MAJOR_VERSION === 8 && \PHP_MINOR_VERSION >= 3) {
-            $reflectedProperty->setStaticPropertyValue('instances', []);
+            $class->setStaticPropertyValue('instances', []);
         } else {
             $reflectedProperty->setValue([]);
         }
@@ -77,7 +77,7 @@ class DatabaseNamedInstancesTest extends TestCase
         $reflectedProperty->setAccessible(true);
 
         if (\PHP_MAJOR_VERSION === 8 && \PHP_MINOR_VERSION >= 3) {
-            $reflectedProperty->setStaticPropertyValue('instances', []);
+            $class->setStaticPropertyValue('instances', []);
         } else {
             $reflectedProperty->setValue([]);
         }
@@ -99,7 +99,7 @@ class DatabaseNamedInstancesTest extends TestCase
         $reflectedProperty->setAccessible(true);
 
         if (\PHP_MAJOR_VERSION === 8 && \PHP_MINOR_VERSION >= 3) {
-            $reflectedProperty->setStaticPropertyValue('instances', []);
+            $class->setStaticPropertyValue('instances', []);
         } else {
             $reflectedProperty->setValue([]);
         }
@@ -117,7 +117,7 @@ class DatabaseNamedInstancesTest extends TestCase
         static::assertTrue(Database::hasInstance('secondary'));
 
         if (\PHP_MAJOR_VERSION === 8 && \PHP_MINOR_VERSION >= 3) {
-            $reflectedProperty->setStaticPropertyValue('instances', []);
+            $class->setStaticPropertyValue('instances', []);
         } else {
             $reflectedProperty->setValue([]);
         }
@@ -133,7 +133,7 @@ class DatabaseNamedInstancesTest extends TestCase
         $reflectedProperty->setAccessible(true);
 
         if (\PHP_MAJOR_VERSION === 8 && \PHP_MINOR_VERSION >= 3) {
-            $reflectedProperty->setStaticPropertyValue('instances', []);
+            $class->setStaticPropertyValue('instances', []);
         } else {
             $reflectedProperty->setValue([]);
         }
@@ -151,7 +151,7 @@ class DatabaseNamedInstancesTest extends TestCase
         static::assertSame($db2, Database::getInstance('secondary'));
 
         if (\PHP_MAJOR_VERSION === 8 && \PHP_MINOR_VERSION >= 3) {
-            $reflectedProperty->setStaticPropertyValue('instances', []);
+            $class->setStaticPropertyValue('instances', []);
         } else {
             $reflectedProperty->setValue([]);
         }
