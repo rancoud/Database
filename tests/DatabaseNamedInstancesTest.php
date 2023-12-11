@@ -38,7 +38,12 @@ class DatabaseNamedInstancesTest extends TestCase
         $class = new ReflectionClass(Database::class);
         $reflectedProperty = $class->getProperty('instances');
         $reflectedProperty->setAccessible(true);
-        $reflectedProperty->setValue([]);
+
+        if (\PHP_MAJOR_VERSION === 8 && \PHP_MINOR_VERSION >= 3) {
+            $class->setStaticPropertyValue('instances', []);
+        } else {
+            $reflectedProperty->setValue([]);
+        }
 
         $db1 = Database::setInstance(new Configurator($this->params));
 
@@ -55,7 +60,11 @@ class DatabaseNamedInstancesTest extends TestCase
         static::assertInstanceOf(Database::class, $propertiesTwo['instances']['secondary']);
         static::assertSame($db2, $propertiesTwo['instances']['secondary']);
 
-        $reflectedProperty->setValue([]);
+        if (\PHP_MAJOR_VERSION === 8 && \PHP_MINOR_VERSION >= 3) {
+            $class->setStaticPropertyValue('instances', []);
+        } else {
+            $reflectedProperty->setValue([]);
+        }
     }
 
     /**
@@ -66,7 +75,12 @@ class DatabaseNamedInstancesTest extends TestCase
         $class = new ReflectionClass(Database::class);
         $reflectedProperty = $class->getProperty('instances');
         $reflectedProperty->setAccessible(true);
-        $reflectedProperty->setValue([]);
+
+        if (\PHP_MAJOR_VERSION === 8 && \PHP_MINOR_VERSION >= 3) {
+            $class->setStaticPropertyValue('instances', []);
+        } else {
+            $reflectedProperty->setValue([]);
+        }
 
         $this->expectException(DatabaseException::class);
         $this->expectExceptionMessage('Cannot overwrite instance "primary"');
@@ -83,7 +97,12 @@ class DatabaseNamedInstancesTest extends TestCase
         $class = new ReflectionClass(Database::class);
         $reflectedProperty = $class->getProperty('instances');
         $reflectedProperty->setAccessible(true);
-        $reflectedProperty->setValue([]);
+
+        if (\PHP_MAJOR_VERSION === 8 && \PHP_MINOR_VERSION >= 3) {
+            $class->setStaticPropertyValue('instances', []);
+        } else {
+            $reflectedProperty->setValue([]);
+        }
 
         static::assertFalse(Database::hasInstance());
 
@@ -97,7 +116,11 @@ class DatabaseNamedInstancesTest extends TestCase
 
         static::assertTrue(Database::hasInstance('secondary'));
 
-        $reflectedProperty->setValue([]);
+        if (\PHP_MAJOR_VERSION === 8 && \PHP_MINOR_VERSION >= 3) {
+            $class->setStaticPropertyValue('instances', []);
+        } else {
+            $reflectedProperty->setValue([]);
+        }
     }
 
     /**
@@ -108,7 +131,12 @@ class DatabaseNamedInstancesTest extends TestCase
         $class = new ReflectionClass(Database::class);
         $reflectedProperty = $class->getProperty('instances');
         $reflectedProperty->setAccessible(true);
-        $reflectedProperty->setValue([]);
+
+        if (\PHP_MAJOR_VERSION === 8 && \PHP_MINOR_VERSION >= 3) {
+            $class->setStaticPropertyValue('instances', []);
+        } else {
+            $reflectedProperty->setValue([]);
+        }
 
         static::assertNull(Database::getInstance());
         static::assertNull(Database::getInstance('secondary'));
@@ -122,6 +150,10 @@ class DatabaseNamedInstancesTest extends TestCase
         static::assertSame($db1, Database::getInstance());
         static::assertSame($db2, Database::getInstance('secondary'));
 
-        $reflectedProperty->setValue([]);
+        if (\PHP_MAJOR_VERSION === 8 && \PHP_MINOR_VERSION >= 3) {
+            $class->setStaticPropertyValue('instances', []);
+        } else {
+            $reflectedProperty->setValue([]);
+        }
     }
 }
