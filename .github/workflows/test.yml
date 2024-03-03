@@ -1,8 +1,16 @@
 name: test
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 on:
   push:
+    paths-ignore:
+      - '**.md'
   pull_request:
+    paths-ignore:
+      - '**.md'
 
 jobs:
   test:
@@ -37,4 +45,5 @@ jobs:
         uses: codecov/codecov-action@v4
         if: success()
         with:
+          token: ${{ secrets.CODECOV_TOKEN }}
           file: ./coverage/clover.xml
