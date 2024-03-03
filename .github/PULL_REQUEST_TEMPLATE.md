@@ -1,19 +1,9 @@
-> Thanks for contributing!
-> Before submitting a pull request, please complete the following checklist:
->  - [ ] For any new features or bug fixes, both positive and negative test cases have been added.
->  - [ ] For any new features, documentation has been added.
->  - [ ] Link issue related to this pull request with keyword `closes` ([documentation about keywords](https://docs.github.com/en/enterprise/2.16/user/github/managing-your-work-on-github/closing-issues-using-keywords))
->  - [ ] Search previous suggestions before making a new one, as yours may be a duplicate.
-
-**You MUST delete the content above including this line before posting, otherwise your pull request will be invalid.**
-
-## Description
-> Describe your changes here.
-
-## Changelist
-- Change 1
-- Change 2
-- Change 3
-
-## Issue
-> Issue related here closes #123
+<!--
+Thanks for sending a pull request!  
+Here are some tips for you:  
+1. If this PR is still in in Progress, put it in draft.
+2. If this PR is introducing a breaking change please prefix with *BREAKING* in PR title.
+3. If this PR has any follow up tasks, please prefix with *TODO* and describe follow up task.
+4. When PR is ready to be reviewed, please tag rancoud as a sole reviewer.
+-->
+# Description

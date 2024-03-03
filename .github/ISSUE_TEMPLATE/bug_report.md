@@ -1,34 +1,28 @@
 ---
 name: Bug report
 about: Create a report to help us improve
-title: "[BUG]"
-labels: bug
+title: "[BUG] "
+labels: "bug"
 assignees: rancoud
 
 ---
 ## Description
-> A clear and concise description of what the bug is.
+<!-- A clear and concise description of what the bug is. -->
 
 ## Steps to reproduce this issue
-1. 
-2. 
-3. 
-4. 
+1.
+2.
+3.
+4.
 
 ## Expected behavior
-> A clear and concise description of what you expected to happen.
+<!-- A clear and concise description of what you expected to happen. -->
 
 ## Actual behavior
-> A clear and concise description of what you actual have instead of expected behavior.
+<!-- A clear and concise description of what you actual have instead of expected behavior. -->
 
 ## Screenshots
-> If applicable, add screenshots to help explain your problem.
-
-## Versions
-> Please complete the following information
- - OS: [e.g. Windows 10]
- - PHP Version: [e.g. 7.4.0]
- - Lib Version: [e.g. 1.0.0]
+<!-- If applicable, add screenshots to help explain your problem. -->
 
 ## Additional context
-> Add any other context about the problem here.
+<!-- Add any other context about the problem here. -->
