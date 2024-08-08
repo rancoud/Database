@@ -33,13 +33,13 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Pull
-        run: docker-compose pull --quiet
+        run: docker compose pull --quiet
 
       - name: Build
-        run: docker-compose build --build-arg PHPVERSION=${{ matrix.php-version }}
+        run: docker compose build --build-arg PHPVERSION=${{ matrix.php-version }}
 
       - name: Test
-        run: docker-compose run -e "PHP_CS_FIXER_IGNORE_ENV=True" lib composer ci
+        run: docker compose run -e "PHP_CS_FIXER_IGNORE_ENV=True" lib composer ci
 
       - name: Upload coverage
         uses: codecov/codecov-action@v4
