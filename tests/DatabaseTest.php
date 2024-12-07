@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace tests;
 
 use PDOStatement;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Rancoud\Database\Configurator;
 use Rancoud\Database\Database;
@@ -466,7 +467,7 @@ class DatabaseTest extends TestCase
 
     // region Data Provider
 
-    public function dbms(): array
+    public static function dbms(): array
     {
         return [
             'mysql'      => ['mysql'],
@@ -530,6 +531,7 @@ class DatabaseTest extends TestCase
      *
      * @throws DatabaseException
      */
+    #[DataProvider('dbms')]
     public function testExec(string $driver): void
     {
         /** @var Database $db */
@@ -564,6 +566,7 @@ class DatabaseTest extends TestCase
      *
      * @throws DatabaseException
      */
+    #[DataProvider('dbms')]
     public function testExecException(string $driver): void
     {
         /** @var Database $db */
@@ -585,6 +588,7 @@ class DatabaseTest extends TestCase
      *
      * @throws DatabaseException
      */
+    #[DataProvider('dbms')]
     public function testInsert(string $driver): void
     {
         /** @var Database $db */
@@ -624,6 +628,7 @@ class DatabaseTest extends TestCase
      *
      * @throws DatabaseException
      */
+    #[DataProvider('dbms')]
     public function testInsertException(string $driver): void
     {
         /** @var Database $db */
@@ -645,6 +650,7 @@ class DatabaseTest extends TestCase
      *
      * @throws DatabaseException
      */
+    #[DataProvider('dbms')]
     public function testUpdate(string $driver): void
     {
         /** @var Database $db */
@@ -683,6 +689,7 @@ class DatabaseTest extends TestCase
      *
      * @throws DatabaseException
      */
+    #[DataProvider('dbms')]
     public function testUpdateException(string $driver): void
     {
         /** @var Database $db */
@@ -704,6 +711,7 @@ class DatabaseTest extends TestCase
      *
      * @throws DatabaseException
      */
+    #[DataProvider('dbms')]
     public function testDelete(string $driver): void
     {
         /** @var Database $db */
@@ -742,6 +750,7 @@ class DatabaseTest extends TestCase
      *
      * @throws DatabaseException
      */
+    #[DataProvider('dbms')]
     public function testDeleteException(string $driver): void
     {
         /** @var Database $db */
@@ -763,6 +772,7 @@ class DatabaseTest extends TestCase
      *
      * @throws DatabaseException
      */
+    #[DataProvider('dbms')]
     public function testSelectAll(string $driver): void
     {
         /** @var Database $db */
@@ -807,6 +817,7 @@ class DatabaseTest extends TestCase
      *
      * @throws DatabaseException
      */
+    #[DataProvider('dbms')]
     public function testSelectAllException(string $driver): void
     {
         /** @var Database $db */
@@ -828,6 +839,7 @@ class DatabaseTest extends TestCase
      *
      * @throws DatabaseException
      */
+    #[DataProvider('dbms')]
     public function testSelectRow(string $driver): void
     {
         /** @var Database $db */
@@ -869,6 +881,7 @@ class DatabaseTest extends TestCase
      *
      * @throws DatabaseException
      */
+    #[DataProvider('dbms')]
     public function testSelectRowException(string $driver): void
     {
         /** @var Database $db */
@@ -890,6 +903,7 @@ class DatabaseTest extends TestCase
      *
      * @throws DatabaseException
      */
+    #[DataProvider('dbms')]
     public function testSelectCol(string $driver): void
     {
         /** @var Database $db */
@@ -943,6 +957,7 @@ class DatabaseTest extends TestCase
      *
      * @throws DatabaseException
      */
+    #[DataProvider('dbms')]
     public function testSelectColException(string $driver): void
     {
         /** @var Database $db */
@@ -964,6 +979,7 @@ class DatabaseTest extends TestCase
      *
      * @throws DatabaseException
      */
+    #[DataProvider('dbms')]
     public function testSelectVar(string $driver): void
     {
         /** @var Database $db */
@@ -1006,6 +1022,7 @@ class DatabaseTest extends TestCase
      *
      * @throws DatabaseException
      */
+    #[DataProvider('dbms')]
     public function testSelectVarException(string $driver): void
     {
         /** @var Database $db */
@@ -1027,6 +1044,7 @@ class DatabaseTest extends TestCase
      *
      * @throws DatabaseException
      */
+    #[DataProvider('dbms')]
     public function testSelect(string $driver): void
     {
         /** @var Database $db */
@@ -1063,6 +1081,7 @@ class DatabaseTest extends TestCase
      *
      * @throws DatabaseException
      */
+    #[DataProvider('dbms')]
     public function testSelectException(string $driver): void
     {
         /** @var Database $db */
@@ -1086,6 +1105,7 @@ class DatabaseTest extends TestCase
      *
      * @noinspection PhpAssignmentInConditionInspection
      */
+    #[DataProvider('dbms')]
     public function testRead(string $driver): void
     {
         /** @var Database $db */
@@ -1137,6 +1157,7 @@ class DatabaseTest extends TestCase
      *
      * @throws DatabaseException
      */
+    #[DataProvider('dbms')]
     public function testReadAll(string $driver): void
     {
         /** @var Database $db */
@@ -1180,6 +1201,7 @@ class DatabaseTest extends TestCase
      *
      * @throws DatabaseException
      */
+    #[DataProvider('dbms')]
     public function testCount(string $driver): void
     {
         /** @var Database $db */
@@ -1204,6 +1226,7 @@ class DatabaseTest extends TestCase
      *
      * @throws DatabaseException
      */
+    #[DataProvider('dbms')]
     public function testCountException(string $driver): void
     {
         /** @var Database $db */
@@ -1227,6 +1250,7 @@ class DatabaseTest extends TestCase
      *
      * @noinspection FopenBinaryUnsafeUsageInspection
      */
+    #[DataProvider('dbms')]
     public function testPdoParamType(string $driver): void
     {
         /** @var Database $db */
@@ -1292,6 +1316,7 @@ class DatabaseTest extends TestCase
      *
      * @throws DatabaseException
      */
+    #[DataProvider('dbms')]
     public function testPdoParamTypeException(string $driver): void
     {
         /** @var Database $db */
@@ -1315,6 +1340,7 @@ class DatabaseTest extends TestCase
      *
      * @throws DatabaseException
      */
+    #[DataProvider('dbms')]
     public function testStartTransaction(string $driver): void
     {
         /** @var Database $db */
@@ -1350,6 +1376,7 @@ class DatabaseTest extends TestCase
      *
      * @throws DatabaseException
      */
+    #[DataProvider('dbms')]
     public function testCommitTransaction(string $driver): void
     {
         /** @var Database $db */
@@ -1385,6 +1412,7 @@ class DatabaseTest extends TestCase
      *
      * @throws DatabaseException
      */
+    #[DataProvider('dbms')]
     public function testCommitTransactionException(string $driver): void
     {
         /** @var Database $db */
@@ -1421,6 +1449,7 @@ class DatabaseTest extends TestCase
      *
      * @throws DatabaseException
      */
+    #[DataProvider('dbms')]
     public function testRollbackTransaction(string $driver): void
     {
         /** @var Database $db */
@@ -1460,6 +1489,7 @@ class DatabaseTest extends TestCase
      *
      * @throws DatabaseException
      */
+    #[DataProvider('dbms')]
     public function testRollbackTransactionException(string $driver): void
     {
         /** @var Database $db */
@@ -1496,6 +1526,7 @@ class DatabaseTest extends TestCase
      *
      * @throws DatabaseException
      */
+    #[DataProvider('dbms')]
     public function testNestedTransaction(string $driver): void
     {
         /** @var Database $db */
@@ -1567,6 +1598,7 @@ class DatabaseTest extends TestCase
      *
      * @throws DatabaseException
      */
+    #[DataProvider('dbms')]
     public function testCompleteTransactionOK(string $driver): void
     {
         /** @var Database $db */
@@ -1602,6 +1634,7 @@ class DatabaseTest extends TestCase
      *
      * @throws DatabaseException
      */
+    #[DataProvider('dbms')]
     public function testCompleteTransactionKO(string $driver): void
     {
         /** @var Database $db */
@@ -1637,6 +1670,7 @@ class DatabaseTest extends TestCase
      *
      * @throws DatabaseException
      */
+    #[DataProvider('dbms')]
     public function testStartCommitAutoConnect(string $driver): void
     {
         $configurator = new Configurator($this->dbms[$driver]['parameters']);
@@ -1667,6 +1701,7 @@ class DatabaseTest extends TestCase
      *
      * @throws DatabaseException
      */
+    #[DataProvider('dbms')]
     public function testErrorsException(string $driver): void
     {
         /** @var Database $db */
@@ -1708,6 +1743,7 @@ class DatabaseTest extends TestCase
      *
      * @throws DatabaseException
      */
+    #[DataProvider('dbms')]
     public function testSaveQueries(string $driver): void
     {
         /** @var Database $db */
@@ -1763,6 +1799,7 @@ class DatabaseTest extends TestCase
      *
      * @throws DatabaseException
      */
+    #[DataProvider('dbms')]
     public function testUseSqlFile(string $driver): void
     {
         /** @var Database $db */
@@ -1786,6 +1823,7 @@ class DatabaseTest extends TestCase
      *
      * @param string $driver
      */
+    #[DataProvider('dbms')]
     public function testUseSqlFileExceptionMissingFile(string $driver): void
     {
         /** @var Database $db */
@@ -1801,6 +1839,7 @@ class DatabaseTest extends TestCase
      *
      * @param string $driver
      */
+    #[DataProvider('dbms')]
     public function testUseSqlFileExceptionDirectory(string $driver): void
     {
         /** @var Database $db */
@@ -1816,6 +1855,7 @@ class DatabaseTest extends TestCase
      *
      * @param string $driver
      */
+    #[DataProvider('dbms')]
     public function testUseSqlFileException(string $driver): void
     {
         /** @var Database $db */
@@ -1837,6 +1877,7 @@ class DatabaseTest extends TestCase
      *
      * @throws DatabaseException
      */
+    #[DataProvider('dbms')]
     public function testTruncateTables(string $driver): void
     {
         /** @var Database $db */
@@ -1866,6 +1907,7 @@ class DatabaseTest extends TestCase
      *
      * @throws DatabaseException
      */
+    #[DataProvider('dbms')]
     public function testTruncateTablesException(string $driver): void
     {
         /** @var Database $db */
@@ -1887,6 +1929,7 @@ class DatabaseTest extends TestCase
      *
      * @throws DatabaseException
      */
+    #[DataProvider('dbms')]
     public function testDropTables(string $driver): void
     {
         /** @var Database $db */
@@ -1939,6 +1982,7 @@ class DatabaseTest extends TestCase
      *
      * @throws DatabaseException
      */
+    #[DataProvider('dbms')]
     public function testDropTablesException(string $driver): void
     {
         /** @var Database $db */
@@ -1962,6 +2006,7 @@ class DatabaseTest extends TestCase
      *
      * @noinspection GetClassUsageInspection
      */
+    #[DataProvider('dbms')]
     public function testConnect(string $driver): void
     {
         /** @var Database $db */
@@ -1986,6 +2031,7 @@ class DatabaseTest extends TestCase
      *
      * @param string $driver
      */
+    #[DataProvider('dbms')]
     public function testConnectException(string $driver): void
     {
         $this->expectException(DatabaseException::class);
@@ -2011,6 +2057,7 @@ class DatabaseTest extends TestCase
      *
      * @noinspection GetClassUsageInspection
      */
+    #[DataProvider('dbms')]
     public function testGetPdo(string $driver): void
     {
         /** @var Database $db */
@@ -2041,6 +2088,7 @@ class DatabaseTest extends TestCase
      *
      * @noinspection GetClassUsageInspection
      */
+    #[DataProvider('dbms')]
     public function testDisconnect(string $driver): void
     {
         /** @var Database $db */
