@@ -19,7 +19,6 @@ use ReflectionClass;
  */
 class DatabaseNamedInstancesTest extends TestCase
 {
-    /** @var Database|null */
     protected ?Database $db;
 
     protected array $params = [

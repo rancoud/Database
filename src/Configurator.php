@@ -12,29 +12,62 @@ use PDOException;
  */
 class Configurator
 {
+    /**
+     * @var string Driver
+     */
     protected string $driver;
 
+    /**
+     * @var string Host
+     */
     protected string $host;
 
+    /**
+     * @var string User
+     */
     protected string $user;
 
+    /**
+     * @var string Password
+     */
     protected string $password;
 
+    /**
+     * @var string Database
+     */
     protected string $database;
 
+    /**
+     * @var array Parameters
+     */
     protected array $parameters = [];
 
+    /**
+     * @var bool Is saving all queries
+     */
     protected bool $saveQueries = false;
 
+    /**
+     * @var bool Is using persistent connection
+     */
     protected bool $persistentConnection = false;
 
+    /**
+     * @var array Default charset by driver
+     */
     protected static array $defaultCharsetByDriver = [
         'mysql' => 'utf8mb4',
         'pgsql' => 'UTF8'
     ];
 
+    /**
+     * @var string|null Charset
+     */
     protected ?string $charset = null;
 
+    /**
+     * @var array List of mandatory settings
+     */
     protected static array $mandatorySettings = [
         'driver',
         'host',
@@ -43,6 +76,9 @@ class Configurator
         'database'
     ];
 
+    /**
+     * @var array List of key settings
+     */
     protected static array $keySettings = [
         'driver',
         'host',
@@ -55,16 +91,20 @@ class Configurator
         'parameters'
     ];
 
+    /**
+     * @var array DSN formats
+     */
     protected static array $dsnFormats = [
         'sqlite' => '%1$s:%3$s'
     ];
 
+    /**
+     * @var string Default DSN format
+     */
     protected static string $defaultDSN = '%1$s:host=%2$s;dbname=%3$s';
 
     /**
-     * DatabaseConfigurator constructor.
-     *
-     * @param array $settings
+     * Configurator constructor.
      *
      * @throws DatabaseException
      */
@@ -78,7 +118,7 @@ class Configurator
     }
 
     /**
-     * @param array $settings
+     * Checks settings.
      *
      * @throws DatabaseException
      */
@@ -93,7 +133,7 @@ class Configurator
     }
 
     /**
-     * @param array $settings
+     * Sets mandatory settings.
      *
      * @throws DatabaseException
      */
@@ -110,7 +150,7 @@ class Configurator
     }
 
     /**
-     * @param array $settings
+     * Sets optionals settings.
      */
     protected function setOptionalsParameters(array $settings): void
     {
@@ -131,13 +171,16 @@ class Configurator
         }
     }
 
+    /**
+     * Returns driver.
+     */
     public function getDriver(): string
     {
         return $this->driver;
     }
 
     /**
-     * @param string $driver
+     * Sets driver.
      *
      * @throws DatabaseException
      */
@@ -155,54 +198,80 @@ class Configurator
         }
     }
 
+    /**
+     * Returns host.
+     */
     public function getHost(): string
     {
         return $this->host;
     }
 
+    /**
+     * Sets host.
+     */
     public function setHost(string $host): void
     {
         $this->host = $host;
     }
 
+    /**
+     * Returns user.
+     */
     public function getUser(): string
     {
         return $this->user;
     }
 
+    /**
+     * Sets user.
+     */
     public function setUser(string $user): void
     {
         $this->user = $user;
     }
 
+    /**
+     * Returns password.
+     */
     public function getPassword(): string
     {
         return $this->password;
     }
 
+    /**
+     * Sets password.
+     */
     public function setPassword(string $password): void
     {
         $this->password = $password;
     }
 
+    /**
+     * Returns database.
+     */
     public function getDatabase(): string
     {
         return $this->database;
     }
 
+    /**
+     * Sets database.
+     */
     public function setDatabase(string $database): void
     {
         $this->database = $database;
     }
 
+    /**
+     * Returns parameters.
+     */
     public function getParameters(): array
     {
         return $this->parameters;
     }
 
     /**
-     * @param $key
-     * @param $value
+     * Sets a parameter.
      *
      * @throws DatabaseException
      */
@@ -217,6 +286,9 @@ class Configurator
         $this->parameters[$key] = $value;
     }
 
+    /**
+     * Sets parameters.
+     */
     public function setParameters(array $parameters): void
     {
         $this->parameters = $parameters;
@@ -285,6 +357,9 @@ class Configurator
         return $charset;
     }
 
+    /**
+     * Returns current DSN.
+     */
     public function getDSN(): string
     {
         $driver = $this->getDriver();
@@ -299,6 +374,8 @@ class Configurator
     }
 
     /**
+     * Creates PDO connection return the PDO object.
+     *
      * @throws DatabaseException
      */
     public function createPDOConnection(): PDO

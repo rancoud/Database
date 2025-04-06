@@ -15,24 +15,43 @@ use PDOStatement;
  */
 class Database
 {
+    /**
+     * @var Configurator|null Configurator
+     */
     protected ?Configurator $configurator = null;
 
+    /**
+     * @var PDO|null PDO
+     */
     protected ?PDO $pdo = null;
 
+    /**
+     * @var array Errors
+     */
     protected array $errors = [];
 
+    /**
+     * @var array Saved queries
+     */
     protected array $savedQueries = [];
 
+    /**
+     * @var array Instances of databases
+     */
     protected static array $instances = [];
 
+    /**
+     * @var string[] List of drivers that support nested transactions
+     */
     protected array $nestedTransactionsDriverSupported = ['mysql', 'pgsql', 'sqlite'];
 
+    /**
+     * @var int Transaction depth
+     */
     protected int $transactionDepth = 0;
 
     /**
      * Database constructor.
-     *
-     * @param Configurator $configurator
      */
     public function __construct(Configurator $configurator)
     {
@@ -40,12 +59,9 @@ class Database
     }
 
     /**
-     * @param Configurator $configurator
-     * @param string       $name
+     * Sets database instances.
      *
      * @throws DatabaseException
-     *
-     * @return Database
      */
     public static function setInstance(Configurator $configurator, string $name = 'primary'): self
     {
@@ -59,9 +75,7 @@ class Database
     }
 
     /**
-     * @param string $name
-     *
-     * @return bool
+     * Returns if database instances exists.
      */
     public static function hasInstance(string $name = 'primary'): bool
     {
@@ -69,7 +83,7 @@ class Database
     }
 
     /**
-     * @param string $name
+     * Returns database instance.
      *
      * @return static|null
      */
@@ -78,12 +92,17 @@ class Database
         return static::$instances[$name] ?? null;
     }
 
+    /**
+     * Returns if nested transaction is supported.
+     */
     public function isNestedTransactionSupported(): bool
     {
         return \in_array($this->configurator->getDriver(), $this->nestedTransactionsDriverSupported, true);
     }
 
     /**
+     * Connect to the database.
+     *
      * @throws DatabaseException
      */
     public function connect(): void
@@ -105,12 +124,9 @@ class Database
     }
 
     /**
-     * @param string $sql
-     * @param array  $parameters
+     * Returns PDOStatement after binding parameter key to value in sql query.
      *
      * @throws DatabaseException
-     *
-     * @return PDOStatement
      */
     protected function prepareBind(string $sql, array $parameters = []): PDOStatement
     {
@@ -158,7 +174,7 @@ class Database
     }
 
     /**
-     * @param mixed $value
+     * Returns PDO param type according to value type.
      *
      * @return bool|int
      */
@@ -191,6 +207,9 @@ class Database
         return false;
     }
 
+    /**
+     * Add error statement in errors.
+     */
     protected function addErrorStatement(PDOStatement $statement): void
     {
         $this->errors[] = [
@@ -201,6 +220,9 @@ class Database
         ];
     }
 
+    /**
+     * Add error connection in errors.
+     */
     protected function addErrorConnection(Exception $exception): void
     {
         $this->errors[] = [
@@ -211,6 +233,9 @@ class Database
         ];
     }
 
+    /**
+     * Add error prepare in errors.
+     */
     protected function addErrorPrepare(string $sql, array $parameters): void
     {
         $this->errors[] = [
@@ -221,6 +246,9 @@ class Database
         ];
     }
 
+    /**
+     * Add query in saved queries.
+     */
     protected function addQuery(PDOStatement $statement, array $parameters, float $time): void
     {
         if ($this->configurator->hasSavedQueries()) {
@@ -232,6 +260,9 @@ class Database
         }
     }
 
+    /**
+     * Returns dump parameters.
+     */
     protected function getDumpParams(PDOStatement $statement): string
     {
         \ob_start();
@@ -241,12 +272,9 @@ class Database
     }
 
     /**
-     * @param string $sql
-     * @param array  $parameters
+     * Query Select.
      *
      * @throws DatabaseException
-     *
-     * @return PDOStatement
      */
     public function select(string $sql, array $parameters = []): PDOStatement
     {
@@ -264,7 +292,7 @@ class Database
     }
 
     /**
-     * @param PDOStatement $statement
+     * Execute Statement.
      *
      * @throws DatabaseException
      */
@@ -282,10 +310,7 @@ class Database
     }
 
     /**
-     * @param PDOStatement $statement
-     * @param int          $fetchType
-     *
-     * @return mixed
+     * Read.
      */
     public function read(PDOStatement $statement, int $fetchType = PDO::FETCH_ASSOC)
     {
@@ -293,10 +318,7 @@ class Database
     }
 
     /**
-     * @param PDOStatement $statement
-     * @param int          $fetchType
-     *
-     * @return array
+     * Read all.
      */
     public function readAll(PDOStatement $statement, int $fetchType = PDO::FETCH_ASSOC): array
     {
@@ -304,13 +326,9 @@ class Database
     }
 
     /**
-     * @param string $sql
-     * @param array  $parameters
-     * @param bool   $getLastInsertId
+     * Insert.
      *
      * @throws DatabaseException
-     *
-     * @return int|null
      */
     public function insert(string $sql, array $parameters = [], bool $getLastInsertId = false): ?int
     {
@@ -336,13 +354,9 @@ class Database
     }
 
     /**
-     * @param string $sql
-     * @param array  $parameters
-     * @param bool   $getAffectedRowsCount
+     * Update.
      *
      * @throws DatabaseException
-     *
-     * @return int|null
      */
     public function update(string $sql, array $parameters = [], bool $getAffectedRowsCount = false): ?int
     {
@@ -368,13 +382,9 @@ class Database
     }
 
     /**
-     * @param string $sql
-     * @param array  $parameters
-     * @param bool   $getAffectedRowsCount
+     * Delete.
      *
      * @throws DatabaseException
-     *
-     * @return int|null
      */
     public function delete(string $sql, array $parameters = [], bool $getAffectedRowsCount = false): ?int
     {
@@ -400,12 +410,9 @@ class Database
     }
 
     /**
-     * @param string $sql
-     * @param array  $parameters
+     * Count.
      *
      * @throws DatabaseException
-     *
-     * @return int|null
      */
     public function count(string $sql, array $parameters = []): ?int
     {
@@ -422,8 +429,7 @@ class Database
     }
 
     /**
-     * @param string $sql
-     * @param array  $parameters
+     * Execute query.
      *
      * @throws DatabaseException
      */
@@ -443,18 +449,18 @@ class Database
         $statement = null;
     }
 
+    /**
+     * Returns PDO object.
+     */
     public function getPDO(): ?PDO
     {
         return $this->pdo;
     }
 
     /**
-     * @param string $sql
-     * @param array  $parameters
+     * Select all.
      *
      * @throws DatabaseException
-     *
-     * @return array
      */
     public function selectAll(string $sql, array $parameters = []): array
     {
@@ -469,12 +475,9 @@ class Database
     }
 
     /**
-     * @param string $sql
-     * @param array  $parameters
+     * Select row.
      *
      * @throws DatabaseException
-     *
-     * @return array
      */
     public function selectRow(string $sql, array $parameters = []): array
     {
@@ -492,12 +495,9 @@ class Database
     }
 
     /**
-     * @param string $sql
-     * @param array  $parameters
+     * Select column.
      *
      * @throws DatabaseException
-     *
-     * @return array
      */
     public function selectCol(string $sql, array $parameters = []): array
     {
@@ -516,12 +516,9 @@ class Database
     }
 
     /**
-     * @param string $sql
-     * @param array  $parameters
+     * Select variable.
      *
      * @throws DatabaseException
-     *
-     * @return mixed
      */
     public function selectVar(string $sql, array $parameters = [])
     {
@@ -541,6 +538,8 @@ class Database
     }
 
     /**
+     * Start transaction.
+     *
      * @throws DatabaseException
      */
     public function startTransaction(): void
@@ -569,6 +568,8 @@ class Database
     }
 
     /**
+     * Complete transaction.
+     *
      * @throws DatabaseException
      */
     public function completeTransaction(): void
@@ -581,6 +582,8 @@ class Database
     }
 
     /**
+     * Commit transaction.
+     *
      * @throws DatabaseException
      */
     public function commitTransaction(): void
@@ -609,6 +612,8 @@ class Database
     }
 
     /**
+     * Rollback transaction.
+     *
      * @throws DatabaseException
      */
     public function rollbackTransaction(): void
@@ -636,16 +641,25 @@ class Database
         // @codeCoverageIgnoreEnd
     }
 
+    /**
+     * Returns if has errors.
+     */
     public function hasErrors(): bool
     {
         return !empty($this->errors);
     }
 
+    /**
+     * Returns errors.
+     */
     public function getErrors(): array
     {
         return $this->errors;
     }
 
+    /**
+     * Return last error.
+     */
     public function getLastError(): ?array
     {
         $countErrors = \count($this->errors);
@@ -656,39 +670,58 @@ class Database
         return $this->errors[$countErrors - 1];
     }
 
+    /**
+     * Wipe errors.
+     */
     public function cleanErrors(): void
     {
         $this->errors = [];
     }
 
+    /**
+     * Returns if has save queries.
+     */
     public function hasSaveQueries(): bool
     {
         return $this->configurator->hasSavedQueries();
     }
 
+    /**
+     * Enable save queries.
+     */
     public function enableSaveQueries(): void
     {
         $this->configurator->enableSaveQueries();
     }
 
+    /**
+     * Disable save queries.
+     */
     public function disableSaveQueries(): void
     {
         $this->configurator->disableSaveQueries();
     }
 
+    /**
+     * Wipe save queries.
+     */
     public function cleanSavedQueries(): void
     {
         $this->savedQueries = [];
     }
 
+    /**
+     * Returns save queries.
+     */
     public function getSavedQueries(): array
     {
         return $this->savedQueries;
     }
 
     /**
-     * @param string $tableMandatory
-     * @param array  $tables
+     * Truncate tables.
+     *
+     * @param array $tables
      *
      * @throws DatabaseException
      */
@@ -708,8 +741,9 @@ class Database
     }
 
     /**
-     * @param string $tableMandatory
-     * @param array  $tables
+     * Drop Tables.
+     *
+     * @param array $tables
      *
      * @throws DatabaseException
      */
@@ -733,7 +767,7 @@ class Database
     }
 
     /**
-     * @param string $filepath
+     * Read SQL file to execute.
      *
      * @throws DatabaseException
      */
@@ -770,11 +804,17 @@ class Database
         $this->exec($sqlFile);
     }
 
+    /**
+     * Returns elapsed time.
+     */
     protected function getTime(float $startTime, float $endTime): float
     {
         return \round(($endTime - $startTime) * 1000000) / 1000000;
     }
 
+    /**
+     * Sets PDO object to null to disconnect from database.
+     */
     public function disconnect(): void
     {
         $this->pdo = null;
