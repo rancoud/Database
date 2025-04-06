@@ -17,6 +17,9 @@ composer require rancoud/database
 ## How to use it?
 ### Connection to a database
 ```php
+use Rancoud\Database\Configurator;
+use Rancoud\Database\Database;
+
 // Create a configurator
 $params = [
     'driver'    => 'mysql',

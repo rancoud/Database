@@ -527,8 +527,6 @@ class DatabaseTest extends TestCase
     /**
      * @dataProvider dbms
      *
-     * @param string $driver
-     *
      * @throws DatabaseException
      */
     #[DataProvider('dbms')]
@@ -562,8 +560,6 @@ class DatabaseTest extends TestCase
     /**
      * @dataProvider dbms
      *
-     * @param string $driver
-     *
      * @throws DatabaseException
      */
     #[DataProvider('dbms')]
@@ -583,8 +579,6 @@ class DatabaseTest extends TestCase
 
     /**
      * @dataProvider dbms
-     *
-     * @param string $driver
      *
      * @throws DatabaseException
      */
@@ -624,8 +618,6 @@ class DatabaseTest extends TestCase
     /**
      * @dataProvider dbms
      *
-     * @param string $driver
-     *
      * @throws DatabaseException
      */
     #[DataProvider('dbms')]
@@ -645,8 +637,6 @@ class DatabaseTest extends TestCase
 
     /**
      * @dataProvider dbms
-     *
-     * @param string $driver
      *
      * @throws DatabaseException
      */
@@ -685,8 +675,6 @@ class DatabaseTest extends TestCase
     /**
      * @dataProvider dbms
      *
-     * @param string $driver
-     *
      * @throws DatabaseException
      */
     #[DataProvider('dbms')]
@@ -706,8 +694,6 @@ class DatabaseTest extends TestCase
 
     /**
      * @dataProvider dbms
-     *
-     * @param string $driver
      *
      * @throws DatabaseException
      */
@@ -746,8 +732,6 @@ class DatabaseTest extends TestCase
     /**
      * @dataProvider dbms
      *
-     * @param string $driver
-     *
      * @throws DatabaseException
      */
     #[DataProvider('dbms')]
@@ -767,8 +751,6 @@ class DatabaseTest extends TestCase
 
     /**
      * @dataProvider dbms
-     *
-     * @param string $driver
      *
      * @throws DatabaseException
      */
@@ -813,8 +795,6 @@ class DatabaseTest extends TestCase
     /**
      * @dataProvider dbms
      *
-     * @param string $driver
-     *
      * @throws DatabaseException
      */
     #[DataProvider('dbms')]
@@ -834,8 +814,6 @@ class DatabaseTest extends TestCase
 
     /**
      * @dataProvider dbms
-     *
-     * @param string $driver
      *
      * @throws DatabaseException
      */
@@ -877,8 +855,6 @@ class DatabaseTest extends TestCase
     /**
      * @dataProvider dbms
      *
-     * @param string $driver
-     *
      * @throws DatabaseException
      */
     #[DataProvider('dbms')]
@@ -898,8 +874,6 @@ class DatabaseTest extends TestCase
 
     /**
      * @dataProvider dbms
-     *
-     * @param string $driver
      *
      * @throws DatabaseException
      */
@@ -953,8 +927,6 @@ class DatabaseTest extends TestCase
     /**
      * @dataProvider dbms
      *
-     * @param string $driver
-     *
      * @throws DatabaseException
      */
     #[DataProvider('dbms')]
@@ -974,8 +946,6 @@ class DatabaseTest extends TestCase
 
     /**
      * @dataProvider dbms
-     *
-     * @param string $driver
      *
      * @throws DatabaseException
      */
@@ -1018,8 +988,6 @@ class DatabaseTest extends TestCase
     /**
      * @dataProvider dbms
      *
-     * @param string $driver
-     *
      * @throws DatabaseException
      */
     #[DataProvider('dbms')]
@@ -1039,8 +1007,6 @@ class DatabaseTest extends TestCase
 
     /**
      * @dataProvider dbms
-     *
-     * @param string $driver
      *
      * @throws DatabaseException
      */
@@ -1077,8 +1043,6 @@ class DatabaseTest extends TestCase
     /**
      * @dataProvider dbms
      *
-     * @param string $driver
-     *
      * @throws DatabaseException
      */
     #[DataProvider('dbms')]
@@ -1098,8 +1062,6 @@ class DatabaseTest extends TestCase
 
     /**
      * @dataProvider dbms
-     *
-     * @param string $driver
      *
      * @throws DatabaseException
      *
@@ -1153,8 +1115,6 @@ class DatabaseTest extends TestCase
     /**
      * @dataProvider dbms
      *
-     * @param string $driver
-     *
      * @throws DatabaseException
      */
     #[DataProvider('dbms')]
@@ -1197,8 +1157,6 @@ class DatabaseTest extends TestCase
     /**
      * @dataProvider dbms
      *
-     * @param string $driver
-     *
      * @throws DatabaseException
      */
     #[DataProvider('dbms')]
@@ -1222,8 +1180,6 @@ class DatabaseTest extends TestCase
     /**
      * @dataProvider dbms
      *
-     * @param string $driver
-     *
      * @throws DatabaseException
      */
     #[DataProvider('dbms')]
@@ -1243,8 +1199,6 @@ class DatabaseTest extends TestCase
 
     /**
      * @dataProvider dbms
-     *
-     * @param string $driver
      *
      * @throws DatabaseException
      *
@@ -1312,8 +1266,6 @@ class DatabaseTest extends TestCase
     /**
      * @dataProvider dbms
      *
-     * @param string $driver
-     *
      * @throws DatabaseException
      */
     #[DataProvider('dbms')]
@@ -1335,8 +1287,6 @@ class DatabaseTest extends TestCase
 
     /**
      * @dataProvider dbms
-     *
-     * @param string $driver
      *
      * @throws DatabaseException
      */
@@ -1372,8 +1322,6 @@ class DatabaseTest extends TestCase
     /**
      * @dataProvider dbms
      *
-     * @param string $driver
-     *
      * @throws DatabaseException
      */
     #[DataProvider('dbms')]
@@ -1407,8 +1355,6 @@ class DatabaseTest extends TestCase
 
     /**
      * @dataProvider dbms
-     *
-     * @param string $driver
      *
      * @throws DatabaseException
      */
@@ -1444,8 +1390,6 @@ class DatabaseTest extends TestCase
 
     /**
      * @dataProvider dbms
-     *
-     * @param string $driver
      *
      * @throws DatabaseException
      */
@@ -1485,8 +1429,6 @@ class DatabaseTest extends TestCase
     /**
      * @dataProvider dbms
      *
-     * @param string $driver
-     *
      * @throws DatabaseException
      */
     #[DataProvider('dbms')]
@@ -1521,8 +1463,6 @@ class DatabaseTest extends TestCase
 
     /**
      * @dataProvider dbms
-     *
-     * @param string $driver
      *
      * @throws DatabaseException
      */
@@ -1594,8 +1534,6 @@ class DatabaseTest extends TestCase
     /**
      * @dataProvider dbms
      *
-     * @param string $driver
-     *
      * @throws DatabaseException
      */
     #[DataProvider('dbms')]
@@ -1629,8 +1567,6 @@ class DatabaseTest extends TestCase
 
     /**
      * @dataProvider dbms
-     *
-     * @param string $driver
      *
      * @throws DatabaseException
      */
@@ -1666,8 +1602,6 @@ class DatabaseTest extends TestCase
     /**
      * @dataProvider dbms
      *
-     * @param string $driver
-     *
      * @throws DatabaseException
      */
     #[DataProvider('dbms')]
@@ -1696,8 +1630,6 @@ class DatabaseTest extends TestCase
 
     /**
      * @dataProvider dbms
-     *
-     * @param string $driver
      *
      * @throws DatabaseException
      */
@@ -1738,8 +1670,6 @@ class DatabaseTest extends TestCase
 
     /**
      * @dataProvider dbms
-     *
-     * @param string $driver
      *
      * @throws DatabaseException
      */
@@ -1795,8 +1725,6 @@ class DatabaseTest extends TestCase
     /**
      * @dataProvider dbms
      *
-     * @param string $driver
-     *
      * @throws DatabaseException
      */
     #[DataProvider('dbms')]
@@ -1820,8 +1748,6 @@ class DatabaseTest extends TestCase
 
     /**
      * @dataProvider dbms
-     *
-     * @param string $driver
      */
     #[DataProvider('dbms')]
     public function testUseSqlFileExceptionMissingFile(string $driver): void
@@ -1836,8 +1762,6 @@ class DatabaseTest extends TestCase
 
     /**
      * @dataProvider dbms
-     *
-     * @param string $driver
      */
     #[DataProvider('dbms')]
     public function testUseSqlFileExceptionDirectory(string $driver): void
@@ -1852,8 +1776,6 @@ class DatabaseTest extends TestCase
 
     /**
      * @dataProvider dbms
-     *
-     * @param string $driver
      */
     #[DataProvider('dbms')]
     public function testUseSqlFileException(string $driver): void
@@ -1872,8 +1794,6 @@ class DatabaseTest extends TestCase
 
     /**
      * @dataProvider dbms
-     *
-     * @param string $driver
      *
      * @throws DatabaseException
      */
@@ -1903,8 +1823,6 @@ class DatabaseTest extends TestCase
     /**
      * @dataProvider dbms
      *
-     * @param string $driver
-     *
      * @throws DatabaseException
      */
     #[DataProvider('dbms')]
@@ -1924,8 +1842,6 @@ class DatabaseTest extends TestCase
 
     /**
      * @dataProvider dbms
-     *
-     * @param string $driver
      *
      * @throws DatabaseException
      */
@@ -1978,8 +1894,6 @@ class DatabaseTest extends TestCase
     /**
      * @dataProvider dbms
      *
-     * @param string $driver
-     *
      * @throws DatabaseException
      */
     #[DataProvider('dbms')]
@@ -1999,8 +1913,6 @@ class DatabaseTest extends TestCase
 
     /**
      * @dataProvider dbms
-     *
-     * @param string $driver
      *
      * @throws DatabaseException
      *
@@ -2028,8 +1940,6 @@ class DatabaseTest extends TestCase
 
     /**
      * @dataProvider dbms
-     *
-     * @param string $driver
      */
     #[DataProvider('dbms')]
     public function testConnectException(string $driver): void
@@ -2050,8 +1960,6 @@ class DatabaseTest extends TestCase
 
     /**
      * @dataProvider dbms
-     *
-     * @param string $driver
      *
      * @throws DatabaseException
      *
@@ -2081,8 +1989,6 @@ class DatabaseTest extends TestCase
 
     /**
      * @dataProvider dbms
-     *
-     * @param string $driver
      *
      * @throws DatabaseException
      *
