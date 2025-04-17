@@ -42,7 +42,7 @@
             "php-cs-fixer fix"
         ],
         "test": [
-            "phpdbg -qrr vendor/bin/phpunit --colors --coverage-html ./coverage --coverage-text --coverage-clover ./coverage/clover.xml"
+            "phpunit --colors --coverage-html ./coverage"
         ]
     }
 }
