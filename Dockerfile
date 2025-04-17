@@ -1,4 +1,4 @@
-ARG PHPVERSION="7.4"
+ARG PHPVERSION="8.4"
 FROM php:$PHPVERSION-cli-alpine
 
 RUN apk --update --no-cache add \
