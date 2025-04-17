@@ -6,6 +6,7 @@ RUN apk --update --no-cache add \
     mysql-client \
     postgresql-client \
     postgresql-dev \
+    php84-pecl-xdebug \
   && rm -rf /tmp/* /var/cache/apk/*
 
 RUN docker-php-ext-install \
