@@ -6,14 +6,13 @@ RUN apk --update --no-cache add \
     mysql-client \
     postgresql-client \
     postgresql-dev \
-    php84-pecl-xdebug \
   && rm -rf /tmp/* /var/cache/apk/*
 
 RUN docker-php-ext-install \
   pdo_mysql \
   pdo_pgsql
 
-RUN docker-php-ext-enable xdebug
+RUN pecl install xdebug && docker-php-ext-enable xdebug
 
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin --filename=composer
 
