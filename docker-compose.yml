@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   mariadb:
     image: mariadb:10.4
@@ -23,6 +21,7 @@ services:
     environment:
       - "MYSQL_HOST=mariadb"
       - "POSTGRES_HOST=postgres"
+      - "XDEBUG_MODE=coverage"
     volumes:
       - "./coverage:/app/coverage"
     restart: "no"
