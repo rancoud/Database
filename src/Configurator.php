@@ -4,70 +4,45 @@ declare(strict_types=1);
 
 namespace Rancoud\Database;
 
-use PDO;
-use PDOException;
-
 /**
  * Class Configurator.
  */
 class Configurator
 {
-    /**
-     * @var string Driver
-     */
+    /** @var string Driver */
     protected string $driver;
 
-    /**
-     * @var string Host
-     */
+    /** @var string Host */
     protected string $host;
 
-    /**
-     * @var string User
-     */
+    /** @var string User */
     protected string $user;
 
-    /**
-     * @var string Password
-     */
+    /** @var string Password */
     protected string $password;
 
-    /**
-     * @var string Database
-     */
+    /** @var string Database */
     protected string $database;
 
-    /**
-     * @var array Parameters
-     */
+    /** @var array Parameters */
     protected array $parameters = [];
 
-    /**
-     * @var bool Is saving all queries
-     */
+    /** @var bool Is saving all queries */
     protected bool $saveQueries = false;
 
-    /**
-     * @var bool Is using persistent connection
-     */
+    /** @var bool Is using persistent connection */
     protected bool $persistentConnection = false;
 
-    /**
-     * @var array Default charset by driver
-     */
+    /** @var array Default charset by driver */
     protected static array $defaultCharsetByDriver = [
         'mysql' => 'utf8mb4',
         'pgsql' => 'UTF8'
     ];
 
-    /**
-     * @var string|null Charset
-     */
+    /** @var string|null Charset */
     protected ?string $charset = null;
 
-    /**
-     * @var array List of mandatory settings
-     */
+    /** @var array List of mandatory settings */
     protected static array $mandatorySettings = [
         'driver',
         'host',
@@ -76,9 +51,7 @@ class Configurator
         'database'
     ];
 
-    /**
-     * @var array List of key settings
-     */
+    /** @var array List of key settings */
     protected static array $keySettings = [
         'driver',
         'host',
@@ -91,16 +64,12 @@ class Configurator
         'parameters'
     ];
 
-    /**
-     * @var array DSN formats
-     */
+    /** @var array DSN formats */
     protected static array $dsnFormats = [
         'sqlite' => '%1$s:%3$s'
     ];
 
-    /**
-     * @var string Default DSN format
-     */
+    /** @var string Default DSN format */
     protected static string $defaultDSN = '%1$s:host=%2$s;dbname=%3$s';
 
     /**
@@ -128,6 +97,7 @@ class Configurator
         $wrongSettings = \array_diff($keys, static::$keySettings);
         if (!empty($wrongSettings)) {
             $key = \reset($wrongSettings);
+
             throw new DatabaseException('"' . $key . '" settings is not recognized');
         }
     }
@@ -149,9 +119,7 @@ class Configurator
         }
     }
 
-    /**
-     * Sets optionals settings.
-     */
+    /** Sets optionals settings. */
     protected function setOptionalsParameters(array $settings): void
     {
         if (isset($settings['save_queries'])) {
@@ -171,9 +139,7 @@ class Configurator
         }
     }
 
-    /**
-     * Returns driver.
-     */
+    /** Returns driver. */
     public function getDriver(): string
     {
         return $this->driver;
@@ -186,7 +152,7 @@ class Configurator
      */
     public function setDriver(string $driver): void
     {
-        $availableDrivers = PDO::getAvailableDrivers();
+        $availableDrivers = \PDO::getAvailableDrivers();
         if (!\in_array($driver, $availableDrivers, true)) {
             throw new DatabaseException('The driver "' . $driver . '" is not available for PDO');
         }
@@ -198,73 +164,55 @@ class Configurator
         }
     }
 
-    /**
-     * Returns host.
-     */
+    /** Returns host. */
     public function getHost(): string
     {
         return $this->host;
     }
 
-    /**
-     * Sets host.
-     */
+    /** Sets host. */
     public function setHost(string $host): void
     {
         $this->host = $host;
     }
 
-    /**
-     * Returns user.
-     */
+    /** Returns user. */
     public function getUser(): string
     {
         return $this->user;
     }
 
-    /**
-     * Sets user.
-     */
+    /** Sets user. */
     public function setUser(string $user): void
     {
         $this->user = $user;
     }
 
-    /**
-     * Returns password.
-     */
+    /** Returns password. */
     public function getPassword(): string
     {
         return $this->password;
     }
 
-    /**
-     * Sets password.
-     */
+    /** Sets password. */
     public function setPassword(string $password): void
     {
         $this->password = $password;
     }
 
-    /**
-     * Returns database.
-     */
+    /** Returns database. */
     public function getDatabase(): string
     {
         return $this->database;
     }
 
-    /**
-     * Sets database.
-     */
+    /** Sets database. */
     public function setDatabase(string $database): void
     {
         $this->database = $database;
     }
 
-    /**
-     * Returns parameters.
-     */
+    /** Returns parameters. */
     public function getParameters(): array
     {
         return $this->parameters;
@@ -275,20 +223,19 @@ class Configurator
      *
      * @throws DatabaseException
      */
-    public function setParameter($key, $value): void
+    public function setParameter(mixed $key, mixed $value): void
     {
-        $errorModeAttributeKeys = [PDO::ATTR_ERRMODE, (string) PDO::ATTR_ERRMODE];
-        if ($value !== PDO::ERRMODE_EXCEPTION && \in_array($key, $errorModeAttributeKeys, true)) {
+        $errorModeAttributeKeys = [\PDO::ATTR_ERRMODE, (string) \PDO::ATTR_ERRMODE];
+        if ($value !== \PDO::ERRMODE_EXCEPTION && \in_array($key, $errorModeAttributeKeys, true)) {
             $message = 'Database module only support error mode with exception. You can\'t modify this setting';
+
             throw new DatabaseException($message);
         }
 
         $this->parameters[$key] = $value;
     }
 
-    /**
-     * Sets parameters.
-     */
+    /** Sets parameters. */
     public function setParameters(array $parameters): void
     {
         $this->parameters = $parameters;
@@ -299,11 +246,11 @@ class Configurator
         $parameters = $this->getParameters();
 
         if ($this->getDriver() === 'mysql') {
-            $parameters[PDO::MYSQL_ATTR_INIT_COMMAND] = 'SET NAMES ' . $this->getCharset();
+            $parameters[\PDO::MYSQL_ATTR_INIT_COMMAND] = 'SET NAMES ' . $this->getCharset();
         }
 
-        $parameters[PDO::ATTR_ERRMODE] = PDO::ERRMODE_EXCEPTION;
-        $parameters[PDO::ATTR_PERSISTENT] = $this->persistentConnection;
+        $parameters[\PDO::ATTR_ERRMODE] = \PDO::ERRMODE_EXCEPTION;
+        $parameters[\PDO::ATTR_PERSISTENT] = $this->persistentConnection;
 
         return $parameters;
     }
@@ -357,9 +304,7 @@ class Configurator
         return $charset;
     }
 
-    /**
-     * Returns current DSN.
-     */
+    /** Returns current DSN. */
     public function getDSN(): string
     {
         $driver = $this->getDriver();
@@ -378,7 +323,7 @@ class Configurator
      *
      * @throws DatabaseException
      */
-    public function createPDOConnection(): PDO
+    public function createPDOConnection(): \PDO
     {
         $user = $this->getUser();
         $password = $this->getPassword();
@@ -391,14 +336,14 @@ class Configurator
                 $password = null;
             }
 
-            $pdo = new PDO($dsn, $user, $password, $parameters);
+            $pdo = new \PDO($dsn, $user, $password, $parameters);
 
             if ($this->getDriver() === 'pgsql' && !empty($this->getCharset())) {
                 $pdo->exec('SET NAMES \'' . $this->getCharset() . '\'');
             }
 
             return $pdo;
-        } catch (PDOException $e) {
+        } catch (\PDOException $e) {
             throw new DatabaseException('could not connect: ' . $e->getMessage());
         }
     }

@@ -4,19 +4,18 @@ declare(strict_types=1);
 
 namespace tests;
 
-use PDO;
 use PHPUnit\Framework\TestCase;
 use Rancoud\Database\Configurator;
 use Rancoud\Database\DatabaseException;
 
 /**
  * Class ConfiguratorTest.
+ *
+ * @internal
  */
 class ConfiguratorTest extends TestCase
 {
-    /**
-     * @throws DatabaseException
-     */
+    /** @throws DatabaseException */
     public function testConstructMandatory(): void
     {
         $params = [
@@ -74,9 +73,7 @@ class ConfiguratorTest extends TestCase
         new Configurator($params);
     }
 
-    /**
-     * @throws DatabaseException
-     */
+    /** @throws DatabaseException */
     public function testConstructInvalidSettingsParametersException(): void
     {
         $this->expectException(\TypeError::class);
@@ -93,9 +90,7 @@ class ConfiguratorTest extends TestCase
         new Configurator($params);
     }
 
-    /**
-     * @throws DatabaseException
-     */
+    /** @throws DatabaseException */
     public function testSetEngine(): void
     {
         $params = [
@@ -130,9 +125,7 @@ class ConfiguratorTest extends TestCase
         $conf->setDriver('driver');
     }
 
-    /**
-     * @throws DatabaseException
-     */
+    /** @throws DatabaseException */
     public function testSetHost(): void
     {
         $params = [
@@ -149,9 +142,7 @@ class ConfiguratorTest extends TestCase
         static::assertSame('host', $conf->getHost());
     }
 
-    /**
-     * @throws DatabaseException
-     */
+    /** @throws DatabaseException */
     public function testSetUser(): void
     {
         $params = [
@@ -168,9 +159,7 @@ class ConfiguratorTest extends TestCase
         static::assertSame('user', $conf->getUser());
     }
 
-    /**
-     * @throws DatabaseException
-     */
+    /** @throws DatabaseException */
     public function testSetPassword(): void
     {
         $params = [
@@ -187,9 +176,7 @@ class ConfiguratorTest extends TestCase
         static::assertSame('password', $conf->getPassword());
     }
 
-    /**
-     * @throws DatabaseException
-     */
+    /** @throws DatabaseException */
     public function testSetDatabase(): void
     {
         $params = [
@@ -206,9 +193,7 @@ class ConfiguratorTest extends TestCase
         static::assertSame('database', $conf->getDatabase());
     }
 
-    /**
-     * @throws DatabaseException
-     */
+    /** @throws DatabaseException */
     public function testDefaultSaveQueriesFalse(): void
     {
         $params = [
@@ -224,9 +209,7 @@ class ConfiguratorTest extends TestCase
         static::assertFalse($conf->hasSavedQueries());
     }
 
-    /**
-     * @throws DatabaseException
-     */
+    /** @throws DatabaseException */
     public function testSaveQueries(): void
     {
         $params = [
@@ -259,9 +242,7 @@ class ConfiguratorTest extends TestCase
         static::assertTrue($conf->hasSavedQueries());
     }
 
-    /**
-     * @throws DatabaseException
-     */
+    /** @throws DatabaseException */
     public function testDefaultPersistentConnectionFalse(): void
     {
         $params = [
@@ -277,9 +258,7 @@ class ConfiguratorTest extends TestCase
         static::assertFalse($conf->hasPersistentConnection());
     }
 
-    /**
-     * @throws DatabaseException
-     */
+    /** @throws DatabaseException */
     public function testPersistentConnection(): void
     {
         $params = [
@@ -312,9 +291,7 @@ class ConfiguratorTest extends TestCase
         static::assertTrue($conf->hasPersistentConnection());
     }
 
-    /**
-     * @throws DatabaseException
-     */
+    /** @throws DatabaseException */
     public function testDefaultGetCharsetUtf8mb4(): void
     {
         $params = [
@@ -330,9 +307,7 @@ class ConfiguratorTest extends TestCase
         static::assertSame('utf8mb4', $conf->getCharset());
     }
 
-    /**
-     * @throws DatabaseException
-     */
+    /** @throws DatabaseException */
     public function testSetCharset(): void
     {
         $params = [
@@ -353,9 +328,7 @@ class ConfiguratorTest extends TestCase
         static::assertSame('new_charset', $conf->getCharset());
     }
 
-    /**
-     * @throws DatabaseException
-     */
+    /** @throws DatabaseException */
     public function testDefaultGetParametersEmpty(): void
     {
         $params = [
@@ -371,9 +344,7 @@ class ConfiguratorTest extends TestCase
         static::assertSame([], $conf->getParameters());
     }
 
-    /**
-     * @throws DatabaseException
-     */
+    /** @throws DatabaseException */
     public function testSetParameterKeyValue(): void
     {
         $params = [
@@ -398,9 +369,7 @@ class ConfiguratorTest extends TestCase
         static::assertSame(['key' => 'another_value', 'new_key' => 'new_value'], $conf->getParameters());
     }
 
-    /**
-     * @throws DatabaseException
-     */
+    /** @throws DatabaseException */
     public function testSetParameterThrowException(): void
     {
         $this->expectException(DatabaseException::class);
@@ -415,12 +384,10 @@ class ConfiguratorTest extends TestCase
         ];
 
         $conf = new Configurator($params);
-        $conf->setParameter(PDO::ATTR_ERRMODE, 1);
+        $conf->setParameter(\PDO::ATTR_ERRMODE, 1);
     }
 
-    /**
-     * @throws DatabaseException
-     */
+    /** @throws DatabaseException */
     public function testSetParameters(): void
     {
         $params = [
@@ -438,9 +405,7 @@ class ConfiguratorTest extends TestCase
         static::assertSame(['key' => 'value'], $conf->getParameters());
     }
 
-    /**
-     * @throws DatabaseException
-     */
+    /** @throws DatabaseException */
     public function testGetDSNMysql(): void
     {
         $params = [
@@ -456,9 +421,7 @@ class ConfiguratorTest extends TestCase
         static::assertSame('mysql:host=localhost;dbname=test_database', $conf->getDSN());
     }
 
-    /**
-     * @throws DatabaseException
-     */
+    /** @throws DatabaseException */
     public function testGetDSNSqlite(): void
     {
         $params = [
@@ -474,9 +437,7 @@ class ConfiguratorTest extends TestCase
         static::assertSame('sqlite:' . __DIR__ . '/test_database.db', $conf->getDSN());
     }
 
-    /**
-     * @throws DatabaseException
-     */
+    /** @throws DatabaseException */
     public function testGetDSNPgsql(): void
     {
         $params = [
@@ -492,9 +453,7 @@ class ConfiguratorTest extends TestCase
         static::assertSame('pgsql:host=127.0.0.1;dbname=test_database', $conf->getDSN());
     }
 
-    /**
-     * @throws DatabaseException
-     */
+    /** @throws DatabaseException */
     public function testGetParametersForPDOMysql(): void
     {
         $params = [
@@ -508,32 +467,30 @@ class ConfiguratorTest extends TestCase
         $conf = new Configurator($params);
 
         $expected = [
-            PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8mb4',
-            PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_PERSISTENT         => false
+            \PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8mb4',
+            \PDO::ATTR_ERRMODE            => \PDO::ERRMODE_EXCEPTION,
+            \PDO::ATTR_PERSISTENT         => false
         ];
         static::assertSame($expected, $conf->getParametersForPDO());
 
         $conf->setCharset('charset');
         $expected = [
-            PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES charset',
-            PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_PERSISTENT         => false
+            \PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES charset',
+            \PDO::ATTR_ERRMODE            => \PDO::ERRMODE_EXCEPTION,
+            \PDO::ATTR_PERSISTENT         => false
         ];
         static::assertSame($expected, $conf->getParametersForPDO());
 
         $conf->enablePersistentConnection();
         $expected = [
-            PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES charset',
-            PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_PERSISTENT         => true
+            \PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES charset',
+            \PDO::ATTR_ERRMODE            => \PDO::ERRMODE_EXCEPTION,
+            \PDO::ATTR_PERSISTENT         => true
         ];
         static::assertSame($expected, $conf->getParametersForPDO());
     }
 
-    /**
-     * @throws DatabaseException
-     */
+    /** @throws DatabaseException */
     public function testGetParametersForPDOSqlite(): void
     {
         $params = [
@@ -547,8 +504,8 @@ class ConfiguratorTest extends TestCase
         $conf = new Configurator($params);
 
         $expected = [
-            PDO::ATTR_ERRMODE    => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_PERSISTENT => false
+            \PDO::ATTR_ERRMODE    => \PDO::ERRMODE_EXCEPTION,
+            \PDO::ATTR_PERSISTENT => false
         ];
         static::assertSame($expected, $conf->getParametersForPDO());
 
@@ -557,15 +514,13 @@ class ConfiguratorTest extends TestCase
 
         $conf->enablePersistentConnection();
         $expected = [
-            PDO::ATTR_ERRMODE    => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_PERSISTENT => true
+            \PDO::ATTR_ERRMODE    => \PDO::ERRMODE_EXCEPTION,
+            \PDO::ATTR_PERSISTENT => true
         ];
         static::assertSame($expected, $conf->getParametersForPDO());
     }
 
-    /**
-     * @throws DatabaseException
-     */
+    /** @throws DatabaseException */
     public function testGetParametersForPDOPgsql(): void
     {
         $params = [
@@ -579,8 +534,8 @@ class ConfiguratorTest extends TestCase
         $conf = new Configurator($params);
 
         $expected = [
-            PDO::ATTR_ERRMODE    => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_PERSISTENT => false
+            \PDO::ATTR_ERRMODE    => \PDO::ERRMODE_EXCEPTION,
+            \PDO::ATTR_PERSISTENT => false
         ];
         static::assertSame($expected, $conf->getParametersForPDO());
 
@@ -589,15 +544,13 @@ class ConfiguratorTest extends TestCase
 
         $conf->enablePersistentConnection();
         $expected = [
-            PDO::ATTR_ERRMODE    => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_PERSISTENT => true
+            \PDO::ATTR_ERRMODE    => \PDO::ERRMODE_EXCEPTION,
+            \PDO::ATTR_PERSISTENT => true
         ];
         static::assertSame($expected, $conf->getParametersForPDO());
     }
 
-    /**
-     * @throws DatabaseException
-     */
+    /** @throws DatabaseException */
     public function testCreatePDOConnectionMysql(): void
     {
         $mysqlHost = \getenv('MYSQL_HOST', true);
@@ -632,9 +585,7 @@ class ConfiguratorTest extends TestCase
         $conf->createPDOConnection();
     }
 
-    /**
-     * @throws DatabaseException
-     */
+    /** @throws DatabaseException */
     public function testCreatePDOConnectionPgsql(): void
     {
         $postgresHost = \getenv('POSTGRES_HOST', true);
@@ -652,9 +603,7 @@ class ConfiguratorTest extends TestCase
         static::assertNotNull($conf->createPDOConnection());
     }
 
-    /**
-     * @throws DatabaseException
-     */
+    /** @throws DatabaseException */
     public function testCreatePDOConnectionPgsqlThrowException(): void
     {
         $this->expectException(DatabaseException::class);
@@ -672,9 +621,7 @@ class ConfiguratorTest extends TestCase
         $conf->createPDOConnection();
     }
 
-    /**
-     * @throws DatabaseException
-     */
+    /** @throws DatabaseException */
     public function testCreatePDOConnectionSqlite(): void
     {
         $params = [
