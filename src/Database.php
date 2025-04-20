@@ -6,9 +6,6 @@ declare(strict_types=1);
 
 namespace Rancoud\Database;
 
-/**
- * Class Database.
- */
 class Database
 {
     /** @var Configurator|null Configurator */
@@ -32,7 +29,6 @@ class Database
     /** @var int Transaction depth */
     protected int $transactionDepth = 0;
 
-    /** Database constructor. */
     public function __construct(Configurator $configurator)
     {
         $this->configurator = $configurator;
@@ -116,7 +112,7 @@ class Database
             if ($statement === false) {
                 throw new DatabaseException('Error Prepare Statement');
             }
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             $this->addErrorPrepare($sql, $parameters);
 
             throw new DatabaseException('Error Prepare Statement');
@@ -140,7 +136,7 @@ class Database
                     throw new DatabaseException('Error Bind Value');
                 }
                 // @codeCoverageIgnoreStart
-            } catch (\Exception $e) {
+            } catch (\Exception) {
                 // Could not reach this statement without mocking database
                 $this->addErrorPrepare($sql, $parameters);
 
@@ -268,7 +264,7 @@ class Database
             if ($success === false) {
                 throw new DatabaseException('Error Execute');
             }
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             $this->addErrorStatement($statement);
 
             throw new DatabaseException('Error Execute');
@@ -519,7 +515,7 @@ class Database
 
             ++$this->transactionDepth;
             // @codeCoverageIgnoreStart
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             // Could not reach this statement without mocking database
             throw new DatabaseException('Error Begin Transaction');
         }
@@ -562,7 +558,7 @@ class Database
                 $this->exec('RELEASE SAVEPOINT LEVEL' . $this->transactionDepth);
             }
             // @codeCoverageIgnoreStart
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             // Could not reach this statement without mocking database
             throw new DatabaseException('Error Commit Transaction');
         }
@@ -591,7 +587,7 @@ class Database
                 $this->exec('ROLLBACK TO SAVEPOINT LEVEL' . $this->transactionDepth);
             }
             // @codeCoverageIgnoreStart
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             // Could not reach this statement without mocking database
             throw new DatabaseException('Error Rollback Transaction');
         }

@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace Rancoud\Database;
 
-/**
- * Class Configurator.
- */
 class Configurator
 {
     /** @var string Driver */
