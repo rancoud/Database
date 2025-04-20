@@ -13,11 +13,7 @@ use Rancoud\Database\Configurator;
 use Rancoud\Database\Database;
 use Rancoud\Database\DatabaseException;
 
-/**
- * Class DatabaseNamedInstancesTest.
- *
- * @internal
- */
+/** @internal */
 class DatabaseNamedInstancesTest extends TestCase
 {
     protected ?Database $db;

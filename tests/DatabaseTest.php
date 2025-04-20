@@ -15,11 +15,7 @@ use Rancoud\Database\Configurator;
 use Rancoud\Database\Database;
 use Rancoud\Database\DatabaseException;
 
-/**
- * Class DatabaseTest.
- *
- * @internal
- */
+/** @internal */
 class DatabaseTest extends TestCase
 {
     protected array $dbms = [
@@ -1185,7 +1181,7 @@ class DatabaseTest extends TestCase
 
         try {
             $db->commitTransaction();
-        } catch (DatabaseException $e) {
+        } catch (DatabaseException) {
             --$exceptionsThrowed;
         }
 
@@ -1193,7 +1189,7 @@ class DatabaseTest extends TestCase
 
         try {
             $db->commitTransaction();
-        } catch (DatabaseException $e) {
+        } catch (DatabaseException) {
             --$exceptionsThrowed;
         }
 
@@ -1251,7 +1247,7 @@ class DatabaseTest extends TestCase
 
         try {
             $db->rollbackTransaction();
-        } catch (DatabaseException $e) {
+        } catch (DatabaseException) {
             --$exceptionsThrowed;
         }
 
@@ -1259,7 +1255,7 @@ class DatabaseTest extends TestCase
 
         try {
             $db->rollbackTransaction();
-        } catch (DatabaseException $e) {
+        } catch (DatabaseException) {
             --$exceptionsThrowed;
         }
 
@@ -1386,7 +1382,7 @@ class DatabaseTest extends TestCase
             $db->update($sql, $params);
 
             $db->select('aaa');
-        } catch (DatabaseException $e) {
+        } catch (DatabaseException) {
         } finally {
             $db->completeTransaction();
         }
@@ -1441,7 +1437,7 @@ class DatabaseTest extends TestCase
             $db->select('aaa');
             // if assert is done then it's not good
             static::fail();
-        } catch (DatabaseException $e) {
+        } catch (DatabaseException) {
             static::assertTrue($db->hasErrors());
             static::assertCount(4, $db->getLastError());
 
