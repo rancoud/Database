@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace tests;
 
-use PDOStatement;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Rancoud\Database\Configurator;
@@ -18,12 +17,13 @@ use Rancoud\Database\DatabaseException;
 
 /**
  * Class DatabaseTest.
+ *
+ * @internal
  */
 class DatabaseTest extends TestCase
 {
     protected array $dbms = [
         'mysql' => [
-            /* @var ?Database $db; */
             'db'         => null,
             'parameters' => [
                 'driver'       => 'mysql',
@@ -34,7 +34,6 @@ class DatabaseTest extends TestCase
             ],
         ],
         'pgsql' => [
-            /* @var ?Database $db; */
             'db'         => null,
             'parameters' => [
                 'driver'        => 'pgsql',
@@ -45,7 +44,6 @@ class DatabaseTest extends TestCase
             ],
         ],
         'sqlite' => [
-            /* @var ?Database $db; */
             'db'         => null,
             'parameters' => [
                 'driver'       => 'sqlite',
@@ -59,40 +57,50 @@ class DatabaseTest extends TestCase
 
     protected array $sqlQueries = [
         'mysql' => [
-            'exec' => 'CREATE TABLE test_exec (
-                id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-                name VARCHAR(255) NOT NULL,
-                PRIMARY KEY (id)
-            ) DEFAULT CHARSET=utf8mb4;',
-            'insert' => 'CREATE TABLE test_insert (
-                id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-                name VARCHAR(255) NOT NULL,
-                PRIMARY KEY (id)
-            ) DEFAULT CHARSET=utf8mb4;',
-            'update' => [
-                'CREATE TABLE test_update (
+            'exec' => <<<'SQL'
+                CREATE TABLE test_exec (
                     id INT UNSIGNED NOT NULL AUTO_INCREMENT,
                     name VARCHAR(255) NOT NULL,
                     PRIMARY KEY (id)
-                ) DEFAULT CHARSET=utf8mb4;',
+                ) DEFAULT CHARSET=utf8mb4;
+            SQL,
+            'insert' => <<<'SQL'
+                CREATE TABLE test_insert (
+                    id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+                    name VARCHAR(255) NOT NULL,
+                    PRIMARY KEY (id)
+                ) DEFAULT CHARSET=utf8mb4;
+            SQL,
+            'update' => [
+                <<<'SQL'
+                    CREATE TABLE test_update (
+                        id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+                        name VARCHAR(255) NOT NULL,
+                        PRIMARY KEY (id)
+                    ) DEFAULT CHARSET=utf8mb4;
+                SQL,
                 "INSERT INTO test_update (name) VALUES ('A'),('B'),('C');",
             ],
             'delete' => [
-                'CREATE TABLE test_delete (
-                    id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-                    name VARCHAR(255) NOT NULL,
-                    PRIMARY KEY (id)
-                ) DEFAULT CHARSET=utf8mb4;',
+                <<<'SQL'
+                    CREATE TABLE test_delete (
+                        id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+                        name VARCHAR(255) NOT NULL,
+                        PRIMARY KEY (id)
+                    ) DEFAULT CHARSET=utf8mb4;
+                SQL,
                 "INSERT INTO test_delete (name) VALUES ('A'),('B'),('C');",
             ],
             'select' => [
-                'CREATE TABLE `test_select` (
-                  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-                  `name` varchar(45) NOT NULL,
-                  `ranking` tinyint(1) unsigned NOT NULL,
-                  `comment` text,
-                  PRIMARY KEY (`id`)
-                ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4;',
+                <<<'SQL'
+                    CREATE TABLE `test_select` (
+                      `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+                      `name` varchar(45) NOT NULL,
+                      `ranking` tinyint(1) unsigned NOT NULL,
+                      `comment` text,
+                      PRIMARY KEY (`id`)
+                    ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4;
+                SQL,
                 "INSERT INTO test_select (id, name, ranking, comment) VALUES (1, 'A', 0, NULL);",
                 "INSERT INTO test_select (id, name, ranking, comment) VALUES (2, 'B', 10, 'yes');",
                 "INSERT INTO test_select (id, name, ranking, comment) VALUES (3, 'C', 20, 'maybe');",
@@ -101,50 +109,64 @@ class DatabaseTest extends TestCase
                 "INSERT INTO test_select (id, name, ranking, comment) VALUES (6, 'F', 5, NULL);",
             ],
             'truncate' => [
-                'CREATE TABLE test_truncate1 (
-                    id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-                    name VARCHAR(255) NOT NULL,
-                    PRIMARY KEY (id)
-                ) DEFAULT CHARSET=utf8mb4;',
+                <<<'SQL'
+                    CREATE TABLE test_truncate1 (
+                        id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+                        name VARCHAR(255) NOT NULL,
+                        PRIMARY KEY (id)
+                    ) DEFAULT CHARSET=utf8mb4;
+                SQL,
                 "INSERT INTO test_truncate1 (name) VALUES ('A'),('B'),('C');",
-                'CREATE TABLE test_truncate2 (
-                    id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-                    name VARCHAR(255) NOT NULL,
-                    PRIMARY KEY (id)
-                ) DEFAULT CHARSET=utf8mb4;',
+                <<<'SQL'
+                    CREATE TABLE test_truncate2 (
+                        id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+                        name VARCHAR(255) NOT NULL,
+                        PRIMARY KEY (id)
+                    ) DEFAULT CHARSET=utf8mb4;
+                SQL,
                 "INSERT INTO test_truncate2 (name) VALUES ('A'),('B'),('C');",
             ]
         ],
         'pgsql' => [
-            'exec' => 'CREATE TABLE test_exec (
-                id SERIAL PRIMARY KEY,
-                name character varying(255) NOT NULL
-            );',
-            'insert' => 'CREATE TABLE test_insert (
-                id SERIAL PRIMARY KEY,
-                name character varying(255) NOT NULL
-            );',
-            'update' => [
-                'CREATE TABLE test_update (
+            'exec' => <<<'SQL'
+                CREATE TABLE test_exec (
                     id SERIAL PRIMARY KEY,
                     name character varying(255) NOT NULL
-                );',
+                );
+            SQL,
+            'insert' => <<<'SQL'
+                CREATE TABLE test_insert (
+                    id SERIAL PRIMARY KEY,
+                    name character varying(255) NOT NULL
+                );
+            SQL,
+            'update' => [
+                <<<'SQL'
+                    CREATE TABLE test_update (
+                        id SERIAL PRIMARY KEY,
+                        name character varying(255) NOT NULL
+                    );
+                SQL,
                 "INSERT INTO test_update (name) VALUES ('A'),('B'),('C');",
             ],
             'delete' => [
-                'CREATE TABLE test_delete (
-                    id SERIAL PRIMARY KEY,
-                    name character varying(255) NOT NULL
-                );',
+                <<<'SQL'
+                    CREATE TABLE test_delete (
+                        id SERIAL PRIMARY KEY,
+                        name character varying(255) NOT NULL
+                    );
+                SQL,
                 "INSERT INTO test_delete (name) VALUES ('A'),('B'),('C');",
             ],
             'select' => [
-                'CREATE TABLE test_select(
-                  id  SERIAL PRIMARY KEY,
-                  name           character varying(255)      NOT NULL,
-                  ranking        INT       NOT NULL,
-                  comment        TEXT
-                );',
+                <<<'SQL'
+                    CREATE TABLE test_select(
+                      id  SERIAL PRIMARY KEY,
+                      name           character varying(255)      NOT NULL,
+                      ranking        INT       NOT NULL,
+                      comment        TEXT
+                    );
+                SQL,
                 "INSERT INTO test_select (id, name, ranking, comment) VALUES (1, 'A', 0, NULL);",
                 "INSERT INTO test_select (id, name, ranking, comment) VALUES (2, 'B', 10, 'yes');",
                 "INSERT INTO test_select (id, name, ranking, comment) VALUES (3, 'C', 20, 'maybe');",
@@ -153,52 +175,66 @@ class DatabaseTest extends TestCase
                 "INSERT INTO test_select (id, name, ranking, comment) VALUES (6, 'F', 5, NULL);",
             ],
             'truncate' => [
-                'CREATE TABLE test_truncate1 (
-                    id SERIAL PRIMARY KEY,
-                    name character varying(255) NOT NULL
-                );',
+                <<<'SQL'
+                    CREATE TABLE test_truncate1 (
+                        id SERIAL PRIMARY KEY,
+                        name character varying(255) NOT NULL
+                    );
+                SQL,
                 "INSERT INTO test_truncate1 (name) VALUES ('A'),('B'),('C');",
-                'CREATE TABLE test_truncate2 (
-                    id SERIAL PRIMARY KEY,
-                    name character varying(255) NOT NULL
-                );',
+                <<<'SQL'
+                    CREATE TABLE test_truncate2 (
+                        id SERIAL PRIMARY KEY,
+                        name character varying(255) NOT NULL
+                    );
+                SQL,
                 "INSERT INTO test_truncate2 (name) VALUES ('A'),('B'),('C');",
             ]
         ],
         'sqlite' => [
-            'exec' => 'CREATE TABLE test_exec (
-                id   INTEGER       PRIMARY KEY AUTOINCREMENT,
-                name VARCHAR (255) NOT NULL
-            );',
-            'insert' => 'CREATE TABLE test_insert (
-                id   INTEGER       PRIMARY KEY AUTOINCREMENT,
-                name VARCHAR (255) NOT NULL
-            );',
-            'update' => [
-                'CREATE TABLE test_update (
+            'exec' => <<<'SQL'
+                CREATE TABLE test_exec (
                     id   INTEGER       PRIMARY KEY AUTOINCREMENT,
                     name VARCHAR (255) NOT NULL
-                );',
+                );
+            SQL,
+            'insert' => <<<'SQL'
+                CREATE TABLE test_insert (
+                    id   INTEGER       PRIMARY KEY AUTOINCREMENT,
+                    name VARCHAR (255) NOT NULL
+                );
+            SQL,
+            'update' => [
+                <<<'SQL'
+                    CREATE TABLE test_update (
+                        id   INTEGER       PRIMARY KEY AUTOINCREMENT,
+                        name VARCHAR (255) NOT NULL
+                    );
+                SQL,
                 "INSERT INTO test_update (name) VALUES ('A');",
                 "INSERT INTO test_update (name) VALUES ('B');",
                 "INSERT INTO test_update (name) VALUES ('C');",
             ],
             'delete' => [
-                'CREATE TABLE test_delete (
-                    id   INTEGER       PRIMARY KEY AUTOINCREMENT,
-                    name VARCHAR (255) NOT NULL
-                );',
+                <<<'SQL'
+                    CREATE TABLE test_delete (
+                        id   INTEGER       PRIMARY KEY AUTOINCREMENT,
+                        name VARCHAR (255) NOT NULL
+                    );
+                SQL,
                 "INSERT INTO test_delete (name) VALUES ('A');",
                 "INSERT INTO test_delete (name) VALUES ('B');",
                 "INSERT INTO test_delete (name) VALUES ('C');",
             ],
             'select' => [
-                'CREATE TABLE test_select (
-                    id      INT          PRIMARY KEY  NOT NULL,
-                    name    VARCHAR (45) NOT NULL,
-                    ranking INT (1)      NOT NULL,
-                    comment TEXT
-                );',
+                <<<'SQL'
+                    CREATE TABLE test_select (
+                        id      INT          PRIMARY KEY  NOT NULL,
+                        name    VARCHAR (45) NOT NULL,
+                        ranking INT (1)      NOT NULL,
+                        comment TEXT
+                    );
+                SQL,
                 "INSERT INTO test_select (id, name, ranking, comment) VALUES (1, 'A', 0, NULL);",
                 "INSERT INTO test_select (id, name, ranking, comment) VALUES (2, 'B', 10, 'yes');",
                 "INSERT INTO test_select (id, name, ranking, comment) VALUES (3, 'C', 20, 'maybe');",
@@ -207,17 +243,21 @@ class DatabaseTest extends TestCase
                 "INSERT INTO test_select (id, name, ranking, comment) VALUES (6, 'F', 5, NULL);",
             ],
             'truncate' => [
-                'CREATE TABLE test_truncate1 (
-                    id   INTEGER       PRIMARY KEY AUTOINCREMENT,
-                    name VARCHAR (255) NOT NULL
-                );',
+                <<<'SQL'
+                    CREATE TABLE test_truncate1 (
+                        id   INTEGER       PRIMARY KEY AUTOINCREMENT,
+                        name VARCHAR (255) NOT NULL
+                    );
+                SQL,
                 "INSERT INTO test_truncate1 (name) VALUES ('A');",
                 "INSERT INTO test_truncate1 (name) VALUES ('B');",
                 "INSERT INTO test_truncate1 (name) VALUES ('C');",
-                'CREATE TABLE test_truncate2 (
-                    id   INTEGER       PRIMARY KEY AUTOINCREMENT,
-                    name VARCHAR (255) NOT NULL
-                );',
+                <<<'SQL'
+                    CREATE TABLE test_truncate2 (
+                        id   INTEGER       PRIMARY KEY AUTOINCREMENT,
+                        name VARCHAR (255) NOT NULL
+                    );
+                SQL,
                 "INSERT INTO test_truncate2 (name) VALUES ('A');",
                 "INSERT INTO test_truncate2 (name) VALUES ('B');",
                 "INSERT INTO test_truncate2 (name) VALUES ('C');",
@@ -226,123 +266,6 @@ class DatabaseTest extends TestCase
     ];
 
     protected array $selectData = [
-        'mysql' => [
-            [
-                'id'      => '1',
-                'name'    => 'A',
-                'ranking' => '0',
-                'comment' => null,
-            ],
-            [
-                'id'      => '2',
-                'name'    => 'B',
-                'ranking' => '10',
-                'comment' => 'yes',
-            ],
-            [
-                'id'      => '3',
-                'name'    => 'C',
-                'ranking' => '20',
-                'comment' => 'maybe',
-            ],
-            [
-                'id'      => '4',
-                'name'    => 'D',
-                'ranking' => '30',
-                'comment' => 'no',
-            ],
-            [
-                'id'      => '5',
-                'name'    => 'E',
-                'ranking' => '25',
-                'comment' => null,
-            ],
-            [
-                'id'      => '6',
-                'name'    => 'F',
-                'ranking' => '5',
-                'comment' => null,
-            ]
-        ],
-        'pgsql' => [
-            [
-                'id'      => 1,
-                'name'    => 'A',
-                'ranking' => 0,
-                'comment' => null,
-            ],
-            [
-                'id'      => 2,
-                'name'    => 'B',
-                'ranking' => 10,
-                'comment' => 'yes',
-            ],
-            [
-                'id'      => 3,
-                'name'    => 'C',
-                'ranking' => 20,
-                'comment' => 'maybe',
-            ],
-            [
-                'id'      => 4,
-                'name'    => 'D',
-                'ranking' => 30,
-                'comment' => 'no',
-            ],
-            [
-                'id'      => 5,
-                'name'    => 'E',
-                'ranking' => 25,
-                'comment' => null,
-            ],
-            [
-                'id'      => 6,
-                'name'    => 'F',
-                'ranking' => 5,
-                'comment' => null,
-            ]
-        ],
-        'sqlite' => [
-            [
-                'id'      => '1',
-                'name'    => 'A',
-                'ranking' => '0',
-                'comment' => null,
-            ],
-            [
-                'id'      => '2',
-                'name'    => 'B',
-                'ranking' => '10',
-                'comment' => 'yes',
-            ],
-            [
-                'id'      => '3',
-                'name'    => 'C',
-                'ranking' => '20',
-                'comment' => 'maybe',
-            ],
-            [
-                'id'      => '4',
-                'name'    => 'D',
-                'ranking' => '30',
-                'comment' => 'no',
-            ],
-            [
-                'id'      => '5',
-                'name'    => 'E',
-                'ranking' => '25',
-                'comment' => null,
-            ],
-            [
-                'id'      => '6',
-                'name'    => 'F',
-                'ranking' => '5',
-                'comment' => null,
-            ]
-        ]
-    ];
-
-    protected array $selectDataPHP81 = [
         'mysql' => [
             [
                 'id'      => 1,
@@ -465,24 +388,11 @@ class DatabaseTest extends TestCase
         'sqlite' => [__DIR__ . '/test-dump-sqlite.sql'],
     ];
 
-    // region Data Provider
-
-    public static function dbms(): array
-    {
-        return [
-            'mysql'      => ['mysql'],
-            'postgresql' => ['pgsql'],
-            'sqlite'     => ['sqlite']
-        ];
-    }
-
     // endregion
 
     // region Setup / Teardown
 
-    /**
-     * @throws DatabaseException
-     */
+    /** @throws DatabaseException */
     protected function setUp(): void
     {
         foreach ($this->dbms as $k => $dbms) {
@@ -520,15 +430,22 @@ class DatabaseTest extends TestCase
         }
     }
 
+    // region Data Provider
+
+    public static function dbms(): iterable
+    {
+        yield 'mysql'      => ['mysql'];
+
+        yield 'postgresql' => ['pgsql'];
+
+        yield 'sqlite'     => ['sqlite'];
+    }
+
     // endregion
 
     // region Database->Exec
 
-    /**
-     * @dataProvider dbms
-     *
-     * @throws DatabaseException
-     */
+    /** @throws DatabaseException */
     #[DataProvider('dbms')]
     public function testExec(string $driver): void
     {
@@ -539,8 +456,10 @@ class DatabaseTest extends TestCase
         try {
             $db->exec($sql);
             if ($driver === 'mysql') {
-                $sql1 = "SELECT COUNT(*) FROM information_schema.tables
-                         WHERE table_schema = 'test_database' AND table_name = 'test_exec';";
+                $sql1 = <<<'SQL'
+                    SELECT COUNT(*) FROM information_schema.tables
+                    WHERE table_schema = 'test_database' AND table_name = 'test_exec';
+                SQL;
 
                 static::assertSame(1, $db->count($sql1));
             } elseif ($driver === 'pgsql') {
@@ -553,15 +472,12 @@ class DatabaseTest extends TestCase
             }
         } catch (DatabaseException $e) {
             \var_dump($db->getErrors());
+
             throw $e;
         }
     }
 
-    /**
-     * @dataProvider dbms
-     *
-     * @throws DatabaseException
-     */
+    /** @throws DatabaseException */
     #[DataProvider('dbms')]
     public function testExecException(string $driver): void
     {
@@ -577,11 +493,7 @@ class DatabaseTest extends TestCase
 
     // region Database->Insert
 
-    /**
-     * @dataProvider dbms
-     *
-     * @throws DatabaseException
-     */
+    /** @throws DatabaseException */
     #[DataProvider('dbms')]
     public function testInsert(string $driver): void
     {
@@ -611,15 +523,12 @@ class DatabaseTest extends TestCase
             static::assertSame(1, $db->count("SELECT COUNT(*) FROM test_insert WHERE name='C' AND id=3"));
         } catch (DatabaseException $e) {
             \var_dump($db->getErrors());
+
             throw $e;
         }
     }
 
-    /**
-     * @dataProvider dbms
-     *
-     * @throws DatabaseException
-     */
+    /** @throws DatabaseException */
     #[DataProvider('dbms')]
     public function testInsertException(string $driver): void
     {
@@ -635,11 +544,7 @@ class DatabaseTest extends TestCase
 
     // region Database->Update
 
-    /**
-     * @dataProvider dbms
-     *
-     * @throws DatabaseException
-     */
+    /** @throws DatabaseException */
     #[DataProvider('dbms')]
     public function testUpdate(string $driver): void
     {
@@ -668,15 +573,12 @@ class DatabaseTest extends TestCase
             static::assertSame(1, $db->count("SELECT COUNT(*) FROM test_update WHERE name='CC' AND id=3"));
         } catch (DatabaseException $e) {
             \var_dump($db->getErrors());
+
             throw $e;
         }
     }
 
-    /**
-     * @dataProvider dbms
-     *
-     * @throws DatabaseException
-     */
+    /** @throws DatabaseException */
     #[DataProvider('dbms')]
     public function testUpdateException(string $driver): void
     {
@@ -692,11 +594,7 @@ class DatabaseTest extends TestCase
 
     // region Database->Delete
 
-    /**
-     * @dataProvider dbms
-     *
-     * @throws DatabaseException
-     */
+    /** @throws DatabaseException */
     #[DataProvider('dbms')]
     public function testDelete(string $driver): void
     {
@@ -725,15 +623,12 @@ class DatabaseTest extends TestCase
             static::assertSame(0, $db->count('SELECT COUNT(*) FROM test_delete WHERE id = 3'));
         } catch (DatabaseException $e) {
             \var_dump($db->getErrors());
+
             throw $e;
         }
     }
 
-    /**
-     * @dataProvider dbms
-     *
-     * @throws DatabaseException
-     */
+    /** @throws DatabaseException */
     #[DataProvider('dbms')]
     public function testDeleteException(string $driver): void
     {
@@ -749,11 +644,7 @@ class DatabaseTest extends TestCase
 
     // region Database->SelectAll
 
-    /**
-     * @dataProvider dbms
-     *
-     * @throws DatabaseException
-     */
+    /** @throws DatabaseException */
     #[DataProvider('dbms')]
     public function testSelectAll(string $driver): void
     {
@@ -765,22 +656,17 @@ class DatabaseTest extends TestCase
             $db->exec($sql);
         }
 
-        $selectData = $this->selectData;
-        if (\PHP_MAJOR_VERSION >= 8 && \PHP_MINOR_VERSION >= 1) {
-            $selectData = $this->selectDataPHP81;
-        }
-
         try {
             $sql = 'SELECT * FROM test_select';
             $rows = $db->selectAll($sql);
-            static::assertSame($selectData[$driver], $rows);
+            static::assertSame($this->selectData[$driver], $rows);
 
             $sql = 'SELECT * FROM test_select WHERE ranking >= :ranking';
             $params = ['ranking' => 20];
             $rows = $db->selectAll($sql, $params);
-            $data[] = $selectData[$driver][2];
-            $data[] = $selectData[$driver][3];
-            $data[] = $selectData[$driver][4];
+            $data[] = $this->selectData[$driver][2];
+            $data[] = $this->selectData[$driver][3];
+            $data[] = $this->selectData[$driver][4];
             static::assertSame($data, $rows);
 
             $params = ['ranking' => 100];
@@ -788,15 +674,12 @@ class DatabaseTest extends TestCase
             static::assertSame([], $rows);
         } catch (DatabaseException $e) {
             \var_dump($db->getErrors());
+
             throw $e;
         }
     }
 
-    /**
-     * @dataProvider dbms
-     *
-     * @throws DatabaseException
-     */
+    /** @throws DatabaseException */
     #[DataProvider('dbms')]
     public function testSelectAllException(string $driver): void
     {
@@ -812,11 +695,7 @@ class DatabaseTest extends TestCase
 
     // region Database->SelectRow
 
-    /**
-     * @dataProvider dbms
-     *
-     * @throws DatabaseException
-     */
+    /** @throws DatabaseException */
     #[DataProvider('dbms')]
     public function testSelectRow(string $driver): void
     {
@@ -828,35 +707,27 @@ class DatabaseTest extends TestCase
             $db->exec($sql);
         }
 
-        $selectData = $this->selectData;
-        if (\PHP_MAJOR_VERSION >= 8 && \PHP_MINOR_VERSION >= 1) {
-            $selectData = $this->selectDataPHP81;
-        }
-
         try {
             $sql = 'SELECT * FROM test_select';
             $row = $db->selectRow($sql);
-            static::assertSame($selectData[$driver][0], $row);
+            static::assertSame($this->selectData[$driver][0], $row);
 
             $sql = 'SELECT * FROM test_select WHERE ranking >= :ranking';
             $params = ['ranking' => 20];
             $row = $db->selectRow($sql, $params);
-            static::assertSame($selectData[$driver][2], $row);
+            static::assertSame($this->selectData[$driver][2], $row);
 
             $params = ['ranking' => 100];
             $rows = $db->selectRow($sql, $params);
             static::assertSame([], $rows);
         } catch (DatabaseException $e) {
             \var_dump($db->getErrors());
+
             throw $e;
         }
     }
 
-    /**
-     * @dataProvider dbms
-     *
-     * @throws DatabaseException
-     */
+    /** @throws DatabaseException */
     #[DataProvider('dbms')]
     public function testSelectRowException(string $driver): void
     {
@@ -872,11 +743,7 @@ class DatabaseTest extends TestCase
 
     // region Database->SelectCol
 
-    /**
-     * @dataProvider dbms
-     *
-     * @throws DatabaseException
-     */
+    /** @throws DatabaseException */
     #[DataProvider('dbms')]
     public function testSelectCol(string $driver): void
     {
@@ -888,30 +755,25 @@ class DatabaseTest extends TestCase
             $db->exec($sql);
         }
 
-        $selectData = $this->selectData;
-        if (\PHP_MAJOR_VERSION >= 8 && \PHP_MINOR_VERSION >= 1) {
-            $selectData = $this->selectDataPHP81;
-        }
-
         try {
             $sql = 'SELECT * FROM test_select';
             $col = $db->selectCol($sql);
             static::assertSame([
-                $selectData[$driver][0]['id'],
-                $selectData[$driver][1]['id'],
-                $selectData[$driver][2]['id'],
-                $selectData[$driver][3]['id'],
-                $selectData[$driver][4]['id'],
-                $selectData[$driver][5]['id']
+                $this->selectData[$driver][0]['id'],
+                $this->selectData[$driver][1]['id'],
+                $this->selectData[$driver][2]['id'],
+                $this->selectData[$driver][3]['id'],
+                $this->selectData[$driver][4]['id'],
+                $this->selectData[$driver][5]['id']
             ], $col);
 
             $sql = 'SELECT name FROM test_select WHERE ranking >= :ranking';
             $params = ['ranking' => 20];
             $col = $db->selectCol($sql, $params);
             static::assertSame([
-                $selectData[$driver][2]['name'],
-                $selectData[$driver][3]['name'],
-                $selectData[$driver][4]['name']
+                $this->selectData[$driver][2]['name'],
+                $this->selectData[$driver][3]['name'],
+                $this->selectData[$driver][4]['name']
             ], $col);
 
             $sql = 'SELECT ranking FROM test_select WHERE ranking >= :ranking';
@@ -920,15 +782,12 @@ class DatabaseTest extends TestCase
             static::assertSame([], $col);
         } catch (DatabaseException $e) {
             \var_dump($db->getErrors());
+
             throw $e;
         }
     }
 
-    /**
-     * @dataProvider dbms
-     *
-     * @throws DatabaseException
-     */
+    /** @throws DatabaseException */
     #[DataProvider('dbms')]
     public function testSelectColException(string $driver): void
     {
@@ -944,11 +803,7 @@ class DatabaseTest extends TestCase
 
     // region Database->SelectVar
 
-    /**
-     * @dataProvider dbms
-     *
-     * @throws DatabaseException
-     */
+    /** @throws DatabaseException */
     #[DataProvider('dbms')]
     public function testSelectVar(string $driver): void
     {
@@ -960,20 +815,15 @@ class DatabaseTest extends TestCase
             $db->exec($sql);
         }
 
-        $selectData = $this->selectData;
-        if (\PHP_MAJOR_VERSION >= 8 && \PHP_MINOR_VERSION >= 1) {
-            $selectData = $this->selectDataPHP81;
-        }
-
         try {
             $sql = 'SELECT * FROM test_select';
             $var = $db->selectVar($sql);
-            static::assertSame($selectData[$driver][0]['id'], $var);
+            static::assertSame($this->selectData[$driver][0]['id'], $var);
 
             $sql = 'SELECT name FROM test_select WHERE ranking >= :ranking';
             $params = ['ranking' => 20];
             $var = $db->selectVar($sql, $params);
-            static::assertSame($selectData[$driver][2]['name'], $var);
+            static::assertSame($this->selectData[$driver][2]['name'], $var);
 
             $sql = 'SELECT ranking FROM test_select WHERE ranking >= :ranking';
             $params = ['ranking' => 100];
@@ -981,15 +831,12 @@ class DatabaseTest extends TestCase
             static::assertFalse($var);
         } catch (DatabaseException $e) {
             \var_dump($db->getErrors());
+
             throw $e;
         }
     }
 
-    /**
-     * @dataProvider dbms
-     *
-     * @throws DatabaseException
-     */
+    /** @throws DatabaseException */
     #[DataProvider('dbms')]
     public function testSelectVarException(string $driver): void
     {
@@ -1005,11 +852,7 @@ class DatabaseTest extends TestCase
 
     // region Database->Select
 
-    /**
-     * @dataProvider dbms
-     *
-     * @throws DatabaseException
-     */
+    /** @throws DatabaseException */
     #[DataProvider('dbms')]
     public function testSelect(string $driver): void
     {
@@ -1024,27 +867,24 @@ class DatabaseTest extends TestCase
         try {
             $sql = 'SELECT * FROM test_select';
             $statement = $db->select($sql);
-            static::assertSame(PDOStatement::class, \get_class($statement));
+            static::assertSame(\PDOStatement::class, $statement::class);
 
             $sql = 'SELECT * FROM test_select WHERE ranking >= :ranking';
             $params = ['ranking' => 20];
             $statement = $db->select($sql, $params);
-            static::assertSame(PDOStatement::class, \get_class($statement));
+            static::assertSame(\PDOStatement::class, $statement::class);
 
             $params = ['ranking' => 100];
             $statement = $db->select($sql, $params);
-            static::assertSame(PDOStatement::class, \get_class($statement));
+            static::assertSame(\PDOStatement::class, $statement::class);
         } catch (DatabaseException $e) {
             \var_dump($db->getErrors());
+
             throw $e;
         }
     }
 
-    /**
-     * @dataProvider dbms
-     *
-     * @throws DatabaseException
-     */
+    /** @throws DatabaseException */
     #[DataProvider('dbms')]
     public function testSelectException(string $driver): void
     {
@@ -1061,8 +901,6 @@ class DatabaseTest extends TestCase
     // region Database->Read
 
     /**
-     * @dataProvider dbms
-     *
      * @throws DatabaseException
      *
      * @noinspection PhpAssignmentInConditionInspection
@@ -1104,6 +942,7 @@ class DatabaseTest extends TestCase
             static::assertCount(6, $rows);
         } catch (DatabaseException $e) {
             \var_dump($db->getErrors());
+
             throw $e;
         }
     }
@@ -1112,11 +951,7 @@ class DatabaseTest extends TestCase
 
     // region Database->ReadAll
 
-    /**
-     * @dataProvider dbms
-     *
-     * @throws DatabaseException
-     */
+    /** @throws DatabaseException */
     #[DataProvider('dbms')]
     public function testReadAll(string $driver): void
     {
@@ -1146,6 +981,7 @@ class DatabaseTest extends TestCase
             static::assertCount(0, $rows);
         } catch (DatabaseException $e) {
             \var_dump($db->getErrors());
+
             throw $e;
         }
     }
@@ -1154,11 +990,7 @@ class DatabaseTest extends TestCase
 
     // region Database->Count
 
-    /**
-     * @dataProvider dbms
-     *
-     * @throws DatabaseException
-     */
+    /** @throws DatabaseException */
     #[DataProvider('dbms')]
     public function testCount(string $driver): void
     {
@@ -1173,15 +1005,12 @@ class DatabaseTest extends TestCase
             static::assertSame(6, $db->count('SELECT COUNT(*) from test_select'));
         } catch (DatabaseException $e) {
             \var_dump($db->getErrors());
+
             throw $e;
         }
     }
 
-    /**
-     * @dataProvider dbms
-     *
-     * @throws DatabaseException
-     */
+    /** @throws DatabaseException */
     #[DataProvider('dbms')]
     public function testCountException(string $driver): void
     {
@@ -1198,8 +1027,6 @@ class DatabaseTest extends TestCase
     // region Database Pdo Param
 
     /**
-     * @dataProvider dbms
-     *
      * @throws DatabaseException
      *
      * @noinspection FopenBinaryUnsafeUsageInspection
@@ -1212,8 +1039,10 @@ class DatabaseTest extends TestCase
 
         try {
             if ($driver !== 'pgsql') {
-                $sql = 'SELECT :true AS `true`, :false AS `false`, :null AS `null`, :float AS `float`,
-                :int AS `int`, :string AS `string`, :resource AS `resource`';
+                $sql = <<<'SQL'
+                    SELECT :true AS `true`, :false AS `false`, :null AS `null`, :float AS `float`,
+                    :int AS `int`, :string AS `string`, :resource AS `resource`
+                SQL;
                 $params = [
                     'true'     => true,
                     'false'    => false,
@@ -1226,18 +1055,14 @@ class DatabaseTest extends TestCase
 
                 $row = $db->selectRow($sql, $params);
 
-                if (\PHP_MAJOR_VERSION >= 8 && \PHP_MINOR_VERSION >= 1) {
-                    static::assertSame(1, $row['true']);
-                    static::assertSame(0, $row['false']);
-                    static::assertSame(800, $row['int']);
-                } else {
-                    static::assertSame('1', $row['true']);
-                    static::assertSame('0', $row['false']);
-                    static::assertSame('800', $row['int']);
-                }
+                static::assertSame(1, $row['true']);
+                static::assertSame(0, $row['false']);
+                static::assertSame(800, $row['int']);
             } else {
-                $sql = 'SELECT :true AS true, :false AS false, :null AS null, :float AS float,
-                :int AS int, :string AS string, :resource AS resource';
+                $sql = <<<'SQL'
+                    SELECT :true AS true, :false AS false, :null AS null, :float AS float,
+                    :int AS int, :string AS string, :resource AS resource
+                SQL;
                 $params = [
                     'true'     => true,
                     'false'    => false,
@@ -1259,15 +1084,12 @@ class DatabaseTest extends TestCase
             static::assertSame('-- MySQL dump', \mb_substr($row['resource'], 0, 13));
         } catch (DatabaseException $e) {
             \var_dump($db->getErrors());
+
             throw $e;
         }
     }
 
-    /**
-     * @dataProvider dbms
-     *
-     * @throws DatabaseException
-     */
+    /** @throws DatabaseException */
     #[DataProvider('dbms')]
     public function testPdoParamTypeException(string $driver): void
     {
@@ -1285,11 +1107,7 @@ class DatabaseTest extends TestCase
 
     // region Database startTransaction/commitTransaction/rollbackTransaction/completeTransaction
 
-    /**
-     * @dataProvider dbms
-     *
-     * @throws DatabaseException
-     */
+    /** @throws DatabaseException */
     #[DataProvider('dbms')]
     public function testStartTransaction(string $driver): void
     {
@@ -1311,6 +1129,7 @@ class DatabaseTest extends TestCase
             $db->commitTransaction();
         } catch (DatabaseException $e) {
             \var_dump($db->getErrors());
+
             throw $e;
         }
 
@@ -1319,11 +1138,7 @@ class DatabaseTest extends TestCase
         static::assertSame('my name', $db->selectVar($sql, $params));
     }
 
-    /**
-     * @dataProvider dbms
-     *
-     * @throws DatabaseException
-     */
+    /** @throws DatabaseException */
     #[DataProvider('dbms')]
     public function testCommitTransaction(string $driver): void
     {
@@ -1345,6 +1160,7 @@ class DatabaseTest extends TestCase
             $db->commitTransaction();
         } catch (DatabaseException $e) {
             \var_dump($db->getErrors());
+
             throw $e;
         }
 
@@ -1353,11 +1169,7 @@ class DatabaseTest extends TestCase
         static::assertSame('my name', $db->selectVar($sql, $params));
     }
 
-    /**
-     * @dataProvider dbms
-     *
-     * @throws DatabaseException
-     */
+    /** @throws DatabaseException */
     #[DataProvider('dbms')]
     public function testCommitTransactionException(string $driver): void
     {
@@ -1388,11 +1200,7 @@ class DatabaseTest extends TestCase
         static::assertSame(0, $exceptionsThrowed);
     }
 
-    /**
-     * @dataProvider dbms
-     *
-     * @throws DatabaseException
-     */
+    /** @throws DatabaseException */
     #[DataProvider('dbms')]
     public function testRollbackTransaction(string $driver): void
     {
@@ -1420,17 +1228,14 @@ class DatabaseTest extends TestCase
             static::assertSame('A', $db->selectVar($sql, $params));
         } catch (DatabaseException $e) {
             \var_dump($db->getErrors());
+
             throw $e;
         }
 
         static::assertSame('A', $db->selectVar($sql, $params));
     }
 
-    /**
-     * @dataProvider dbms
-     *
-     * @throws DatabaseException
-     */
+    /** @throws DatabaseException */
     #[DataProvider('dbms')]
     public function testRollbackTransactionException(string $driver): void
     {
@@ -1461,11 +1266,7 @@ class DatabaseTest extends TestCase
         static::assertSame(0, $exceptionsThrowed);
     }
 
-    /**
-     * @dataProvider dbms
-     *
-     * @throws DatabaseException
-     */
+    /** @throws DatabaseException */
     #[DataProvider('dbms')]
     public function testNestedTransaction(string $driver): void
     {
@@ -1508,6 +1309,7 @@ class DatabaseTest extends TestCase
                     $db->rollbackTransaction();
                 } catch (DatabaseException $e) {
                     \var_dump($db->getErrors());
+
                     throw $e;
                 }
 
@@ -1517,6 +1319,7 @@ class DatabaseTest extends TestCase
                 $db->commitTransaction();
             } catch (DatabaseException $e) {
                 \var_dump($db->getErrors());
+
                 throw $e;
             }
 
@@ -1525,17 +1328,14 @@ class DatabaseTest extends TestCase
             $db->commitTransaction();
         } catch (DatabaseException $e) {
             \var_dump($db->getErrors());
+
             throw $e;
         }
 
         static::assertSame('my name 1', $db->selectVar($sql, $params));
     }
 
-    /**
-     * @dataProvider dbms
-     *
-     * @throws DatabaseException
-     */
+    /** @throws DatabaseException */
     #[DataProvider('dbms')]
     public function testCompleteTransactionOK(string $driver): void
     {
@@ -1555,6 +1355,7 @@ class DatabaseTest extends TestCase
             $db->update($sql, $params);
         } catch (DatabaseException $e) {
             \var_dump($db->getErrors());
+
             throw $e;
         } finally {
             $db->completeTransaction();
@@ -1565,11 +1366,7 @@ class DatabaseTest extends TestCase
         static::assertSame('my name', $db->selectVar($sql, $params));
     }
 
-    /**
-     * @dataProvider dbms
-     *
-     * @throws DatabaseException
-     */
+    /** @throws DatabaseException */
     #[DataProvider('dbms')]
     public function testCompleteTransactionKO(string $driver): void
     {
@@ -1599,11 +1396,7 @@ class DatabaseTest extends TestCase
         static::assertSame('A', $db->selectVar($sql, $params));
     }
 
-    /**
-     * @dataProvider dbms
-     *
-     * @throws DatabaseException
-     */
+    /** @throws DatabaseException */
     #[DataProvider('dbms')]
     public function testStartCommitAutoConnect(string $driver): void
     {
@@ -1628,11 +1421,7 @@ class DatabaseTest extends TestCase
 
     // region Database hasErrors/getErrors/getLastError/cleanErrors
 
-    /**
-     * @dataProvider dbms
-     *
-     * @throws DatabaseException
-     */
+    /** @throws DatabaseException */
     #[DataProvider('dbms')]
     public function testErrorsException(string $driver): void
     {
@@ -1668,11 +1457,7 @@ class DatabaseTest extends TestCase
 
     // region Database hasSaveQueries/getSavedQueries/cleanSavedQueries
 
-    /**
-     * @dataProvider dbms
-     *
-     * @throws DatabaseException
-     */
+    /** @throws DatabaseException */
     #[DataProvider('dbms')]
     public function testSaveQueries(string $driver): void
     {
@@ -1714,6 +1499,7 @@ class DatabaseTest extends TestCase
             static::assertCount(0, $queries);
         } catch (DatabaseException $e) {
             \var_dump($db->getErrors());
+
             throw $e;
         }
     }
@@ -1722,11 +1508,7 @@ class DatabaseTest extends TestCase
 
     // region Database->useSqlFile
 
-    /**
-     * @dataProvider dbms
-     *
-     * @throws DatabaseException
-     */
+    /** @throws DatabaseException */
     #[DataProvider('dbms')]
     public function testUseSqlFile(string $driver): void
     {
@@ -1742,13 +1524,11 @@ class DatabaseTest extends TestCase
             static::assertSame(6, $db->count('SELECT COUNT(*) FROM test_select'));
         } catch (DatabaseException $e) {
             \var_dump($db->getErrors());
+
             throw $e;
         }
     }
 
-    /**
-     * @dataProvider dbms
-     */
     #[DataProvider('dbms')]
     public function testUseSqlFileExceptionMissingFile(string $driver): void
     {
@@ -1760,9 +1540,6 @@ class DatabaseTest extends TestCase
         $db->useSqlFile('./missing-dump.sql');
     }
 
-    /**
-     * @dataProvider dbms
-     */
     #[DataProvider('dbms')]
     public function testUseSqlFileExceptionDirectory(string $driver): void
     {
@@ -1774,9 +1551,6 @@ class DatabaseTest extends TestCase
         $db->useSqlFile(__DIR__);
     }
 
-    /**
-     * @dataProvider dbms
-     */
     #[DataProvider('dbms')]
     public function testUseSqlFileException(string $driver): void
     {
@@ -1792,11 +1566,7 @@ class DatabaseTest extends TestCase
 
     // region Database->TruncateTables
 
-    /**
-     * @dataProvider dbms
-     *
-     * @throws DatabaseException
-     */
+    /** @throws DatabaseException */
     #[DataProvider('dbms')]
     public function testTruncateTables(string $driver): void
     {
@@ -1816,15 +1586,12 @@ class DatabaseTest extends TestCase
             static::assertSame(0, $db->count('SELECT COUNT(*) FROM test_truncate2'));
         } catch (DatabaseException $e) {
             \var_dump($db->getErrors());
+
             throw $e;
         }
     }
 
-    /**
-     * @dataProvider dbms
-     *
-     * @throws DatabaseException
-     */
+    /** @throws DatabaseException */
     #[DataProvider('dbms')]
     public function testTruncateTablesException(string $driver): void
     {
@@ -1840,11 +1607,7 @@ class DatabaseTest extends TestCase
 
     // region Database->DropTables
 
-    /**
-     * @dataProvider dbms
-     *
-     * @throws DatabaseException
-     */
+    /** @throws DatabaseException */
     #[DataProvider('dbms')]
     public function testDropTables(string $driver): void
     {
@@ -1858,10 +1621,14 @@ class DatabaseTest extends TestCase
 
         try {
             if ($driver === 'mysql') {
-                $sql1 = "SELECT COUNT(*) FROM information_schema.tables
-                         WHERE table_schema = 'test_database' AND table_name = 'test_truncate1';";
-                $sql2 = "SELECT COUNT(*) FROM information_schema.tables
-                         WHERE table_schema = 'test_database' AND table_name = 'test_truncate2';";
+                $sql1 = <<<'SQL'
+                    SELECT COUNT(*) FROM information_schema.tables
+                    WHERE table_schema = 'test_database' AND table_name = 'test_truncate1';
+                SQL;
+                $sql2 = <<<'SQL'
+                    SELECT COUNT(*) FROM information_schema.tables
+                    WHERE table_schema = 'test_database' AND table_name = 'test_truncate2';
+                SQL;
 
                 static::assertSame(1, $db->count($sql1));
                 static::assertSame(1, $db->count($sql2));
@@ -1887,15 +1654,12 @@ class DatabaseTest extends TestCase
             }
         } catch (DatabaseException $e) {
             \var_dump($db->getErrors());
+
             throw $e;
         }
     }
 
-    /**
-     * @dataProvider dbms
-     *
-     * @throws DatabaseException
-     */
+    /** @throws DatabaseException */
     #[DataProvider('dbms')]
     public function testDropTablesException(string $driver): void
     {
@@ -1912,8 +1676,6 @@ class DatabaseTest extends TestCase
     // region Database->Connect
 
     /**
-     * @dataProvider dbms
-     *
      * @throws DatabaseException
      *
      * @noinspection GetClassUsageInspection
@@ -1930,17 +1692,15 @@ class DatabaseTest extends TestCase
             $db->enableSaveQueries();
             $db->connect();
 
-            static::assertSame('PDO', \get_class($db->getPDO()));
+            static::assertSame(\PDO::class, \get_class($db->getPDO()));
             static::assertCount(1, $db->getSavedQueries());
         } catch (DatabaseException $e) {
             \var_dump($db->getErrors());
+
             throw $e;
         }
     }
 
-    /**
-     * @dataProvider dbms
-     */
     #[DataProvider('dbms')]
     public function testConnectException(string $driver): void
     {
@@ -1959,8 +1719,6 @@ class DatabaseTest extends TestCase
     // region Database->GetPdo
 
     /**
-     * @dataProvider dbms
-     *
      * @throws DatabaseException
      *
      * @noinspection GetClassUsageInspection
@@ -1976,9 +1734,10 @@ class DatabaseTest extends TestCase
 
             $db->connect();
 
-            static::assertSame('PDO', \get_class($db->getPDO()));
+            static::assertSame(\PDO::class, \get_class($db->getPDO()));
         } catch (DatabaseException $e) {
             \var_dump($db->getErrors());
+
             throw $e;
         }
     }
@@ -1988,8 +1747,6 @@ class DatabaseTest extends TestCase
     // region Database->Disconnect
 
     /**
-     * @dataProvider dbms
-     *
      * @throws DatabaseException
      *
      * @noinspection GetClassUsageInspection
@@ -2003,13 +1760,14 @@ class DatabaseTest extends TestCase
         try {
             $db->connect();
 
-            static::assertSame('PDO', \get_class($db->getPDO()));
+            static::assertSame(\PDO::class, \get_class($db->getPDO()));
 
             $db->disconnect();
 
             static::assertNull($db->getPDO());
         } catch (DatabaseException $e) {
             \var_dump($db->getErrors());
+
             throw $e;
         }
     }

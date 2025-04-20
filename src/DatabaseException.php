@@ -4,11 +4,7 @@ declare(strict_types=1);
 
 namespace Rancoud\Database;
 
-use Exception;
-
 /**
  * Class DatabaseException.
  */
-class DatabaseException extends Exception
-{
-}
+class DatabaseException extends \Exception {}

@@ -39,10 +39,10 @@
             "@test"
         ],
         "lint": [
-            "php-cs-fixer fix"
+            "php-cs-fixer fix -vvv"
         ],
         "test": [
-            "phpunit --colors --coverage-html ./coverage"
+            "phpunit --colors --coverage-html ./coverage --coverage-clover coverage/clover.xml"
         ]
     }
 }

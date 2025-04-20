@@ -6,53 +6,33 @@ declare(strict_types=1);
 
 namespace Rancoud\Database;
 
-use Exception;
-use PDO;
-use PDOStatement;
-
 /**
  * Class Database.
  */
 class Database
 {
-    /**
-     * @var Configurator|null Configurator
-     */
+    /** @var Configurator|null Configurator */
     protected ?Configurator $configurator = null;
 
-    /**
-     * @var PDO|null PDO
-     */
-    protected ?PDO $pdo = null;
+    /** @var \PDO|null PDO */
+    protected ?\PDO $pdo = null;
 
-    /**
-     * @var array Errors
-     */
+    /** @var array Errors */
     protected array $errors = [];
 
-    /**
-     * @var array Saved queries
-     */
+    /** @var array Saved queries */
     protected array $savedQueries = [];
 
-    /**
-     * @var array Instances of databases
-     */
+    /** @var array Instances of databases */
     protected static array $instances = [];
 
-    /**
-     * @var string[] List of drivers that support nested transactions
-     */
+    /** @var string[] List of drivers that support nested transactions */
     protected array $nestedTransactionsDriverSupported = ['mysql', 'pgsql', 'sqlite'];
 
-    /**
-     * @var int Transaction depth
-     */
+    /** @var int Transaction depth */
     protected int $transactionDepth = 0;
 
-    /**
-     * Database constructor.
-     */
+    /** Database constructor. */
     public function __construct(Configurator $configurator)
     {
         $this->configurator = $configurator;
@@ -74,9 +54,7 @@ class Database
         return static::$instances[$name];
     }
 
-    /**
-     * Returns if database instances exists.
-     */
+    /** Returns if database instances exists. */
     public static function hasInstance(string $name = 'primary'): bool
     {
         return isset(static::$instances[$name]);
@@ -92,9 +70,7 @@ class Database
         return static::$instances[$name] ?? null;
     }
 
-    /**
-     * Returns if nested transaction is supported.
-     */
+    /** Returns if nested transaction is supported. */
     public function isNestedTransactionSupported(): bool
     {
         return \in_array($this->configurator->getDriver(), $this->nestedTransactionsDriverSupported, true);
@@ -117,8 +93,9 @@ class Database
             if ($this->configurator->hasSavedQueries()) {
                 $this->savedQueries[] = ['Connection' => $this->getTime($startTime, $endTime)];
             }
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->addErrorConnection($e);
+
             throw new DatabaseException('Error Connecting Database');
         }
     }
@@ -128,7 +105,7 @@ class Database
      *
      * @throws DatabaseException
      */
-    protected function prepareBind(string $sql, array $parameters = []): PDOStatement
+    protected function prepareBind(string $sql, array $parameters = []): \PDOStatement
     {
         if ($this->pdo === null) {
             $this->connect();
@@ -139,8 +116,9 @@ class Database
             if ($statement === false) {
                 throw new DatabaseException('Error Prepare Statement');
             }
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->addErrorPrepare($sql, $parameters);
+
             throw new DatabaseException('Error Prepare Statement');
         }
 
@@ -152,19 +130,20 @@ class Database
 
             if ($param === false) {
                 $this->addErrorPrepare($sql, $parameters);
+
                 throw new DatabaseException('Error Bind Value');
             }
 
             try {
-                $success = $statement->bindValue(":$key", $value, $param);
+                $success = $statement->bindValue(":{$key}", $value, $param);
                 if ($success === false) {
                     throw new DatabaseException('Error Bind Value');
                 }
                 // @codeCoverageIgnoreStart
-            } catch (Exception $e) {
-                /* Could not reach this statement without mocking database
-                 */
+            } catch (\Exception $e) {
+                // Could not reach this statement without mocking database
                 $this->addErrorPrepare($sql, $parameters);
+
                 throw new DatabaseException('Error Bind Value');
             }
             // @codeCoverageIgnoreEnd
@@ -173,44 +152,38 @@ class Database
         return $statement;
     }
 
-    /**
-     * Returns PDO param type according to value type.
-     *
-     * @return bool|int
-     */
-    protected function getPdoParamType($value)
+    /** Returns PDO param type according to value type. */
+    protected function getPdoParamType(mixed $value): bool|int
     {
         if (\is_int($value)) {
-            return PDO::PARAM_INT;
+            return \PDO::PARAM_INT;
         }
 
         if (\is_bool($value)) {
-            return PDO::PARAM_BOOL;
+            return \PDO::PARAM_BOOL;
         }
 
         if ($value === null) {
-            return PDO::PARAM_NULL;
+            return \PDO::PARAM_NULL;
         }
 
         if (\is_string($value)) {
-            return PDO::PARAM_STR;
+            return \PDO::PARAM_STR;
         }
 
         if (\is_float($value)) {
-            return PDO::PARAM_STR;
+            return \PDO::PARAM_STR;
         }
 
         if (\is_resource($value)) {
-            return PDO::PARAM_LOB;
+            return \PDO::PARAM_LOB;
         }
 
         return false;
     }
 
-    /**
-     * Add error statement in errors.
-     */
-    protected function addErrorStatement(PDOStatement $statement): void
+    /** Add error statement in errors. */
+    protected function addErrorStatement(\PDOStatement $statement): void
     {
         $this->errors[] = [
             'query'       => $statement->queryString,
@@ -220,10 +193,8 @@ class Database
         ];
     }
 
-    /**
-     * Add error connection in errors.
-     */
-    protected function addErrorConnection(Exception $exception): void
+    /** Add error connection in errors. */
+    protected function addErrorConnection(\Exception $exception): void
     {
         $this->errors[] = [
             'query'       => $this->configurator->getDSN(),
@@ -233,9 +204,7 @@ class Database
         ];
     }
 
-    /**
-     * Add error prepare in errors.
-     */
+    /** Add error prepare in errors. */
     protected function addErrorPrepare(string $sql, array $parameters): void
     {
         $this->errors[] = [
@@ -246,10 +215,8 @@ class Database
         ];
     }
 
-    /**
-     * Add query in saved queries.
-     */
-    protected function addQuery(PDOStatement $statement, array $parameters, float $time): void
+    /** Add query in saved queries. */
+    protected function addQuery(\PDOStatement $statement, array $parameters, float $time): void
     {
         if ($this->configurator->hasSavedQueries()) {
             $this->savedQueries[] = [
@@ -260,10 +227,8 @@ class Database
         }
     }
 
-    /**
-     * Returns dump parameters.
-     */
-    protected function getDumpParams(PDOStatement $statement): string
+    /** Returns dump parameters. */
+    protected function getDumpParams(\PDOStatement $statement): string
     {
         \ob_start();
         $statement->debugDumpParams();
@@ -276,7 +241,7 @@ class Database
      *
      * @throws DatabaseException
      */
-    public function select(string $sql, array $parameters = []): PDOStatement
+    public function select(string $sql, array $parameters = []): \PDOStatement
     {
         $statement = $this->prepareBind($sql, $parameters);
 
@@ -296,31 +261,28 @@ class Database
      *
      * @throws DatabaseException
      */
-    protected function executeStatement(PDOStatement $statement): void
+    protected function executeStatement(\PDOStatement $statement): void
     {
         try {
             $success = $statement->execute();
             if ($success === false) {
                 throw new DatabaseException('Error Execute');
             }
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->addErrorStatement($statement);
+
             throw new DatabaseException('Error Execute');
         }
     }
 
-    /**
-     * Read.
-     */
-    public function read(PDOStatement $statement, int $fetchType = PDO::FETCH_ASSOC)
+    /** Read. */
+    public function read(\PDOStatement $statement, int $fetchType = \PDO::FETCH_ASSOC): mixed
     {
         return $statement->fetch($fetchType);
     }
 
-    /**
-     * Read all.
-     */
-    public function readAll(PDOStatement $statement, int $fetchType = PDO::FETCH_ASSOC): array
+    /** Read all. */
+    public function readAll(\PDOStatement $statement, int $fetchType = \PDO::FETCH_ASSOC): array
     {
         return $statement->fetchAll($fetchType);
     }
@@ -418,7 +380,7 @@ class Database
     {
         $statement = $this->select($sql, $parameters);
 
-        $cursor = $statement->fetch(PDO::FETCH_ASSOC);
+        $cursor = $statement->fetch(\PDO::FETCH_ASSOC);
 
         $count = (int) \current($cursor);
 
@@ -449,10 +411,8 @@ class Database
         $statement = null;
     }
 
-    /**
-     * Returns PDO object.
-     */
-    public function getPDO(): ?PDO
+    /** Returns PDO object. */
+    public function getPDO(): ?\PDO
     {
         return $this->pdo;
     }
@@ -520,7 +480,7 @@ class Database
      *
      * @throws DatabaseException
      */
-    public function selectVar(string $sql, array $parameters = [])
+    public function selectVar(string $sql, array $parameters = []): mixed
     {
         $statement = $this->select($sql, $parameters);
 
@@ -559,9 +519,8 @@ class Database
 
             ++$this->transactionDepth;
             // @codeCoverageIgnoreStart
-        } catch (Exception $e) {
-            /* Could not reach this statement without mocking database
-             */
+        } catch (\Exception $e) {
+            // Could not reach this statement without mocking database
             throw new DatabaseException('Error Begin Transaction');
         }
         // @codeCoverageIgnoreEnd
@@ -603,9 +562,8 @@ class Database
                 $this->exec('RELEASE SAVEPOINT LEVEL' . $this->transactionDepth);
             }
             // @codeCoverageIgnoreStart
-        } catch (Exception $e) {
-            /* Could not reach this statement without mocking database
-             */
+        } catch (\Exception $e) {
+            // Could not reach this statement without mocking database
             throw new DatabaseException('Error Commit Transaction');
         }
         // @codeCoverageIgnoreEnd
@@ -633,33 +591,26 @@ class Database
                 $this->exec('ROLLBACK TO SAVEPOINT LEVEL' . $this->transactionDepth);
             }
             // @codeCoverageIgnoreStart
-        } catch (Exception $e) {
-            /* Could not reach this statement without mocking database
-             */
+        } catch (\Exception $e) {
+            // Could not reach this statement without mocking database
             throw new DatabaseException('Error Rollback Transaction');
         }
         // @codeCoverageIgnoreEnd
     }
 
-    /**
-     * Returns if has errors.
-     */
+    /** Returns if has errors. */
     public function hasErrors(): bool
     {
         return !empty($this->errors);
     }
 
-    /**
-     * Returns errors.
-     */
+    /** Returns errors. */
     public function getErrors(): array
     {
         return $this->errors;
     }
 
-    /**
-     * Return last error.
-     */
+    /** Return last error. */
     public function getLastError(): ?array
     {
         $countErrors = \count($this->errors);
@@ -670,49 +621,37 @@ class Database
         return $this->errors[$countErrors - 1];
     }
 
-    /**
-     * Wipe errors.
-     */
+    /** Wipe errors. */
     public function cleanErrors(): void
     {
         $this->errors = [];
     }
 
-    /**
-     * Returns if has save queries.
-     */
+    /** Returns if has save queries. */
     public function hasSaveQueries(): bool
     {
         return $this->configurator->hasSavedQueries();
     }
 
-    /**
-     * Enable save queries.
-     */
+    /** Enable save queries. */
     public function enableSaveQueries(): void
     {
         $this->configurator->enableSaveQueries();
     }
 
-    /**
-     * Disable save queries.
-     */
+    /** Disable save queries. */
     public function disableSaveQueries(): void
     {
         $this->configurator->disableSaveQueries();
     }
 
-    /**
-     * Wipe save queries.
-     */
+    /** Wipe save queries. */
     public function cleanSavedQueries(): void
     {
         $this->savedQueries = [];
     }
 
-    /**
-     * Returns save queries.
-     */
+    /** Returns save queries. */
     public function getSavedQueries(): array
     {
         return $this->savedQueries;
@@ -779,8 +718,7 @@ class Database
 
         if (!\is_readable($filepath)) {
             // @codeCoverageIgnoreStart
-            /* Could not reach this statement without mocking filesystem
-              */
+            // Could not reach this statement without mocking filesystem
             throw new DatabaseException('File is not readable for useSqlFile method: ' . $filepath);
             // @codeCoverageIgnoreEnd
         }
@@ -804,17 +742,13 @@ class Database
         $this->exec($sqlFile);
     }
 
-    /**
-     * Returns elapsed time.
-     */
+    /** Returns elapsed time. */
     protected function getTime(float $startTime, float $endTime): float
     {
         return \round(($endTime - $startTime) * 1000000) / 1000000;
     }
 
-    /**
-     * Sets PDO object to null to disconnect from database.
-     */
+    /** Sets PDO object to null to disconnect from database. */
     public function disconnect(): void
     {
         $this->pdo = null;
