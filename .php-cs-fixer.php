@@ -105,7 +105,7 @@ $classUsageRules = [
 ];
 
 $commentRules = [
-    'comment_to_phpdoc'                 => ['ignored_tags' => []],
+    'comment_to_phpdoc'                 => ['ignored_tags' => ['codeCoverageIgnoreStart', 'codeCoverageIgnoreEnd']],
     'header_comment'                    => false,
     'multiline_comment_opening_closing' => true,
     'no_empty_comment'                  => true,
