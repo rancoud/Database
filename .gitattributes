@@ -13,5 +13,4 @@ Dockerfile linguist-detectable=false
 /Dockerfile         export-ignore
 /docker-compose.yml export-ignore
 /entrypoint.sh      export-ignore
-/phpcs.xml          export-ignore
 /phpunit.xml        export-ignore

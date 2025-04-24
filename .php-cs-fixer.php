@@ -111,7 +111,7 @@ $commentRules = [
     'no_empty_comment'                  => true,
     'no_trailing_whitespace_in_comment' => true,
     'single_line_comment_spacing'       => true,
-    'single_line_comment_style'         => ['comment_types' => ['asterisk', 'hash']]
+    'single_line_comment_style'         => ['comment_types' => ['hash']]
 ];
 
 $constantNotationRules = [

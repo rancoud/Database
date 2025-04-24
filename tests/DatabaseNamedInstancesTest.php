@@ -1,8 +1,6 @@
 <?php
 
-/**
- * @noinspection SqlDialectInspection
- */
+/** @noinspection SqlDialectInspection */
 
 declare(strict_types=1);
 
