@@ -8,7 +8,9 @@ use PHPUnit\Framework\TestCase;
 use Rancoud\Database\Configurator;
 use Rancoud\Database\DatabaseException;
 
-/** @internal */
+/**
+ * @internal
+ */
 class ConfiguratorTest extends TestCase
 {
     /** @throws DatabaseException */
