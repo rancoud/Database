@@ -15,7 +15,9 @@ use Rancoud\Database\Configurator;
 use Rancoud\Database\Database;
 use Rancoud\Database\DatabaseException;
 
-/** @internal */
+/**
+ * @internal
+ */
 class DatabaseTest extends TestCase
 {
     protected array $dbms = [
