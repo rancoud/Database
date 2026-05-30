@@ -243,7 +243,11 @@ class Configurator
         $parameters = $this->getParameters();
 
         if ($this->getDriver() === 'mysql') {
-            $parameters[\PDO::MYSQL_ATTR_INIT_COMMAND] = 'SET NAMES ' . $this->getCharset();
+            if (PHP_VERSION_ID >= 80500) {
+                $parameters[\Pdo\Mysql::ATTR_INIT_COMMAND] = 'SET NAMES ' . $this->getCharset();
+            } else {
+                $parameters[\PDO::MYSQL_ATTR_INIT_COMMAND] = 'SET NAMES ' . $this->getCharset();
+            }
         }
 
         $parameters[\PDO::ATTR_ERRMODE] = \PDO::ERRMODE_EXCEPTION;
