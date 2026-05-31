@@ -464,8 +464,14 @@ class ConfiguratorTest extends TestCase
 
         $conf = new Configurator($params);
 
+        if (PHP_VERSION_ID >= 80500) {
+            $parameterValueForAttrInitCommand = \Pdo\Mysql::ATTR_INIT_COMMAND;
+        } else {
+            $parameterValueForAttrInitCommand = \PDO::MYSQL_ATTR_INIT_COMMAND;
+        }
+
         $expected = [
-            \PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8mb4',
+            $parameterValueForAttrInitCommand => 'SET NAMES utf8mb4',
             \PDO::ATTR_ERRMODE            => \PDO::ERRMODE_EXCEPTION,
             \PDO::ATTR_PERSISTENT         => false
         ];
@@ -473,7 +479,7 @@ class ConfiguratorTest extends TestCase
 
         $conf->setCharset('charset');
         $expected = [
-            \PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES charset',
+            $parameterValueForAttrInitCommand => 'SET NAMES charset',
             \PDO::ATTR_ERRMODE            => \PDO::ERRMODE_EXCEPTION,
             \PDO::ATTR_PERSISTENT         => false
         ];
@@ -481,7 +487,7 @@ class ConfiguratorTest extends TestCase
 
         $conf->enablePersistentConnection();
         $expected = [
-            \PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES charset',
+            $parameterValueForAttrInitCommand => 'SET NAMES charset',
             \PDO::ATTR_ERRMODE            => \PDO::ERRMODE_EXCEPTION,
             \PDO::ATTR_PERSISTENT         => true
         ];

@@ -8,12 +8,13 @@ concurrency:
   cancel-in-progress: true
 
 on:
-  push:
-    paths-ignore:
-      - '**.md'
   pull_request:
     paths-ignore:
       - '**.md'
+    types:
+      - opened
+      - synchronize
+      - reopened
 
 jobs:
   test:
@@ -26,6 +27,7 @@ jobs:
           - ubuntu-latest
         php-version:
           - '8.4'
+          - '8.5'
 
     steps:
       - name: Checkout
@@ -37,8 +39,12 @@ jobs:
       - name: Build
         run: docker compose build --build-arg PHPVERSION=${{ matrix.php-version }}
 
+      - name: Lint
+        if: matrix.php-version == '8.4'
+        run: docker compose run lib composer lint
+
       - name: Test
-        run: docker compose run -e "PHP_CS_FIXER_IGNORE_ENV=True" lib composer ci
+        run: docker compose run lib composer test
 
       - name: Upload coverage
         uses: codecov/codecov-action@v6

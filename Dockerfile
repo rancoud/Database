@@ -15,7 +15,7 @@ RUN docker-php-ext-install \
 RUN apk add --no-cache \
     $PHPIZE_DEPS \
     linux-headers \
-    && pecl install xdebug-3.4.2 \
+    && pecl install xdebug-3.5.1 \
     && docker-php-ext-enable xdebug \
     && rm -rf /tmp/* /var/cache/apk/*
 
