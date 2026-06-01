@@ -30,8 +30,8 @@
         "ext-pdo_sqlite": "Needed to connect SQLite"
     },
     "require-dev": {
-        "friendsofphp/php-cs-fixer": "^3.0",
-        "phpunit/phpunit": "^12.0"
+        "friendsofphp/php-cs-fixer": "3.95.1",
+        "phpunit/phpunit": "12.5.22"
     },
     "scripts": {
         "ci": [
