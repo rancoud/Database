@@ -5,7 +5,6 @@
 [![Packagist Downloads](https://img.shields.io/packagist/dt/rancoud/database)](https://packagist.org/packages/rancoud/database)
 [![Composer dependencies](https://img.shields.io/badge/dependencies-0-brightgreen)](https://github.com/rancoud/database/blob/master/composer.json)
 [![Test workflow](https://img.shields.io/github/actions/workflow/status/rancoud/database/test.yml?branch=master)](https://github.com/rancoud/database/actions/workflows/test.yml)
-[![Codecov](https://img.shields.io/codecov/c/github/rancoud/database?logo=codecov)](https://codecov.io/gh/rancoud/database)
 
 Request Database (use PDO). Supported drivers: MySQL, PostgreSQL, SQLite.
 
