@@ -21,7 +21,7 @@
         }
     },
     "require": {
-        "php": ">=8.4.0",
+        "php": "^8.4.27 || ^8.5.12 || ^8.6.0",
         "ext-pdo": "*"
     },
     "suggest": {
@@ -42,7 +42,7 @@
             "php-cs-fixer fix -vvv"
         ],
         "test": [
-            "phpunit --colors --display-all-issues --coverage-html ./coverage --coverage-clover coverage/clover.xml --coverage-text"
+            "phpunit --colors --display-all-issues --coverage-html ./coverage --coverage-text"
         ]
     }
 }

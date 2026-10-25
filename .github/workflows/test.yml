@@ -31,6 +31,7 @@ jobs:
         php-version:
           - '8.4'
           - '8.5'
+          - '8.6'
 
     steps:
       - name: Checkout
@@ -40,7 +41,7 @@ jobs:
         run: docker compose pull --quiet
 
       - name: Build
-        run: docker compose build --build-arg PHPVERSION=${{ matrix.php-version }}
+        run: docker compose build --build-arg PHPVERSION=${{ matrix.php-version == '8.6' && '8.6.0RC4' || matrix.php-version }}
 
       - name: Lint
         if: matrix.php-version == '8.4'
